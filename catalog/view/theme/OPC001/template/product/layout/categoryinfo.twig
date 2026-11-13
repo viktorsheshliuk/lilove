@@ -1,0 +1,53 @@
+<div id="_mobile_search_filters"></div>
+<div class="categories-info">
+  <div class="col-xs-12 col-sm-6 col-md-5 col-lg-5 col-xl-5 total-products clearfix">
+    <div class="display btn-group hidden-xs">
+      <button type="button" id="grid-view" class="btn btn-default"  title="{{ button_grid }}"></button>
+      <button type="button" id="list-view" class="btn btn-default"  title="{{ button_list }}"></button>
+    </div>
+    <div class="compare-form">
+      <a href="{{ compare }}" id="compare-total" class="btn btn-primary">{{ text_compare }}</a>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-6 col-md-7 col-lg-7 col-xl-7 clearfix">
+    <div class="sortby col-xs-7 col-sm-8 col-md-7 col-lg-7 col-xl-6">
+      <div class="form-group input-group">
+        <label class="input-group-addon hidden-md-down" for="input-sort">{{ text_sort }}</label>
+        <select id="input-sort" class="form-control" onchange="location = this.value;">
+          {% for sorts in sorts %}
+          {% if sorts.value == '%s-%s'|format(sort, order) %}
+          <option value="{{ sorts.href }}" selected="selected">{{ sorts.text }}</option>
+          {% else %}
+          <option value="{{ sorts.href }}">{{ sorts.text }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="show col-xs-5 col-sm-4 col-md-5 col-lg-5 col-xl-6">
+      <div class="form-group input-group">
+        <label class="input-group-addon hidden-md-down" for="input-limit">{{ text_limit }}</label>
+        <select id="input-limit" class="form-control" onchange="location = this.value;">
+          {% for limits in limits %}
+          {% if limits.value == limit %}
+          <option value="{{ limits.href }}" selected="selected">{{ limits.text }}</option>
+          {% else %}
+          <option value="{{ limits.href }}">{{ limits.text }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+   {% for product in products %}
+    <div class="product-layout product-list col-xs-12">
+      {% include themedir ~ '/template/product/layout/defaultlayout.twig' %}
+    </div>
+  {% endfor %}
+</div>
+<div class="pagination-result">
+  <div class="results">{{ results }}</div>
+  <div class="pagination_bottom">{{ pagination }}</div>
+</div>

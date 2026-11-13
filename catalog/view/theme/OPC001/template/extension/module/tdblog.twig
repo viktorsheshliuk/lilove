@@ -1,0 +1,78 @@
+<div class="box blogs tdproductsblock hb-animate-element bottom-to-top clearfix">
+	<h2 class="homepage-heading">
+		Наш блог
+	</h2>
+	<div class="sub-heading">
+		
+	</div>
+	<div class="box-content row">
+		<div id="blog-slides-{{ module }}" class="owl-carousel owl-theme blogcarousel">
+			{% for blog in blogs %}
+			<div class="blog-item">
+				<div class="blog_post">
+					{% if blog.image %}
+						<div class="news_module_image_holder">
+							<img data-src="{{ blog.image }}" alt="{{ heading_title }}" title="{{ heading_title }}" class="replace-2x img-responsive" />
+							<span class="blog-hover"> </span>
+						</div>
+						<div class="blog_content">
+							<div class="blog_inner">
+								<h4 class="sds_post_title">
+									<a href="{{ blog.href }}">{{ blog.title }}</a>
+								</h4>
+								<div class="desc"> {{ blog.description }} </div>
+								<div class="info-wrapper">
+									<div class="blog_date">
+										<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+										<span class="day_year">{{ blog.date_added }}</span>
+									</div>
+									<div class="more-wrapper">
+										<a href="{{ blog.href }}" class="r_more">{{ text_read_more }}</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+<span class="blog_default_width" style="display:none; visibility:hidden"></span>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#blog-slides-{{ module }}").owlCarousel({
+		dots: {% if tdblogs_slide.pagination %}true{% else %}false{% endif %},
+		autoplay: {% if tdblogs_slide.auto %}true{% else %}false{% endif %},
+		autoplayTimeout: {% if tdblogs_slide.speed %}{{ tdblogs_slide.speed }}{% else %}2000{% endif %},
+		autoplayHoverPause: true,
+		nav: {% if tdblogs_slide.navigation %}true{% else %}false{% endif %},
+		navElement: 'div',
+		navText: ['<i class="fa icon"></i>', '<i class="fa icon"></i>'],
+		rtl:($("html").attr('dir')=="rtl") ? true : false,
+		rewind: true,
+		responsive:{
+			0:{
+				items: 1
+			},
+			544:{
+				items: 2
+			},
+			768:{
+				items: 2
+			},
+			992:{
+				items: 2
+			},
+			1200:{
+				items: 3
+			},
+			1560:{
+				items: 3
+			}
+		},
+	});
+});
+</script>

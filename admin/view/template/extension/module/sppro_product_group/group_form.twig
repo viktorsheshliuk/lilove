@@ -1,0 +1,264 @@
+{{ header }}{{ column_left }}
+<div class="sp" id="content">
+    <div class="header_module_info">
+        <div class="title">{{ txt_heading_title_group_products }}</div>
+        <div class="buttons">
+            <button type="submit" form="form-module" data-toggle="tooltip" title="{{ txt_btn_save }}" class="btn btn-save"><i class="fa fa-save"></i></button>
+            <a href="{{ cancel }}" data-toggle="tooltip" title="{{ txt_btn_cancel }}" class="btn btn-close"><i class="fa fa-reply"></i></a>
+        </div>
+    </div>
+
+    <div class="module_form">
+        <div class="single_block">
+            <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+                <input type="hidden" name="group_id" value="{{ group_id }}">
+                <span class="title">{{ txt_title }}</span>
+
+                <div class="row">
+                    {% for language in languages %}
+                        <div class="col-sm-6">
+                            <div class="sp_animated_input_group">
+                                <input id="input_group_description_name" type="text" name="group_description[{{ language.language_id }}][name]" placeholder="{{ language.name }}" value="{{ group_description[language.language_id] ? group_description[language.language_id].name }}" class="profile-form-input">
+                                <label for="input_group_description_name" class="label">{{ language.name }}</label>
+                                <span class="bar"></span>
+                            </div>
+                            {% if error_name[language.language_id] %}
+                                <div class="text-danger">{{ error_name[language.language_id] }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="snp_select">
+                            <div class="snp_select_sub">
+                                <select name="type" id="input-type" class="snp_select_select">
+                                    <option value="text" {% if type == 'text' %}selected="selected"{% endif %}>{{ txt_group_type_text }}</option>
+                                    <option value="color" {% if type == 'color' %}selected="selected"{% endif %}>{{ txt_group_type_color }}</option>
+                                    <option value="product" {% if type == 'product' %}selected="selected"{% endif %}>{{ txt_group_type_product }}</option>
+                                    <option value="select" {% if type == 'select' %}selected="selected"{% endif %}>{{ txt_group_type_select }}</option>
+                                </select>
+                                <span class="snp_select_span">
+                                    <label class="snp_select_span_label">{{ txt_type }}</label>
+                                    <span class="snp_select_span_arrow"><svg><use xlink:href="#sp-icon-arrow-down"></use></svg></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="snp_select">
+                            <div class="snp_select_sub">
+                                <select name="type_cat" id="input-type-cat" class="snp_select_select">
+                                    <option value="" {% if type_cat == '' %}selected="selected"{% endif %}>{{ txt_group_type_none }}</option>
+                                    <option value="text" {% if type_cat == 'text' %}selected="selected"{% endif %}>{{ txt_group_type_text }}</option>
+                                    <option value="color" {% if type_cat == 'color' %}selected="selected"{% endif %}>{{ txt_group_type_color }}</option>
+                                    <option value="product" {% if type_cat == 'product' %}selected="selected"{% endif %}>{{ txt_group_type_product }}</option>
+                                    <option value="select" {% if type_cat == 'select' %}selected="selected"{% endif %}>{{ txt_group_type_select }}</option>
+                                </select>
+                                <span class="snp_select_span">
+                                    <label class="snp_select_span_label">{{ txt_type_cat }}</label>
+                                    <span class="snp_select_span_arrow"><svg><use xlink:href="#sp-icon-arrow-down"></use></svg></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="snp_select">
+                            <div class="snp_select_sub">
+                                <select name="help" id="input-help" class="snp_select_select">
+                                    <option value="" {% if not help %}selected="selected"{% endif %}>{{ txt_group_help_ }}</option>
+                                    <option value="value" {% if help == 'value' %}selected="selected"{% endif %}>{{ txt_group_help_value }}</option>
+                                    <option value="product" {% if help == 'product' %}selected="selected"{% endif %}>{{ txt_group_help_product }}</option>
+                                </select>
+                                <span class="snp_select_span">
+                                    <label class="snp_select_span_label">{{ txt_help }}</label>
+                                    <span class="snp_select_span_arrow"><svg><use xlink:href="#sp-icon-arrow-down"></use></svg></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sp_animated_input_group">
+                    <input id="input-sort-order" type="text" name="sort_order" placeholder="{{ txt_sort_order }}" value="{{ sort_order }}" class="profile-form-input">
+                    <label for="input-sort-order" class="label">{{ txt_sort_order }}</label>
+                    <span class="bar"></span>
+                </div>
+
+                <div class="switch-box full_width">
+                    <div class="title">{{ txt_form_in_category }}</div>
+                    <label class="input-switch">
+                        <input type="checkbox" name="category_status" {% if category_status %} checked {% endif %}>
+                    </label>
+                </div>
+
+                <div class="switch-box full_width">
+                    <div class="title">{{ txt_main_title }}</div>
+                    <label class="input-switch">
+                        <input type="checkbox" name="title_status" {% if title_status %} checked {% endif %}>
+                    </label>
+                </div>
+
+                <span class="title">{{ txt_attrs }}</span>
+
+                {% if attributes %}
+                    <div class="sp_animated_input_group">
+                        <input id="sp_scrollable_block_input" type="text" placeholder="{{ txt_enter_attr_name }}" class="profile-form-input sp_scrollable_block_input">
+                        <label for="sp_scrollable_block_input" class="label">{{ txt_enter_attr_name }}</label>
+                        <span class="bar"></span>
+                    </div>
+
+                    <div class="sp_scrollable_block">
+                        {% for attribute in attributes %}
+                            <div class="sp_checkbox full_width"><label><input type="checkbox" name="group_attribute[]" value="{{ attribute.attribute_id }}" {% if attribute.attribute_id in group_attributes %} checked {% endif%}>{{ attribute.name }}</label></div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ txt_attr_none }}
+                {% endif %}
+
+                <div id="attribue-values" style="display:none;">
+                    {{ attribute_values }}
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getSearchList() {
+        const inputField_one = document.querySelector(".sp_scrollable_block_input");
+        const checkboxes_one = document.querySelectorAll(".sp_scrollable_block > .sp_checkbox");
+
+        inputField_one.addEventListener("input", function() {
+            const searchText = this.value.toLowerCase();
+            checkboxes_one.forEach(function(checkbox) {
+                const label = checkbox.querySelector("label").textContent.toLowerCase();
+                if (label.includes(searchText)) {
+                    checkbox.classList.remove("hidden");
+                } else {
+                    checkbox.classList.add("hidden");
+                }
+            });
+        });
+    }
+    getSearchList();
+</script>
+
+<script>
+    function spNotify(type, text) {
+        var icon = "fa fa-info";
+        var css = "";
+        switch (type) {
+            case"success":
+                icon = "fa fa-check";
+                css = "success";
+                break;
+            case"danger":
+                icon = "fa fa-exclamation-triangle";
+                css = "warning";
+                break;
+            case"warning":
+                icon = "fa fa-exclamation-triangle"
+                css = "warning"
+        }
+        var randomNumber = Math.floor(Math.random() * 100);
+        $('.sp_notify_block').append('<div id="sp_alert_'+randomNumber+'" class="sp_notify_alert '+css+'"><div class="sp_notify_alert__icon"><i class="'+icon+'"></i></div><div class="sp_notify_alert__message">'+text+'</div></div>');
+        setTimeout(function () {
+            $('#sp_alert_'+randomNumber).addClass('hide');
+            setTimeout(function () {
+                $('#sp_alert_'+randomNumber).remove();
+            }, 2000);
+        }, 5000);
+    }
+
+
+</script>
+{% if error_warning %}
+    <script>
+        spNotify('warning', '{{ error_warning }}');
+    </script>
+{% endif %}
+
+{% if success %}
+    <script>
+        spNotify('warning', '{{ success }}');
+    </script>
+{% endif %}
+
+
+<script>
+
+    function checkAttributeValues(){
+        if ($('#input-type').val() == 'color'){
+            $('#attribue-values').show();
+        } else if($('#input-type-cat').val() == 'color'){
+            $('#attribue-values').show();
+        } else {
+            $('#attribue-values').hide();
+        }
+    }
+
+    $(document).on('click', '#button-update-attribute-values', function(){
+        data = $('#form-module').serialize();
+        $('#attribue-values').html('<i class="fa fa-refresh"></i> {{ txt_updated }}');
+
+        $.ajax({
+            url: 'index.php?route=extension/module/sppro_product_group/updateGroupAttributeValues&user_token={{ user_token }}',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(json) {
+                if(json['html']){
+                    $('#attribue-values').html(json['html']);
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.remove-attribute-value', function(){
+        $(this).parent().parent().remove();
+    });
+
+    $(document).on('click', '.product-group-color-remove', function(){
+        $(this).parent().parent().removeClass('two-colors').find('.sp_attributes_values_item_color_second_color input').val('')
+    });
+
+    $(document).on('click', '.product-group-color-add', function(){
+        $(this).parent().parent().addClass('two-colors')
+    });
+
+    $('#input-type').on('change', checkAttributeValues);
+    checkAttributeValues();
+</script>
+
+<div style="display:none;position:absolute;left:-9999px;">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <symbol xmlns="http://www.w3.org/2000/svg" id="trash" viewBox="0 -960 960 960">
+            <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="plus" viewBox="0 -960 960 960">
+            <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Zm40 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="minus" viewBox="0 -960 960 960">
+            <path d="M280-440h400v-80H280v80ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+        </symbol>
+        <symbol id="sp-icon-arrow-down" viewBox="0 0 24 12">
+            <path fill-rule="evenodd" d="M12,12,0,0H24Z"/>
+        </symbol>
+    </svg>
+</div>
+
+<script>
+    $(".spectrum").spectrum({
+        preferredFormat: "rgb",
+        showInitial: true,
+        showInput: true,
+        showAlpha: true,
+        showPalette: false,
+        palette: [['#1abc9c','#16a085','#2ecc71','#27ae60']]
+    });
+</script>
+{{ footer }}

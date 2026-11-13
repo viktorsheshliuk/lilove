@@ -1,0 +1,113 @@
+</div>
+<footer>
+  <div class="container">
+    <div class="footer_inner"> 
+      <div class="footer_logo_block">
+        <div class="footer_logo">
+          <img src="/image/icons/5_white.png" alt="Lilove" title="Lilove" width="170px">
+        </div>
+        <div class="footer_address">{{ address }}</div>
+        <div class="footer_telephone">{{ telephone }}</div>
+        <div class="footer_config_open">{{ config_open }}</div>
+      </div>
+      {#<div class="footer_navigate_block"> #}
+        <div class="navigate_block">
+          <div class ="footer_list_title">{{ text_information }}</div>
+          {% if informations %}
+            <ul class="list-unstyled footer_list">
+                {% for information in informations %}
+                <li><a href="{{ information.href }}">{{ information.title }}</a></li>
+                {% endfor %}
+                <li><a href="{{ contact }}">{{ text_contact }}</a></li>
+                <li><a href="{{ sitemap }}">{{ text_sitemap }}</a></li>
+            </ul>
+          {% endif %}
+        </div>
+        <div class="category_block">
+         <div class ="footer_list_title">{{ text_categories }}</div>
+          {% if categories %}
+             <ul class="list-unstyled footer_list">
+              {% for category in categories %}
+              {% if category.children %}
+              <li class=""><a href="{{ category.href }}" class="" data-toggle="">{{ category.name }}</a>
+                <div class="" style="display: none;">
+                  <div class=""> {% for children in category.children|batch(category.children|length / category.column|round(1, 'ceil')) %}
+                    <ul class="list-unstyled">
+                      {% for child in children %}
+                      <li><a href="{{ child.href }}">{{ child.name }}</a></li>
+                      {% endfor %}
+                    </ul>
+                    {% endfor %}</div>
+                  <a href="{{ category.href }}" class="see-all">{{ text_all }} {{ category.name }}</a> </div>
+              </li>
+              {% else %}
+              <li><a href="{{ category.href }}">{{ category.name }}</a></li>
+              {% endif %}
+              {% endfor %}
+            </ul>     
+          {% endif %}
+        </div> 
+        <div class="account_block">
+          <div class ="footer_list_title">{{ text_account }}</div>
+          <ul class="list-unstyled footer_list">
+            <li><a href="{{ account }}">{{ text_account }}</a></li>
+            <li><a href="{{ wishlist }}">{{ text_wishlist }}</a></li>
+            <li><a href="{{ order }}">{{ text_order }}</a></li>
+            <li><a href="{{ return }}">{{ text_return }}</a></li>
+            {# <li><a href="{{ account_address }}">{{ text_address }}</a></li> #}
+          </ul>
+        </div>   
+    {#  </div> #}
+      <div class="footer_follow_block">
+          <div class="footer_list_title">{{ text_social }}</div>
+          <div class="icons">
+                  <a href="https://www.facebook.com/lilove.com.ua" target="_black">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="12" fill="#B9B9B9"/>
+                      <path d="M12.9999 9.00002C12.9999 8.00002 13.4999 8.00002 13.9999 8.00002H14.5999C14.7001 8.00137 14.7995 7.98263 14.8923 7.94491C14.9852 7.90719 15.0695 7.85126 15.1403 7.78042C15.2112 7.70958 15.2671 7.62526 15.3048 7.53244C15.3425 7.43963 15.3613 7.3402 15.3599 7.24002V6.30002C15.3599 6.19937 15.3399 6.09972 15.3011 6.00685C15.2623 5.91399 15.2054 5.82976 15.1338 5.75905C15.0622 5.68835 14.9772 5.63258 14.8838 5.59498C14.7905 5.55738 14.6906 5.5387 14.5899 5.54002L13.1699 5.52002C12.7565 5.50403 12.3444 5.57794 11.9623 5.73667C11.5802 5.89539 11.237 6.13514 10.9566 6.43937C10.6761 6.7436 10.465 7.10506 10.3378 7.49881C10.2107 7.89256 10.1704 8.30921 10.2199 8.72002V10.17H9.42992C9.22836 10.17 9.03505 10.2501 8.89252 10.3926C8.74999 10.5351 8.66992 10.7285 8.66992 10.93V11.87C8.66992 12.0716 8.74999 12.2649 8.89252 12.4074C9.03505 12.55 9.22836 12.63 9.42992 12.63H10.2199V18C10.2199 18.1326 10.2726 18.2598 10.3664 18.3536C10.4601 18.4473 10.5873 18.5 10.7199 18.5H12.5299C12.6573 18.4924 12.7769 18.4363 12.8642 18.3434C12.9516 18.2504 13.0002 18.1276 12.9999 18V12.63H13.8799C14.0815 12.63 14.2748 12.55 14.4173 12.4074C14.5599 12.2649 14.6399 12.0716 14.6399 11.87V10.93C14.6399 10.7285 14.5599 10.5351 14.4173 10.3926C14.2748 10.2501 14.0815 10.17 13.8799 10.17H12.9999V9.00002Z" fill="#141414"/>
+                    </svg>
+                  </a>
+                  {# <a href="#">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="12" fill="#B9B9B9"/>
+                      <path d="M8.99996 14.4C8.28589 14.9609 7.4663 15.3724 6.58996 15.61C6.49343 15.6451 6.41003 15.709 6.3511 15.793C6.29216 15.8771 6.26054 15.9773 6.26054 16.08C6.26054 16.1827 6.29216 16.2829 6.3511 16.367C6.41003 16.4511 6.49343 16.515 6.58996 16.55C13.51 19.39 17.91 15 17.24 10.13L18.36 7.81002H17.06C15.44 5.82002 11.14 5.92002 11.85 10.16C11.85 10.16 9.54996 10.57 6.60996 7.68002C6.54195 7.61288 6.45612 7.56663 6.36264 7.54676C6.26916 7.52689 6.17195 7.53422 6.08251 7.56789C5.99307 7.60156 5.91515 7.66016 5.85799 7.73675C5.80082 7.81333 5.7668 7.9047 5.75996 8.00002C5.44909 9.27787 5.60466 10.6247 6.19866 11.7981C6.79266 12.9714 7.78605 13.8941 8.99996 14.4Z" fill="#141414"/>
+                    </svg>
+                  </a> #}
+                  <a href="https://www.instagram.com/lilove.ua" target="_black">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="12" fill="#B9B9B9"/>
+                      <g clip-path="url(#clip0_578_5090)">
+                      <path d="M12.0007 5C10.0996 5 9.86097 5.00831 9.11429 5.04229C8.36908 5.07642 7.8604 5.1944 7.41532 5.3675C6.95492 5.54629 6.56437 5.78546 6.17528 6.17469C5.7859 6.56377 5.54673 6.95431 5.36736 7.41456C5.19381 7.85979 5.07569 8.3686 5.04215 9.11352C5.00875 9.86019 5 10.0989 5 12C5 13.9011 5.00846 14.1389 5.04229 14.8856C5.07656 15.6308 5.19454 16.1395 5.3675 16.5846C5.54644 17.045 5.78561 17.4355 6.17485 17.8246C6.56379 18.214 6.95433 18.4537 7.41444 18.6325C7.85982 18.8056 8.36864 18.9236 9.11371 18.9577C9.86038 18.9917 10.0988 19 11.9998 19C13.901 19 14.1389 18.9917 14.8856 18.9577C15.6308 18.9236 16.14 18.8056 16.5854 18.6325C17.0457 18.4537 17.4356 18.214 17.8246 17.8246C18.214 17.4355 18.4531 17.045 18.6325 16.5847C18.8046 16.1395 18.9227 15.6307 18.9577 14.8857C18.9912 14.1391 19 13.9011 19 12C19 10.0989 18.9912 9.86033 18.9577 9.11367C18.9227 8.36846 18.8046 7.85979 18.6325 7.41471C18.4531 6.95431 18.214 6.56377 17.8246 6.17469C17.4352 5.78531 17.0458 5.54615 16.585 5.3675C16.1387 5.1944 15.6298 5.07642 14.8845 5.04229C14.1379 5.00831 13.9002 5 11.9985 5H12.0007ZM11.3727 6.26146C11.5591 6.26117 11.767 6.26146 12.0007 6.26146C13.8697 6.26146 14.0912 6.26817 14.8293 6.30171C15.5118 6.33292 15.8822 6.44696 16.1289 6.54277C16.4556 6.66965 16.6885 6.82131 16.9334 7.06631C17.1784 7.31131 17.33 7.54465 17.4572 7.87131C17.553 8.11777 17.6672 8.48819 17.6983 9.17069C17.7318 9.9086 17.7391 10.1303 17.7391 11.9984C17.7391 13.8665 17.7318 14.0882 17.6983 14.8261C17.6671 15.5086 17.553 15.879 17.4572 16.1255C17.3303 16.4521 17.1784 16.6847 16.9334 16.9296C16.6884 17.1746 16.4558 17.3263 16.1289 17.4531C15.8825 17.5494 15.5118 17.6631 14.8293 17.6944C14.0913 17.7279 13.8697 17.7352 12.0007 17.7352C10.1315 17.7352 9.90997 17.7279 9.17204 17.6944C8.48954 17.6629 8.11912 17.5488 7.87222 17.453C7.54555 17.3261 7.31221 17.1745 7.06721 16.9295C6.82221 16.6845 6.67054 16.4517 6.54337 16.1249C6.44756 15.8784 6.33337 15.508 6.30231 14.8255C6.26876 14.0876 6.26205 13.8659 6.26205 11.9966C6.26205 10.1274 6.26876 9.90685 6.30231 9.16894C6.33351 8.48644 6.44756 8.11602 6.54337 7.86927C6.67025 7.5426 6.82221 7.30927 7.06721 7.06427C7.31221 6.81927 7.54555 6.6676 7.87222 6.54044C8.11897 6.44419 8.48954 6.33044 9.17204 6.29908C9.8178 6.26992 10.0681 6.26117 11.3727 6.25971V6.26146ZM15.7372 7.42375C15.2735 7.42375 14.8972 7.79956 14.8972 8.26346C14.8972 8.72721 15.2735 9.10346 15.7372 9.10346C16.201 9.10346 16.5772 8.72721 16.5772 8.26346C16.5772 7.79971 16.201 7.42346 15.7372 7.42346V7.42375ZM12.0007 8.40521C10.0154 8.40521 8.40583 10.0148 8.40583 12C8.40583 13.9852 10.0154 15.5941 12.0007 15.5941C13.9859 15.5941 15.5949 13.9852 15.5949 12C15.5949 10.0148 13.9859 8.40521 12.0007 8.40521ZM12.0007 9.66667C13.2893 9.66667 14.334 10.7113 14.334 12C14.334 13.2886 13.2893 14.3333 12.0007 14.3333C10.7119 14.3333 9.6673 13.2886 9.6673 12C9.6673 10.7113 10.7119 9.66667 12.0007 9.66667Z" fill="#141414"/>
+                      </g>
+                      <defs>
+                      <clipPath id="clip0_578_5090">
+                      <rect width="14" height="14" fill="white" transform="translate(5 5)"/>
+                      </clipPath>
+                      </defs>
+                    </svg>
+                  </a>
+              </div> 
+      </div>
+      <div class="footer_cards">
+          <img src="image/icons/logo_visa.png" alt="Visa" title="Visa">
+          <img src="image/icons/logo_mastercard.png" alt="MasterCard" title="MasterCard">
+          {# <img src="image/catalog/logo_american.png" alt="American" title="American">
+          <img src="image/catalog/logo_discover.png" alt="Discover" title="Discover">
+          <img src="image/catalog/logo_jcb.png" alt="Jcb" title="Jcb"> #}
+      </div>
+      <div class="powered">{{ powered }}</div>
+
+    </div>  
+   
+  </div>
+</footer>
+</div>
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+{# віджет CallCatcher #}
+{# <script>var telerWdWidgetId="bf4769e7-a973-47de-a4c9-2f28be596865";var telerWdDomain="lilove.phonet.com.ua";</script> <script src="//lilove.phonet.com.ua/public/widget/call-catcher/lib-v3.js" async></script> #}
+</body></html>

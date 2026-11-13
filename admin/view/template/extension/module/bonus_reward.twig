@@ -1,0 +1,923 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button id="add-reward-to-customer"data-toggle="tooltip" title="{{ button_add_reward_to_customer }}" class="btn btn-primary"><i class="fa fa-envelope"></i></button>
+        {% if module_bonus_reward_method == 'standard' %}
+        <button id="add-reward-to-products"data-toggle="tooltip" title="{{ button_add_reward_to_product }}" class="btn btn-warning"><i class="fa fa-plus"></i></button>
+        <button id="remove-reward-to-products"data-toggle="tooltip" title="{{ button_remove_reward_to_product }}" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+        {% endif %}
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container">
+    <div id="progress-import" class="progress" style="display: none;">
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ text_refresh }}</div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+            <li><a href="#tab-mail" data-toggle="tab">{{ tab_mail }}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-method">
+                  <span data-toggle="tooltip" title="{{ help_method }}">{{ entry_method }}</span>
+                </label>
+                <div class="col-sm-10">
+                  <select name="module_bonus_reward_method" id="input-method" class="form-control selectpicker">
+                    {% if module_bonus_reward_method == 'standard' %}
+                    <option value="standard" selected="selected">{{ text_standard }}</option>
+                    <option value="cart">{{ text_cart }}</option>
+                    {% else %}
+                    <option value="standard">{{ text_standard }}</option>
+                    <option value="cart" selected="selected">{{ text_cart }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+              {% if module_bonus_reward_method %}
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                <div class="col-sm-4">
+                  <select name="module_bonus_reward_status" id="input-status" class="form-control selectpicker">
+                    {% if module_bonus_reward_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+                <label class="col-sm-2 control-label" for="input-date-enable">
+                  <span data-toggle="tooltip" title="{{ help_date_enable }}">{{ entry_date_enable }}</span>
+                </label>
+                <div class="col-sm-4">
+                  <div class="input-group date">
+                    <input type="text" name="module_bonus_reward_date_enable" value="{{ module_bonus_reward_date_enable }}" placeholder="{{ entry_date_enable }}" data-date-format="YYYY-MM-DD" id="input-date-enable" class="form-control" />
+                    <span class="input-group-btn">
+                    <button class="btn btn-default" type="button"><i class="fa fa-calendar"></i></button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {% if module_bonus_reward_method == 'standard' %}
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-day-end">
+                  <span data-toggle="tooltip" title="{{ help_limit }}">{{ entry_limit }}</span>
+                </label>
+                <div class="col-sm-2">
+                  <div class="input-group" style="margin-bottom: 10px;">
+                    <input type="text" name="module_bonus_reward_limit" value="{{ module_bonus_reward_limit }}" placeholder="{{ entry_limit }}" id="input-day-end" class="form-control"/>
+                    <span class="input-group-addon">{{ entry_product }}</span>
+                    </div>
+                </div>
+                <label class="col-sm-2 control-label" for="input-special-price">
+                  <span data-toggle="tooltip" title="{{ help_special_status }}">{{ entry_special_status }}</span>
+                </label>
+                <div class="col-sm-2">
+                  <select name="module_bonus_reward_special_status" id="input-special-status" class="form-control selectpicker">
+                    {% if module_bonus_reward_special_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+                <label class="col-sm-2 control-label" for="input-option-price">
+                  <span data-toggle="tooltip" title="{{ help_option_status }}">{{ entry_option_status }}</span>
+                </label>
+                <div class="col-sm-2">
+                  <select name="module_bonus_reward_option_status" id="input-special-status" class="form-control selectpicker">
+                    {% if module_bonus_reward_option_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+              {% endif %}
+              <fieldset>
+                <legend>{{ text_cron }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-cron">{{ entry_cron }}</label>
+                  <div class="col-sm-2">
+                    <select name="module_bonus_reward_cron" id="input-cron" class="form-control selectpicker">
+                      {% if module_bonus_reward_cron %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                      {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-cron-key">{{ entry_cron_key }}</label>
+                  <div class="col-sm-6">
+                    <input type="text" name="module_bonus_reward_cron_key" value="{{ module_bonus_reward_cron_key }}" placeholder="{{ entry_cron_key }}" id="input-cron-key" class="form-control"/>
+                  </div>
+                  {% if module_bonus_reward_cron_key %}
+                  <div class="col-sm-6 col-sm-offset-2" style="margin-top: 10px;">
+                    <p><strong>{{ entry_cron_url }}</strong></p>
+                    <p><a href="{{ cron_url }}" target="_blank" class="copy-link">{{ cron_url }}</a></p>
+                    <p><a href="#" class="copy-link">{{ wget_url }}</a></p>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-day-start">
+                    <span data-toggle="tooltip" title="{{ help_day_start }}">{{ entry_day_start }}</span>
+                  </label>
+                  <div class="col-sm-2">
+                    <div class="input-group" style="margin-bottom: 10px;">
+                      <input type="text" name="module_bonus_reward_day_start" value="{{ module_bonus_reward_day_start }}" placeholder="{{ entry_day_start }}" id="input-day-start" class="form-control"/>
+                      <span class="input-group-addon">{{ entry_day }}</span>
+                      </div>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-day-end">
+                    <span data-toggle="tooltip" title="{{ help_day_end }}">{{ entry_day_end }}</span>
+                  </label>
+                  <div class="col-sm-2">
+                    <div class="input-group" style="margin-bottom: 10px;">
+                      <input type="text" name="module_bonus_reward_day_end" value="{{ module_bonus_reward_day_end }}" placeholder="{{ entry_day_end }}" id="input-day-end" class="form-control"/>
+                      <span class="input-group-addon">{{ entry_day }}</span>
+                      </div>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-day-warning">
+                    <span data-toggle="tooltip" title="{{ help_day_warning }}">{{ entry_day_warning }}</span>
+                  </label>
+                  <div class="col-sm-2">
+                    <div class="input-group" style="margin-bottom: 10px;">
+                      <span class="input-group-addon">{{ entry_for_day }}</span>
+                      <input type="text" name="module_bonus_reward_day_warning" value="{{ module_bonus_reward_day_warning }}" placeholder="{{ entry_day_warning }}" id="input-day-warning" class="form-control"/>
+                      <span class="input-group-addon">{{ entry_day }}</span>
+                      </div>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_action_reward }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-register">
+                    <span data-toggle="tooltip" title="{{ help_register }}">{{ entry_register }}</span>
+                  </label>
+                  <div class="col-sm-2">
+                    <input type="text" name="module_bonus_reward_register" value="{{ module_bonus_reward_register }}" placeholder="{{ entry_register }}" id="input-register" class="form-control"/>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-comment">
+                    <span data-toggle="tooltip" title="{{ help_comment }}">{{ entry_comment }}</span>
+                  </label>
+                  <div class="col-sm-2">
+                    <input type="text" name="module_bonus_reward_comment" value="{{ module_bonus_reward_comment }}" placeholder="{{ entry_comment }}" id="input-comment" class="form-control"/>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-newsletter">
+                    <span data-toggle="tooltip" title="{{ help_newsletter }}">{{ entry_newsletter }}</span>
+                  </label>
+                  <div class="col-sm-2">
+                    <input type="text" name="module_bonus_reward_newsletter" value="{{ module_bonus_reward_newsletter }}" placeholder="{{ entry_newsletter }}" id="input-newsletter" class="form-control"/>
+                  </div>
+                </div>
+              </fieldset>
+              {% if module_bonus_reward_method == 'cart' %}
+              <fieldset>
+                <legend>{{ text_limit }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-special-limit">{{ entry_special_limit }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_special_limit" id="input-special-limit" class="form-control selectpicker">
+                      {% if module_bonus_reward_special_limit %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-reward-if-special">{{ entry_reward_if_special }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_product_if_special" id="input-reward-if-special" class="form-control selectpicker">
+                      {% if module_bonus_reward_product_if_special %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-coupon-limit">{{ entry_coupon_limit }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_coupon_limit" id="input-coupon-limit" class="form-control selectpicker">
+                      {% if module_bonus_reward_coupon_limit %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-reward-if-coupon">{{ entry_reward_if_coupon }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_product_if_coupon" id="input-reward-if-coupon" class="form-control selectpicker">
+                      {% if module_bonus_reward_product_if_coupon %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-voucher-limit">{{ entry_voucher_limit }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_voucher_limit" id="input-voucher-limit" class="form-control selectpicker">
+                      {% if module_bonus_reward_voucher_limit %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-reward-if-voucher">{{ entry_reward_if_voucher }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_product_if_voucher" id="input-reward-if-voucher" class="form-control selectpicker">
+                      {% if module_bonus_reward_product_if_voucher %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-min-cart-price">{{ entry_min_cart_price }}</label>
+                  <div class="col-sm-4">
+                    <input type="text" name="module_bonus_reward_min_cart_price" value="{{ module_bonus_reward_min_cart_price }}" placeholder="{{ entry_min_cart_price }}" id="input-min-cart-price" class="form-control"/>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-max-cart-price">{{ entry_max_cart_price }}</label>
+                  <div class="col-sm-4">
+                    <input type="text" name="module_bonus_reward_max_cart_price" value="{{ module_bonus_reward_max_cart_price }}" placeholder="{{ entry_max_cart_price }}" id="input-max-cart-price" class="form-control"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-points-limit">{{ entry_points_limit }}</label>
+                  <div class="col-sm-4">
+                    <select name="module_bonus_reward_reward_limit" id="input-points-limit" class="form-control selectpicker">
+                      {% if module_bonus_reward_reward_limit %}
+                      <option value="1" selected="selected">{{ text_yes }}</option>
+                      <option value="0">{{ text_no }}</option>
+                      {% else %}
+                      <option value="1">{{ text_yes }}</option>
+                      <option value="0" selected="selected">{{ text_no }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                  <label class="col-sm-2 control-label" for="input-cart-percent">
+                    <span data-toggle="tooltip" title="{{ help_cart_percent }}">{{ entry_cart_percent }}</span>
+                  </label>
+                  <div class="col-sm-4">
+                    <div class="input-group" style="margin-bottom: 10px;">
+                      <input type="text" name="module_bonus_reward_cart_percent" value="{{ module_bonus_reward_cart_percent }}" placeholder="{{ entry_cart_percent }}" id="input-cart-percent" class="form-control"/>
+                      <span class="input-group-addon">%</span>
+                      </div>
+                  </div>
+                </div>
+              </fieldset>
+              {% endif %}
+              <fieldset>
+                <legend>{{ text_source }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-calculation-source">
+                    <span data-toggle="tooltip" title="{{ help_calculation_source }}">{{ entry_calculation_source }}</span>
+                  </label>
+                  <div class="col-sm-10">
+                    <select name="module_bonus_reward_calculation_source" id="input-calculation-source" class="form-control selectpicker">
+                      {% if module_bonus_reward_calculation_source == 'category' %}
+                      <option value="category" selected="selected">{{ entry_category }}</option>
+                      <option value="manufacturer">{{ entry_manufacturer }}</option>
+                      {% else %}
+                      <option value="category">{{ entry_category }}</option>
+                      <option value="manufacturer" selected="selected">{{ entry_manufacturer }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_setting_category }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-category-method">
+                    <span data-toggle="tooltip" title="{{ help_category_method }}">{{ entry_category_method }}</span>
+                  </label>
+                  <div class="col-sm-10">
+                    <select name="module_bonus_reward_category_method" id="input-category-method" class="form-control selectpicker">
+                      {% if module_bonus_reward_category_method %}
+                      <option value="1" selected="selected">{{ text_ocstore }}</option>
+                      <option value="0">{{ text_opencart }}</option>
+                      {% else %}
+                      <option value="1">{{ text_ocstore }}</option>
+                      <option value="0" selected="selected">{{ text_opencart }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-category">
+                    <span data-toggle="tooltip" title="{{ help_category }}">{{ entry_category }}</span>
+                  </label>
+                  <div class="col-sm-10">
+                    <select id="input-category" class="form-control selectpicker" data-live-search="true" multiple>
+                      {% for category_id, category_name in categories %}
+                        <option data-tokens="{{ category_name }}" value="{{ category_id }}"{% if module_bonus_reward_category is defined and category_id in module_bonus_reward_category|keys %} selected="selected"{% endif %}>{{ category_name }}</option>
+                      {% endfor %}
+                    </select>
+                    <div class="table-responsive" id="category-table-container" style="display: none;">
+                      <table class="table table-bordered table-hover">
+                        <thead>
+                          <tr>
+                            <td>{{ column_category }}</td>
+                            {% if module_bonus_reward_method == 'standard' %}
+                            <td><span data-toggle="tooltip" title="{{ help_coefficient }}">{{ column_coefficient }}</span></td>
+                            {% endif %}
+                            {% for customer_group in customer_groups %}
+                              <td><span data-toggle="tooltip" title="{{ help_customer_group }}">{{ customer_group.name }}</span></td>
+                            {% endfor %}
+                            <td>{{ column_action }}</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% if module_bonus_reward_category %}
+                            {% for category_id, category_data in module_bonus_reward_category %}
+                              <tr data-category-id="{{ category_id }}">
+                                <td>{{ categories[category_id] }}</td>
+                                {% if module_bonus_reward_method == 'standard' %}
+                                <td><input type="text" class="form-control" name="module_bonus_reward_category[{{ category_id }}][coefficient]" value="{{ category_data.coefficient }}" /></td>
+                                {% endif %}
+                                {% for customer_group in customer_groups %}
+                                  <td>
+                                    <input type="text" class="form-control" name="module_bonus_reward_category[{{ category_id }}][customer_group][{{ customer_group.customer_group_id }}]" value="{{ category_data.customer_group[customer_group.customer_group_id] }}" /></td>
+                                {% endfor %}
+                                <td><button type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+                              </tr>
+                            {% endfor %}
+                          {% endif %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_setting_manufacturer }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-manufacturer">
+                    <span data-toggle="tooltip" title="{{ help_manufacturer }}">{{ entry_manufacturer }}</span>
+                  </label>
+                  <div class="col-sm-10">
+                    <select id="input-manufacturer" class="form-control selectpicker" data-live-search="true" multiple>
+                      {% for manufacturer_id, manufacturer_name in manufacturers %}
+                        <option data-tokens="{{ manufacturer_name }}" value="{{ manufacturer_id }}"{% if module_bonus_reward_manufacturer is defined and manufacturer_id in module_bonus_reward_manufacturer|keys %} selected="selected"{% endif %}>{{ manufacturer_name }}</option>
+                      {% endfor %}
+                    </select>
+                    <div class="table-responsive" id="manufacturer-table-container" style="display: none;">
+                      <table class="table table-bordered table-hover">
+                        <thead>
+                          <tr>
+                            <td>{{ column_manufacturer }}</td>
+                            {% if module_bonus_reward_method == 'standard' %}
+                            <td><span data-toggle="tooltip" title="{{ help_coefficient }}">{{ column_coefficient }}</span></td>
+                            {% endif %}
+                            {% for customer_group in customer_groups %}
+                              <td><span data-toggle="tooltip" title="{{ help_customer_group }}">{{ customer_group.name }}</span></td>
+                            {% endfor %}
+                            <td>{{ column_action }}</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% if module_bonus_reward_manufacturer %}
+                            {% for manufacturer_id, manufacturer_data in module_bonus_reward_manufacturer %}
+                              <tr data-manufacturer-id="{{ manufacturer_id }}">
+                                <td>{{ manufacturers[manufacturer_id] }}</td>
+                                {% if module_bonus_reward_method == 'standard' %}
+                                <td><input type="text" class="form-control" name="module_bonus_reward_manufacturer[{{ manufacturer_id }}][coefficient]" value="{{ manufacturer_data.coefficient }}" /></td>
+                                {% endif %}
+                                {% for customer_group in customer_groups %}
+                                  <td>
+                                    <input type="text" class="form-control" name="module_bonus_reward_manufacturer[{{ manufacturer_id }}][customer_group][{{ customer_group.customer_group_id }}]" value="{{ manufacturer_data.customer_group[customer_group.customer_group_id] }}" /></td>
+                                {% endfor %}
+                                <td><button type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+                              </tr>
+                            {% endfor %}
+                          {% endif %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+              {% endif %}
+            </div>
+            <div class="tab-pane" id="tab-mail">
+              <fieldset>
+                <legend>{{ text_mail_template_register }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-subject">{{ entry_subject }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_bonus_reward_register_subject" value="{{ module_bonus_reward_register_subject }}" placeholder="{{ entry_subject }}" id="input-subject" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-message"><span data-toggle="tooltip" title="{{ help_message }}">{{ entry_message }}</span></label>
+                  <div class="col-sm-10">
+                    <textarea name="module_bonus_reward_register_message" placeholder="{{ entry_message }}" id="input-message" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ module_bonus_reward_register_message }}</textarea>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_mail_template_review }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-subject">{{ entry_subject }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_bonus_reward_review_subject" value="{{ module_bonus_reward_review_subject }}" placeholder="{{ entry_subject }}" id="input-subject" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-message"><span data-toggle="tooltip" title="{{ help_message }}">{{ entry_message }}</span></label>
+                  <div class="col-sm-10">
+                    <textarea name="module_bonus_reward_review_message" placeholder="{{ entry_message }}" id="input-message" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ module_bonus_reward_review_message }}</textarea>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_mail_template_newsletter }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-subject">{{ entry_subject }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_bonus_reward_newsletter_subject" value="{{ module_bonus_reward_newsletter_subject }}" placeholder="{{ entry_subject }}" id="input-subject" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-message"><span data-toggle="tooltip" title="{{ help_message }}">{{ entry_message }}</span></label>
+                  <div class="col-sm-10">
+                    <textarea name="module_bonus_reward_newsletter_message" placeholder="{{ entry_message }}" id="input-message" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ module_bonus_reward_newsletter_message }}</textarea>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_mail_template_order }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-subject">{{ entry_subject }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_bonus_reward_order_subject" value="{{ module_bonus_reward_order_subject }}" placeholder="{{ entry_subject }}" id="input-subject" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-message"><span data-toggle="tooltip" title="{{ help_message }}">{{ entry_message }}</span></label>
+                  <div class="col-sm-10">
+                    <textarea name="module_bonus_reward_order_message" placeholder="{{ entry_message }}" id="input-message" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ module_bonus_reward_order_message }}</textarea>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_mail_template_warning }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-subject">{{ entry_subject }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_bonus_reward_warning_subject" value="{{ module_bonus_reward_warning_subject }}" placeholder="{{ entry_subject }}" id="input-subject" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-message"><span data-toggle="tooltip" title="{{ help_message }}">{{ entry_message }}</span></label>
+                  <div class="col-sm-10">
+                    <textarea name="module_bonus_reward_warning_message" placeholder="{{ entry_message }}" id="input-message" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ module_bonus_reward_warning_message }}</textarea>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_mail_template_remove }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-subject">{{ entry_subject }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_bonus_reward_remove_subject" value="{{ module_bonus_reward_remove_subject }}" placeholder="{{ entry_subject }}" id="input-subject" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-message"><span data-toggle="tooltip" title="{{ help_message }}">{{ entry_message }}</span></label>
+                  <div class="col-sm-10">
+                    <textarea name="module_bonus_reward_remove_message" placeholder="{{ entry_message }}" id="input-message" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ module_bonus_reward_remove_message }}</textarea>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<link href="view/javascript/bootstrap-select/css/bootstrap-select.css" rel="stylesheet"/>
+<link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+<link href="view/javascript/codemirror/lib/codemirror.css" rel="stylesheet" />
+<link href="view/javascript/codemirror/theme/monokai.css" rel="stylesheet" />
+<script type="text/javascript" src="view/javascript/bootstrap-select/js/bootstrap-select.js"></script>
+<script type="text/javascript" src="view/javascript/codemirror/lib/codemirror.js"></script> 
+<script type="text/javascript" src="view/javascript/codemirror/lib/xml.js"></script> 
+<script type="text/javascript" src="view/javascript/codemirror/lib/formatting.js"></script> 
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+<script type="text/javascript" src="view/javascript/summernote/summernote-image-attributes.js"></script> 
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script> 
+
+<script>
+  $('.date').datetimepicker({
+    language: '{{ datepicker }}',
+    pickTime: false
+  });
+</script> 
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".copy-link").forEach(link => {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();
+        var temp = document.createElement("textarea");
+        temp.value = this.textContent.trim();
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        alert("{{ text_copy }}");
+      });
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const categorySelect = $('#input-category');
+    const categoryTableBody = document.querySelector('#category-table-container tbody');
+    const tableContainer = document.querySelector('#category-table-container');
+
+    function toggleTableVisibility() {
+      if (categoryTableBody.querySelector('tr')) {
+        tableContainer.style.display = 'block';
+      } else {
+        tableContainer.style.display = 'none';
+      }
+    }
+
+    categorySelect.on('changed.bs.select', function () {
+      const selectedOptions = Array.from(categorySelect[0].selectedOptions);
+      selectedOptions.forEach(option => {
+        const categoryId = option.value;
+        const categoryName = option.text;
+
+        if (categoryTableBody.querySelector(`tr[data-category-id="${categoryId}"]`)) {
+          return;
+        }
+
+        const row = document.createElement('tr');
+        row.setAttribute('data-category-id', categoryId);
+
+        let coefficientInput = `<td>
+          <input type="text" class="form-control" 
+                 name="module_bonus_reward_category[${categoryId}][coefficient]" 
+                 value="" />
+        </td>`;
+
+        let inputFields = '';
+        {% for customer_group in customer_groups %}
+          inputFields += `  
+            <td>
+              <input type="text" class="form-control" 
+                     name="module_bonus_reward_category[${categoryId}][customer_group][{{ customer_group.customer_group_id }}]" 
+                     value="" />
+            </td>
+          `;
+        {% endfor %}
+
+        row.innerHTML = `
+          <td class="cat">${categoryName}</td>
+          {% if module_bonus_reward_method == 'standard' %}${coefficientInput}{% endif %}
+          ${inputFields}
+          <td class="rm">
+            <button type="button" class="btn btn-danger">
+              <i class="fa fa-minus-circle"></i>
+            </button>
+          </td>
+        `;
+
+        categoryTableBody.appendChild(row);
+
+        categorySelect.selectpicker('refresh');
+
+        toggleTableVisibility();
+      });
+    });
+
+    categoryTableBody.addEventListener('click', function (e) {
+      if (e.target.closest('.btn-danger')) {
+        const row = e.target.closest('tr');
+        const categoryId = row.getAttribute('data-category-id');
+
+        const option = categorySelect.find(`option[value="${categoryId}"]`)[0];
+        if (option) {
+          option.selected = false;
+
+          categorySelect.selectpicker('refresh');
+        }
+
+        row.remove();
+
+        toggleTableVisibility();
+      }
+    });
+
+    categorySelect.on('change', function () {
+      const selectedOptions = Array.from(categorySelect[0].selectedOptions).map(option => option.value);
+
+      const rows = categoryTableBody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const categoryId = row.getAttribute('data-category-id');
+        if (!selectedOptions.includes(categoryId)) {
+          row.remove();
+        }
+      });
+
+      toggleTableVisibility();
+    });
+
+    toggleTableVisibility();
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const manufacturerSelect = $('#input-manufacturer');
+    const manufacturerTableBody = document.querySelector('#manufacturer-table-container tbody');
+    const tableContainer = document.querySelector('#manufacturer-table-container');
+
+    function toggleTableVisibility() {
+      if (manufacturerTableBody.querySelector('tr')) {
+        tableContainer.style.display = 'block';
+      } else {
+        tableContainer.style.display = 'none';
+      }
+    }
+
+    manufacturerSelect.on('changed.bs.select', function () {
+      const selectedOptions = Array.from(manufacturerSelect[0].selectedOptions);
+      selectedOptions.forEach(option => {
+        const manufacturerId = option.value;
+        const manufacturerName = option.text;
+
+        if (manufacturerTableBody.querySelector(`tr[data-manufacturer-id="${manufacturerId}"]`)) {
+          return;
+        }
+
+        const row = document.createElement('tr');
+        row.setAttribute('data-manufacturer-id', manufacturerId);
+
+        let coefficientInput = `<td>
+          <input type="text" class="form-control" 
+                 name="module_bonus_reward_manufacturer[${manufacturerId}][coefficient]" 
+                 value="" />
+        </td>`;
+
+        let inputFields = '';
+        {% for customer_group in customer_groups %}
+          inputFields += `  
+            <td>
+              <input type="text" class="form-control" 
+                     name="module_bonus_reward_manufacturer[${manufacturerId}][customer_group][{{ customer_group.customer_group_id }}]" 
+                     value="" />
+            </td>
+          `;
+        {% endfor %}
+
+        row.innerHTML = `
+          <td class="cat">${manufacturerName}</td>
+          {% if module_bonus_reward_method == 'standard' %}${coefficientInput}{% endif %}
+          ${inputFields}
+          <td class="rm">
+            <button type="button" class="btn btn-danger">
+              <i class="fa fa-minus-circle"></i>
+            </button>
+          </td>
+        `;
+
+        manufacturerTableBody.appendChild(row);
+
+        manufacturerSelect.selectpicker('refresh');
+
+        toggleTableVisibility();
+      });
+    });
+
+    manufacturerTableBody.addEventListener('click', function (e) {
+      if (e.target.closest('.btn-danger')) {
+        const row = e.target.closest('tr');
+        const manufacturerId = row.getAttribute('data-manufacturer-id');
+
+        const option = manufacturerSelect.find(`option[value="${manufacturerId}"]`)[0];
+        if (option) {
+          option.selected = false;
+
+          manufacturerSelect.selectpicker('refresh');
+        }
+
+        row.remove();
+
+        toggleTableVisibility();
+      }
+    });
+
+    manufacturerSelect.on('change', function () {
+      const selectedOptions = Array.from(manufacturerSelect[0].selectedOptions).map(option => option.value);
+
+      const rows = manufacturerTableBody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const manufacturerId = row.getAttribute('data-manufacturer-id');
+        if (!selectedOptions.includes(manufacturerId)) {
+          row.remove();
+        }
+      });
+
+      toggleTableVisibility();
+    });
+
+    toggleTableVisibility();
+  });
+</script>
+<script>
+  $('#add-reward-to-customer').on('click', function () {
+    $.ajax({
+      url: 'index.php?route=extension/module/bonus_reward/updateRewardToCustomers&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+        if (json['error']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+        }
+        if (json['success']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  });
+</script>
+
+<script>
+  $('#remove-reward-to-products').on('click', function () {
+    $.ajax({
+      url: 'index.php?route=extension/module/bonus_reward/removeRewardToProducts&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+        if (json['error']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+        }
+        if (json['success']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  });
+</script>
+
+<script>
+  $('#add-reward-to-products').on('click', function () {
+    var $btn = $(this);
+    $btn.prop('disabled', true);
+    $.ajax({
+      url: 'index.php?route=extension/module/bonus_reward/removeRewardToProducts&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+        if (json['error']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+          $btn.prop('disabled', false);
+        } else {
+          startAddingRewards($btn);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        $btn.prop('disabled', false);
+      }
+    });
+  });
+
+  function startAddingRewards($btn) {
+    $('#progress-import').show();
+    $.ajax({
+      url: 'index.php?route=extension/module/bonus_reward/addRewardToProducts&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+        if (json['error']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+        if (json['success']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+        if (json['total']) {
+          $('#progress-import .progress-bar').attr('aria-valuenow', json['total']);
+          $('#progress-import .progress-bar').css('width', json['total'] + '%');
+        }
+        if (json['next']) {
+          next(json['next'], $btn);
+        } else {
+          $btn.prop('disabled', false);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        $btn.prop('disabled', false);
+      }
+    });
+  }
+
+  function next(url, $btn) {
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+        if (json['error']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+        if (json['success']) {
+          $('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+        if (json['total']) {
+          $('#progress-import .progress-bar').attr('aria-valuenow', json['total']);
+          $('#progress-import .progress-bar').css('width', json['total'] + '%');
+        }
+        if (json['next']) {
+          next(json['next'], $btn);
+        } else {
+          $btn.prop('disabled', false);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        $btn.prop('disabled', false);
+      }
+    });
+  }
+</script>
+{{ footer }}

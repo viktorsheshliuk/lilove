@@ -1,0 +1,600 @@
+{{ header }}{{ column_left }}
+<div class="sp sp_in_module" id="content">
+    <div class="header_module_info">
+        <div class="title">{{ heading_title }} <span id="version"></span></div>
+        <div class="buttons">
+            <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-save"><i class="fa fa-save"></i></button>
+            <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-close"><i class="fa fa-reply"></i></a>
+        </div>
+    </div>
+
+    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+        <div class="module_form" id="form-module-block">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">{{ txt_tab_main }}</a></li>
+                {% if license_status %}
+                    {% if not error_license %}
+                        <li role="presentation"><a href="#styles" aria-controls="styles" role="tab" data-toggle="tab">{{ txt_tab_style_setting }}</a></li>
+                        <li role="presentation"><a href="#groups" aria-controls="groups" role="tab" data-toggle="tab">{{ txt_tab_groups_of_products }}</a></li>
+                        <li role="presentation"><a href="#grouped_product" aria-controls="grouped_product" role="tab" data-toggle="tab">{{ txt_tab_adding_products_to_groups }}</a></li>
+                        <li role="presentation"><a href="#auto_grouped_product" aria-controls="auto_grouped_product" role="tab" data-toggle="tab">{{ txt_tab_auto_grouped_product }}</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="main">
+                    <div class="single_block">
+                        <div class="title">{{ txt_module_settings }}</div>
+                        <div class="switch-box full_width">
+                            <div class="title">{{ txt_status }}</div>
+                            <label class="input-switch">
+                                <input type="checkbox" name="module_sppro_product_group_status" {% if module_sppro_product_group_status %} checked {% endif %}>
+                            </label>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-license" type="text" name="module_sppro_product_group_license" placeholder="{{ txt_license_key }}" value="{{ module_sppro_product_group_license }}" class="profile-form-input {% if error_license %} error_style {% endif %}">
+                            <label for="input-license" class="label">{{ txt_license_key }}</label>
+                            <span class="bar"></span>
+                            {% if error_license %}
+                                <div class="error_style_text">{{ error_license }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if license_status %}
+                        {% if not error_license %}
+                            <div class="single_block">
+                                <div class="title">{{ txt_visible_main_product }}</div>
+
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_in_category }}</div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_main_category" {% if module_sppro_product_group_main_category %} checked {% endif %}>
+                                    </label>
+                                </div>
+
+                                <div class="title title_helper" style="margin-bottom: 10px !important;">{{ txt_category_list }}<a class="info"><svg><use xlink:href="#sp-icon-info"></use></svg><span class="info-content">{{ txt_category_list_help }}</span></a></div>
+
+                                <div class="sp_animated_input_group" style="margin-top: 20px;">
+                                    <input id="sp_scrollable_block_input" type="text" placeholder="{{ txt_enter_cate_name }}" class="profile-form-input sp_scrollable_block_input">
+                                    <label for="sp_scrollable_block_input" class="label">{{ txt_enter_cate_name }}</label>
+                                    <span class="bar"></span>
+                                </div>
+
+                                <div class="sp_scrollable_block_input_hr"></div>
+
+                                <div class="sp_scrollable_block sp_scrollable_block_attr">
+                                    {% for category in categories %}
+                                        <div class="sp_checkbox full_width sp_category_list_item">
+                                            <label><input type="checkbox" name="module_sppro_product_group_main_category_list[]" value="{{ category.category_id }}" {% if category.category_id in module_sppro_product_group_main_category_list %} checked {% endif %}>{{ category.name }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="sp_selected_btn">
+                                    <span onclick="catSelected('sp_category_list_item', true)">{{ txt_recommendation_select_all }}</span>/<span onclick="catSelected('sp_category_list_item', false)">{{ txt_recommendation_unselect_all }}</span>
+                                </div>
+
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_in_search }}</div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_main_search" {% if module_sppro_product_group_main_search %} checked {% endif %}>
+                                    </label>
+                                </div>
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_in_manufacturer }}</div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_main_manufatcurer" {% if module_sppro_product_group_main_manufatcurer %} checked {% endif %}>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="single_block">
+                                <div class="title">{{ txt_microdata }}</div>
+
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_shema }}<a class="info"><svg><use xlink:href="#sp-icon-info"></use></svg><span class="info-content">{{ txt_shema_info }}</span></a></div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_shema" {% if module_sppro_product_group_shema %} checked {% endif %}>
+                                    </label>
+                                </div>
+
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_canonical }}<a class="info"><svg><use xlink:href="#sp-icon-info"></use></svg><span class="info-content">{{ txt_canonical_info }}</span></a></div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_canonical" {% if module_sppro_product_group_canonical %} checked {% endif %}>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="single_block">
+                                <div class="title">{{ txt_ajax }}</div>
+
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_ajax_product_page }}</div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_ajax_product_page" {% if module_sppro_product_group_ajax_product_page %} checked {% endif %}>
+                                    </label>
+                                </div>
+
+                                <div class="switch-box full_width">
+                                    <div class="title">{{ txt_ajax_in_category }}</div>
+                                    <label class="input-switch">
+                                        <input type="checkbox" name="module_sppro_product_group_ajax_in_category" {% if module_sppro_product_group_ajax_in_category %} checked {% endif %}>
+                                    </label>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="styles">
+                    <div class="single_block">
+                        <div class="title">{{ txt_setting_style }}</div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_border_selected_c_cat }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[border_color_selected_c_cat]" value="{{ module_sppro_product_group_styles.border_color_selected_c_cat }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_border_selected_tci }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[border_color_selected_tci]" value="{{ module_sppro_product_group_styles.border_color_selected_tci }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_border_tci }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[border_color_tci]" value="{{ module_sppro_product_group_styles.border_color_tci }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_border_hover_tci }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[border_color_hover_tci]" value="{{ module_sppro_product_group_styles.border_color_hover_tci }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_text_color_t }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[text_color_t]" value="{{ module_sppro_product_group_styles.text_color_t }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_text_color_selected_t }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[text_color_selected_t]" value="{{ module_sppro_product_group_styles.text_color_selected_t }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_text_color_hover_t }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[text_color_hover_t]" value="{{ module_sppro_product_group_styles.text_color_hover_t }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_border_color_s }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[border_color_s]" value="{{ module_sppro_product_group_styles.border_color_s }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_background_color_t }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[background_color_t]" value="{{ module_sppro_product_group_styles.background_color_t }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_background_color_selected_t }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[background_color_selected_t]" value="{{ module_sppro_product_group_styles.background_color_selected_t }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_background_color_s }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[background_color_s]" value="{{ module_sppro_product_group_styles.background_color_s }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_background_color_selected_s }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[background_color_selected_s]" value="{{ module_sppro_product_group_styles.background_color_selected_s }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_background_color_hover_s }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[background_color_hover_s]" value="{{ module_sppro_product_group_styles.background_color_hover_s }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_text_color_s }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[text_color_s]" value="{{ module_sppro_product_group_styles.text_color_s }}"></div>
+                        </div>
+
+                        <div class="sp_space_between_color">
+                            <div class="sp_space_between_color_title">{{ txt_text_color_hover_s }}</div>
+                            <div><input type="text" class="spectrum" data-coloris name="module_sppro_product_group_styles[text_color_hover_s]" value="{{ module_sppro_product_group_styles.text_color_hover_s }}"></div>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-circle-border-radius" type="number" name="module_sppro_product_group_styles[circle_border_radius]" value="{{ module_sppro_product_group_styles.circle_border_radius }}" class="profile-form-input">
+                            <label for="input-circle-border-radius" class="label">{{ txt_circle_border_radius }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-image-border-radius" type="number" name="module_sppro_product_group_styles[image_border_radius]" value="{{ module_sppro_product_group_styles.image_border_radius }}" class="profile-form-input">
+                            <label for="input-image-border-radius" class="label">{{ txt_image_border_radius }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-button-border-radius" type="number" name="module_sppro_product_group_styles[button_border_radius]" value="{{ module_sppro_product_group_styles.button_border_radius }}" class="profile-form-input">
+                            <label for="input-button-border-radius" class="label">{{ txt_button_border_radius }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-button-border-radius" type="number" name="module_sppro_product_group_styles[select_border_radius]" value="{{ module_sppro_product_group_styles.select_border_radius }}" class="profile-form-input">
+                            <label for="input-button-border-radius" class="label">{{ txt_select_border_radius }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-image-width" type="number" name="module_sppro_product_group_styles[image_width]" value="{{ module_sppro_product_group_styles.image_width }}" class="profile-form-input">
+                            <label for="input-image-width" class="label">{{ txt_image_width }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-image-height" type="number" name="module_sppro_product_group_styles[image_height]" value="{{ module_sppro_product_group_styles.image_height }}" class="profile-form-input">
+                            <label for="input-image-height" class="label">{{ txt_image_height }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-color-width" type="number" name="module_sppro_product_group_styles[color_width]" value="{{ module_sppro_product_group_styles.color_width }}" class="profile-form-input">
+                            <label for="input-color-width" class="label">{{ txt_color_width }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-color-height" type="number" name="module_sppro_product_group_styles[color_height]" value="{{ module_sppro_product_group_styles.color_height }}" class="profile-form-input">
+                            <label for="input-color-height" class="label">{{ txt_color_height }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-color-width-cat" type="number" name="module_sppro_product_group_styles[color_width_cat]" value="{{ module_sppro_product_group_styles.color_width_cat }}" class="profile-form-input">
+                            <label for="input-color-width-cat" class="label">{{ txt_color_width_cat }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="input-color_-eight-cat" type="number" name="module_sppro_product_group_styles[color_height_cat]" value="{{ module_sppro_product_group_styles.color_height_cat }}" class="profile-form-input">
+                            <label for="input-color_-eight-cat" class="label">{{ txt_color_height_cat }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="groups">
+                    <div class="single_block full_width">
+                        <div class="title">{{ txt_tab_groups_of_products }}</div>
+
+                        <div class="text-right add-group">
+                            <a href="{{ add_group }}" class="sppg_btn_create_group">{{ txt_btn_add_group }}</a>
+                        </div>
+
+                        <table class="sp_groups_table">
+                            <thead role="rowgroup">
+                            <tr role="row" class="sp_groups_table__header-row">
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_name_product }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_attributes }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_type }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_hint_when_hovering }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_sort_order }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_categorization }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell">{{ txt_col_display_title }}</th>
+                                <th role="columnheader" class="sp_groups_table__header-cell text-center">{{ txt_col_status }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if groups %}
+                                {% for group in groups %}
+                                    <tr>
+                                        <td class="text-left">{{ group.name }}</td>
+                                        <td class="text-left">{{ group.attributes_count }}</td>
+                                        <td class="text-left">{{ group.type }}</td>
+                                        <td class="text-left">{{ group.help }}</td>
+                                        <td class="text-left">{{ group.sort_order }}</td>
+                                        <td class="text-left">{{ group.category_status }}</td>
+                                        <td class="text-left">{{ group.title_status }}</td>
+                                        <td class="text-center">
+                                            <a href="{{ group.edit }}" data-toggle="tooltip" title="{{ txt_edit }}" class="sppg_btn_edit_static">
+                                                <svg>
+                                                    <use xlink:href="#pen"></use>
+                                                </svg>
+                                            </a>
+                                            <a href="{{ group.remove }}" onclick="return confirm('{{ notify_alert_message }}');" data-toggle="tooltip" title="{{ txt_delete }}" class="sppg_btn_delete">
+                                                <svg><use xlink:href="#trash"></use></svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td class="text-center" colspan="8">{{ txt_empty_groups }}</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="grouped_product">
+                    <div class="single_block full_width">
+                        <div class="title">{{ txt_tab_adding_products_to_groups }}</div>
+                        {{ product_add_form }}
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="auto_grouped_product">
+                    <div class="single_block">
+                        <div class="title">{{ txt_step_1 }}</div>
+                        <div class="sppro-product-auto-group-values">
+                            {% for key,name in auto_group_product_values %}
+                                <div class="sp_checkbox full_width"><label><input type="checkbox" name="module_sppro_product_group_auto_setting[products][{{ key }}]" {% if module_sppro_product_group_auto_setting.products[key] %} checked="checked"{% endif %}>{{ name }}</label></div>
+                            {% endfor %}
+                        </div>
+                        <div class="sppro-product-auto-group-values">
+                            <div class="sp_checkbox full_width"><label><input type="checkbox" name="module_sppro_product_group_auto_setting[products][name_part]" {% if module_sppro_product_group_auto_setting.products.name_part %} checked="checked"{% endif %}>{{ txt_filter_by_symbol }}</label></div>
+                        </div>
+                        <div class="sppro-product-auto-group-values">
+                            <div class="sp_animated_input_group" style="margin-top:20px;">
+                                <input id="input-product_group_search_by_model" type="text" name="module_sppro_product_group_auto_setting[products][name_part_diff]" value="{{ module_sppro_product_group_auto_setting.products.name_part_diff }}" placeholder="{{ txt_filter_by_symbol_count }}" class="profile-form-input">
+                                <label for="input-product_group_search_by_model" class="label">{{ txt_filter_by_symbol_count }}</label>
+                                <span class="bar"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="single_block">
+                        <div class="title">{{ txt_step_2 }}</div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <select name="module_sppro_product_group_auto_setting[categories][]" multiple id="sppro-product-auto-group-categories">
+                                    {% for category in categories %}
+                                        <option value="{{ category.category_id }}"{% if category.category_id in module_sppro_product_group_auto_setting.categories %} selected="selected"{% endif %}>{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <br>
+                            <br>
+                            <div class="col-sm-12">
+                                <select name="module_sppro_product_group_auto_setting[manufacturers][]" multiple id="sppro-product-auto-group-manufacturers">
+                                    {% for manufacturer in manufacturers %}
+                                        <option value="{{ manufacturer.manufacturer_id }}"{% if manufacturer.manufacturer_id in module_sppro_product_group_auto_setting.manufacturers %} selected="selected"{% endif %}>{{ manufacturer.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="single_block" style="margin-bottom:40px;">
+                        <div class="title">{{ txt_step_3 }}</div>
+                        <div class="sppro-product-auto-group-loader sppro-product-auto-group-loader-attributes">{{ txt_load_atributes }}</div>
+
+                        <div class="sp_animated_input_group">
+                            <input id="sp_scrollable_block_input" type="text" placeholder="{{ txt_enter_attr_name }}" class="profile-form-input sp_scrollable_block_input">
+                            <label for="sp_scrollable_block_input" class="label">{{ txt_enter_attr_name }}</label>
+                            <span class="bar"></span>
+                        </div>
+
+                        <div class="sp_scrollable_block_input_hr"></div>
+
+                        <div class="sp_scrollable_block sp_scrollable_block_attr" id="auto-group-attributes-list"></div>
+
+                        <div class="sp_selected_btn">
+                            <span onclick="catSelected('sp_scrollable_block_attr', true)">{{ txt_recommendation_select_all }}</span>/<span onclick="catSelected('sp_scrollable_block_attr', false)">{{ txt_recommendation_unselect_all }}</span>
+                        </div>
+                    </div>
+
+                    <div class="single_block_btns">
+                        <button type="button" onclick="updateAutoGroup('autoGroupRemove');" class="sp_button_danger button-add-products-to-group" >{{ txt_delete_connections }}</button>
+                        <button type="button" onclick="updateAutoGroup('autoGroupSet');" class="sp_button_success button-remove-products-from-group">{{ txt_connection }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function catSelected(block, status) {
+        var checkboxes = document.querySelectorAll('.'+block+' input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = status;
+        });
+    }
+
+    function getSearchList() {
+        const inputField_one = document.querySelector(".sp_scrollable_block_input");
+        const checkboxes_one = document.querySelectorAll(".sp_scrollable_block_attr > .sp_checkbox");
+
+        inputField_one.addEventListener("input", function() {
+            const searchText = this.value.toLowerCase();
+            checkboxes_one.forEach(function(checkbox) {
+                const label = checkbox.querySelector("label").textContent.toLowerCase();
+                if (label.includes(searchText)) {
+                    checkbox.classList.remove("hidden");
+                } else {
+                    checkbox.classList.add("hidden");
+                }
+            });
+        });
+    }
+</script>
+
+<script>
+    function autoOffAttributes() {
+        var checkboxes = document.querySelectorAll('#auto-group-attributes-list input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+    }
+    function autoOnAttributes() {
+        var checkboxes = document.querySelectorAll('#auto-group-attributes-list input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = true;
+        });
+    }
+</script>
+
+<div class="sp_notify_block"></div>
+
+<script>
+    function spNotify(type, text) {
+        var icon = "fa fa-info";
+        var css = "";
+        switch (type) {
+            case"success":
+                icon = "sp-icon-notify-success";
+                css = "success";
+                break;
+            case"danger":
+                icon = "sp-icon-notify-danger";
+                css = "warning";
+                break;
+            case"warning":
+                icon = "sp-icon-notify-warning"
+                css = "warning"
+        }
+        var randomNumber = Math.floor(Math.random() * 100);
+        $('.sp_notify_block').append('<div id="sp_alert_' + randomNumber + '" class="sp_notify_alert ' + css + '"><div class="sp_notify_alert__icon"><svg><use xlink:href="#' + icon + '"></use></svg></div><div class="sp_notify_alert__message">' + text + '</div></div>');
+        setTimeout(function () {
+            $('#sp_alert_' + randomNumber).addClass('hide');
+            setTimeout(function () {
+                $('#sp_alert_' + randomNumber).remove();
+            }, 2000);
+        }, 5000);
+    }
+</script>
+
+{% if error_warning %}
+    <script>
+        spNotify('warning', '{{ error_warning }}');
+    </script>
+{% endif %}
+
+{% if success %}
+    <script>
+        spNotify('success', '{{ success }}');
+    </script>
+{% endif %}
+
+<script>
+    $('#sppro-product-auto-group-categories').multiselect({
+            texts: {
+                placeholder: '{{ txt_select_category }}',
+                selectedOptions: ' {{ txt_selected }}',
+            }
+        }
+    );
+    $('#sppro-product-auto-group-manufacturers').multiselect({
+            texts: {
+                placeholder: '{{ txt_select_manufacturer }}',
+                selectedOptions: ' {{ txt_selected }}',
+            }
+        }
+    );
+
+    function loadAutoGroupAttributes() {
+        $('#auto-group-attributes-list').html('');
+        $.ajax({
+            url: 'index.php?route=extension/module/sppro_product_group/autoGroupGetAttributes&user_token={{ user_token }}',
+            data: $('#form-module').serialize(),
+            type: 'post',
+            dataType: 'json',
+            success: function (json) {
+                $('.sppro-product-auto-group-loader-attributes').remove();
+                if (json['attributes'].length) {
+                    for (i in json['attributes']) {
+                        attribute_html = ' <div class="sp_checkbox full_width"><label>';
+                        attribute_html += '<input type="checkbox" name="module_sppro_product_group_auto_setting[attributes][' + json['attributes'][i]['attribute_id'] + ']"';
+                        if (json['attributes'][i]['checked']) {
+                            attribute_html += ' checked="checked"';
+                        }
+                        attribute_html += '>';
+                        attribute_html += json['attributes'][i]['name'];
+                        attribute_html += '</label></div>';
+                        $('#auto-group-attributes-list').append(attribute_html);
+                    }
+                    getSearchList();
+                } else {
+                    $('#auto-group-attributes-list').text('{{ txt_attributes_not_found }}');
+                }
+            }
+        });
+    }
+
+    function updateAutoGroup(method) {
+        $('.alert').remove();
+        $('.sppro-product-auto-group-buttons').after('<div class="sppro-product-auto-group-loader sppro-product-auto-group-loader-set">{{ txt_wait_dots }}</div>');
+        $.ajax({
+            url: 'index.php?route=extension/module/sppro_product_group/' + method + '&user_token={{ user_token }}',
+            data: $('#form-module').serialize(),
+            type: 'post',
+            dataType: 'json',
+            success: function (json) {
+                if (json['success']) {
+                    $('.sppro-product-auto-group-loader-set').remove();
+                    spNotify('success', json['success']);
+                }
+                if (json['error']) {
+                    $('.sppro-product-auto-group-loader-set').remove();
+                    spNotify('warning', json['error']);
+                }
+            }
+        });
+    }
+
+    loadAutoGroupAttributes();
+    $('#sppro-product-auto-group-categories, #sppro-product-auto-group-manufacturers').on('change', loadAutoGroupAttributes);
+</script>
+
+<script>
+    $(".spectrum").spectrum({
+        preferredFormat: "rgb",
+        showInitial: true,
+        showInput: true,
+        showAlpha: true,
+        showPalette: false
+    });
+</script>
+
+<div style="display:none;position:absolute;left:-9999px;">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <symbol xmlns="http://www.w3.org/2000/svg" id="pen" viewBox="0 -960 960 960">
+            <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="trash" viewBox="0 -960 960 960">
+            <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="checkout" viewBox="0 -960 960 960">
+            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Z"/>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="checkin" viewBox="0 -960 960 960">
+            <path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/>
+        </symbol>
+        <symbol id="sp-icon-info" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M10.8,18h2.4V10.8H10.8ZM12,8.4a1.1,1.1,0,0,0,.85-.35,1.12,1.12,0,0,0,.35-.85,1.15,1.15,0,0,0-.35-.86,1.23,1.23,0,0,0-1.7,0,1.19,1.19,0,0,0-.35.86,1.15,1.15,0,0,0,.35.85A1.1,1.1,0,0,0,12,8.4ZM12,24a11.69,11.69,0,0,1-4.68-.95,12.1,12.1,0,0,1-3.81-2.56A11.94,11.94,0,0,1,1,16.68,11.52,11.52,0,0,1,0,12,11.52,11.52,0,0,1,1,7.32,11.94,11.94,0,0,1,3.51,3.51,12.13,12.13,0,0,1,7.32.94,11.68,11.68,0,0,1,12,0a11.68,11.68,0,0,1,4.68.94,12.13,12.13,0,0,1,3.81,2.57,12.3,12.3,0,0,1,2.57,3.81,12.12,12.12,0,0,1,0,9.36,12.3,12.3,0,0,1-2.57,3.81,12.1,12.1,0,0,1-3.81,2.56A11.69,11.69,0,0,1,12,24Zm0-2.4a9.27,9.27,0,0,0,6.81-2.79A9.27,9.27,0,0,0,21.6,12a9.27,9.27,0,0,0-2.79-6.81A9.27,9.27,0,0,0,12,2.4,9.27,9.27,0,0,0,5.19,5.19,9.27,9.27,0,0,0,2.4,12a9.27,9.27,0,0,0,2.79,6.81A9.27,9.27,0,0,0,12,21.6Z"/>
+        </symbol>
+        <symbol id="sp-icon-notify-success" viewBox="0 0 32 32">
+            <g fill="none" fill-rule="evenodd">
+                <circle fill="#5AE4AA" cx="16" cy="16" r="16"/>
+                <path d="M15.484 23.544V12.83c0-.572.374-.858.99-.858.594 0 1.012.286 1.012.858v10.714c0 .594-.418.88-1.012.88-.616 0-.99-.286-.99-.88zM16.496 7a1.46 1.46 0 0 1 1.474 1.474c0 .858-.66 1.496-1.474 1.496A1.47 1.47 0 0 1 15 8.474C15 7.638 15.66 7 16.496 7z" fill="#383838" fill-rule="nonzero"/>
+            </g>
+        </symbol>
+        <symbol id="sp-icon-notify-warning" viewBox="0 0 35.94 31.63">
+            <path fill="#ffd600" fill-rule="evenodd" d="M19.06,.81c-.62-1.08-1.64-1.08-2.26,0L.24,29.47c-.63,1.07,.04,2.16,1.28,2.16H34.66c1.24,0,1.6-1.09,.98-2.16L19.06,.81Z"/>
+            <path fill="#383838" fill-rule="evenodd" d="M16.45,24.75c0-.83,.68-1.51,1.51-1.51,.83,0,1.51,.68,1.51,1.51,0,.83-.68,1.51-1.51,1.51-.83,0-1.51-.67-1.51-1.5,0,0,0,0,0,0m2.04-3.38c-.03,.29-1.04,.25-1.07,0l-.98-9.93c-.08-.83,.52-1.57,1.36-1.66s1.57,.52,1.66,1.36c.01,.1,.01,.2,0,.3l-.98,9.93h0Z"/>
+        </symbol>
+        <symbol id="sp-icon-notify-danger" viewBox="0 0 37 33">
+            <g fill="none" fill-rule="evenodd">
+                <path d="M19.61 1.677C18.987.6 17.971.6 17.35 1.677L.79 30.339C.165 31.414.826 32.5 2.067 32.5H35.21c1.243 0 1.6-1.086.978-2.161L19.61 1.677z" fill="#FA6767"/>
+                <path d="M17.002 25.617a1.508 1.508 0 1 1 1.507 1.51 1.506 1.506 0 0 1-1.507-1.51M19.042 22.24c-.03.292-1.04.248-1.065 0l-.975-9.931a1.515 1.515 0 1 1 3.015 0l-.975 9.932z" fill="#383838"/>
+            </g>
+        </symbol>
+    </svg>
+</div>
+{{ footer }}

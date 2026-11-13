@@ -1,0 +1,290 @@
+.block_newsletter {
+  font-size: $font-size-sm;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  text-align: center;
+  margin-bottom: 40px;
+  @include media-breakpoint-down(md) { /* max 991 */
+    margin-bottom: 20px;
+  }
+  .newsletter_content {
+    text-align: center;
+  }
+  .block_content {
+    text-align: center;
+    form {
+      .newsletter_form_inner {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 753px;
+        width: 100%;
+        @include media-breakpoint-down(md) { /* max 991 */
+          max-width: 600px;
+        }
+      }
+      .input-wrapper {
+        overflow: hidden;
+      }
+      input[type=text] {
+        width: 100%;
+        color: $gray;
+        text-align: left;
+        padding: 10px;
+        background: $light-color;
+        border: 2px solid $base-border-color;
+        border-radius: 0;
+        [dir="rtl"] &{
+          text-align: right;
+        }
+      }
+      button[type=submit] {
+        border: medium none;
+        border-radius: 0;
+        background: $brand-primary;
+        color: $light-color;
+        float: right;
+        font-size: 14px;
+        margin: 0 0 0 20px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        [dir="rtl"] &{
+          float: left;
+          margin: 0 20px 0 0;
+        }
+        &:hover {
+          background:$brand-secondary;
+        }
+      }
+      input, button {
+        height: 42px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+.footer-container {
+  padding-top: 55px;
+  overflow: hidden;
+  @include media-breakpoint-down(md) { /* max 991 */
+    padding-top: 35px;
+  }
+  h4.title_block {
+    font: 500 16px / 20px $font-custom;
+    text-transform:uppercase;
+    color: $base-heading-color;
+    margin: 0 0 15px 0;
+    cursor: pointer;
+    @include media-breakpoint-only(lg) { /* min 992 max 1199 */
+      font-size: 14px;
+      line-height: 18px;
+    }
+    @include media-breakpoint-down(md) { /* max 991 */
+      position: relative;
+      cursor:pointer;
+      margin: 0;
+      padding: 10px 0;
+      &:after {
+        content: "\f107";
+        display: block;
+        font-family: $font-icon;
+        font-size: 20px;
+        vertical-align: middle;
+        position: absolute;
+        right: 0;
+        top: 10px;
+        [dir="rtl"] &{
+          left: 0;
+          right: auto;
+        }
+      }
+      &.active:after {
+        content: "\f106";
+      }
+    }
+    a {
+      color: $base-heading-color;
+      font: 500 16px / 20px $font-custom;
+      @include media-breakpoint-only(lg) { /* min 992 max 1199 */
+        font-size: 14px;
+        line-height: 18px;
+      }
+    }
+    &:hover {
+      color: $brand-secondary;
+    }
+  }
+  ul {
+    margin-bottom: 0;
+  }
+  li {
+    margin-bottom: 5px;
+    a {
+      font-size: 14px;
+      line-height: 24px;
+    }
+  }
+}
+.footer-container-after {
+  background: $brand-primary;
+  padding: 12px 0;
+  margin-top: 48px;
+  @include media-breakpoint-down(md) { /* max 991 */
+    margin-top: 28px;
+    padding: 15px 0;
+  }
+  .copyright {
+    float: left;
+    line-height: 24px;
+    color: $light-color;
+    @include media-breakpoint-down(md) { /* max 991 */
+      width: 100%;
+      text-align: center;
+      float: none;
+      margin-bottom: 5px;
+    }
+    a {
+      color: $light-color!important;
+    }
+    &:hover {
+      color: $brand-secondary;
+      a {
+        color:$brand-secondary!important;
+      }
+    }
+    [dir="rtl"] &{
+      float: right;
+      @include media-breakpoint-down(md) { /* max 991 */
+        text-align: center;
+        float: none;
+      }
+    }
+  }
+  .paiement_logo_block {
+    float: right;
+    @include media-breakpoint-down(md) { /* max 991 */
+      width: 100%;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    img {
+      margin: 0 1px;
+    }
+    [dir="rtl"] &{
+      float: left;
+      @include media-breakpoint-down(md) { /* max 991 */
+        text-align: center;
+        float: none;
+      }
+    }
+  }
+}
+.social-footer {
+  @include media-breakpoint-up(lg) { /* min 992 */
+    float: right;
+    [dir="rtl"] &{
+      float: left
+    }
+    .title_block {
+      display: none;
+    }
+  }
+  ul {
+    margin: 0;
+    li {
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      margin: 0;
+      a {
+        background: transparent;
+        display: inline-block;
+        font-size:20px;
+        height: 25px;
+        line-height: normal;
+        margin: 0 2px;
+        text-align: center;
+        width:25px;
+        @include transition(all 0.5s ease 0s);
+        &:before {
+          display: inline-block;
+          font-family: $font-icon;
+          font-weight: normal;
+          position: relative;
+          vertical-align: middle;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+      }
+      &.facebook {
+        a {
+          &:before {
+            content: "\f09a";
+          }
+          &:hover{
+            color:#3b5999;
+          }
+        }
+      }
+      &.twitter {
+        a {
+          &:before {
+            content: "\f099";
+          }
+          &:hover{
+            color:#00aced;
+          }
+        }
+      }
+      &.youtube {
+        a {
+          &:before {
+            content: "\f16a";
+          }
+          &:hover{
+            color:#d12121;
+          }
+        }
+      }
+      &.googleplus {
+        a {
+          &:before {
+            content: "\f0d5";
+          }
+          &:hover{
+            color:#dc473b;
+          }
+        }
+      }
+      &.pinterest {
+        a {
+          &:before {
+            content: "\f231";
+          }
+          &:hover{
+            color:#cb2027;
+          }
+        }
+      }
+      &.vimeo {
+        a {
+          &:before {
+            content: "\f27d";
+          }
+          &:hover{
+            color:#00B3EC;
+          }
+        }
+      }
+      &.instagram {
+        a {
+          &:before {
+            content: "\f16d";
+          }
+          &:hover{
+            color: #9b6954;
+          }
+        }
+      }
+    }
+  }
+}

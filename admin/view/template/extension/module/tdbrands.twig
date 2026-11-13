@@ -1,0 +1,324 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-tdbrands" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <button onclick="$('#content form #saveandstay').attr('value', '1'); $('#' + $('#content form').attr('id')).submit();" data-toggle="tooltip" title="{{ button_savestay }}" class="btn btn-warning"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+	<div class="container-fluid">
+		{% if error_warning %}
+		<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="panel panel-default custom-panel">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-tdbrands" class="form-horizontal">
+
+					{# Module Name #}
+					<div class="form-group">
+						<label class="control-label" for="input-name">{{ entry_name }}</label>
+						<div class="control-group">
+							<input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+							{% if error_name %}
+							<div class="text-danger">{{ error_name }}</div>
+							{% endif %}
+						</div>
+					</div>
+
+					{# Module Status #}
+					<div class="form-group">
+						<label class="control-label" for="input-status">{{ entry_status }}</label>
+						<div class="control-group">
+							<div class="switch-field">
+								<input type="radio" name="status" id="status_on" value="1" {% if status == 1 %} checked="checked" {% endif %}/>
+								<label for="status_on">{{ text_enabled }}</label>
+								<input type="radio" name="status" id="status_off" value="0" {% if status == 0 %} checked="checked" {% endif %}/>
+								<label for="status_off">{{ text_disabled }}</label>
+							</div>
+						</div>
+					</div>
+
+					{# Heading Title #}
+					<div class="form-group">
+						<label class="control-label" for="input-title">{{ entry_title }}</label>
+						<div class="control-group">
+							{% for language in languages %}
+							<div class="input-group">
+								<span class="input-group-addon"><img src="language/{{language['code']}}/{{language['code']}}.png" title="{{language['name']}}" /></span>
+								<input type="text" name="title[{{ language.code }}][title]" value="{{ title[language.code]['title'] is defined ? title[language.code]['title'] : '' }}" placeholder="" id="input-title{{ language.language_id }}" class="form-control" />
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+
+					{# Sub Title #}
+					<div class="form-group">
+						<label class="control-label" for="input-subtitle">{{ entry_subtitle }}</label>
+						<div class="control-group">
+							{% for language in languages %}
+							<div class="input-group">
+								<span class="input-group-addon"><img src="language/{{language['code']}}/{{language['code']}}.png" title="{{language['name']}}" /></span>
+								<input type="text" name="subtitle[{{ language.code }}][subtitle]" value="{{ subtitle[language.code]['subtitle'] is defined ? subtitle[language.code]['subtitle'] : '' }}" placeholder="" id="input-subtitle{{ language.language_id }}" class="form-control" />
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+
+				  {# Product WxH #}
+				  <div class="form-group">
+				  	<label class="control-label" for="input-width">{{ entry_image_size }}</label>
+				  	<div class="control-group">
+				  		<input type="text" name="width" value="{{ width }}" placeholder="{{ entry_width }}" id="input-width" class="td-number-field form-control" />
+				  		{% if error_width %}
+				  		<div class="text-danger">{{ error_width }}</div>
+				  		{% endif %}
+				  		x
+				  		<input type="text" name="height" value="{{ height }}" placeholder="{{ entry_height }}" id="input-height" class="td-number-field form-control" />
+				  		{% if error_height %}
+				  		<div class="text-danger">{{ error_height }}</div>
+				  		{% endif %}
+				  	</div>
+				  </div>
+
+				  <div class="products_type">
+				  	{# Product Type #}
+				  	<div class="form-group parent-form">
+				  		<label class="control-label" for="input-brands-type">{{ entry_type }}</label>
+				  		<div class="control-group">
+				  			<div class="switch-field">
+				  				<input type="radio" name="brands_type" class="switch-input" id="all_brands" value="0" onClick="GetOptionsSelect();" {% if brands_type == 0 %} checked="checked"{% endif %}/>
+				  				<label for="all_brands">{{ entry_type_all }}</label>
+				  				<input type="radio" name="brands_type" class="switch-input" id="specific_brands" value="1" onClick="GetOptionsSelect();" {% if brands_type == 1 %} checked="checked"{% endif %}/>
+				  				<label for="specific_brands">{{ entry_type_specific }}</label>
+				  				<span class="switch-selection"></span>
+				  			</div>
+				  		</div>
+				  	</div>
+
+				  	{# All Brands #}
+				  	<div class="all_brands_selected select-options">
+				  	</div>
+
+				  	{# Specific Brands #}
+				  	<div class="specific_brands_selected select-options">
+				  		<div class="form-group">
+				  			<label class="control-label" for="input-manufacturer">{{ entry_manufacturer }}</label>
+				  			<div class="control-group">
+				  				<input type="text" name="manufacturer" value="" placeholder="{{ entry_manufacturer }}" id="input-specific" class="form-control" />
+				  				<div id="specific" class="well well-sm" style="height: 150px; overflow: auto;">
+				  					{% for manufacturer in manufacturers %}
+				  					<div id="manufacturer{{ manufacturer.manufacturer_id }}" class="manufacturer">
+				  						<i class="fa fa-minus-circle"></i>
+				  						{{ manufacturer.name }}
+				  						<input type="hidden" name="manufacturer[]" value="{{ manufacturer.manufacturer_id }}" />
+				  					</div>
+				  					{% endfor %}
+				  				</div>
+				  			</div>
+				  		</div>
+				  	</div>
+				  </div>
+
+				  <div class="form-group">
+				  	<label class="control-label" for="input_manufacturer_link">{{ entry_link_to_page }}</label>
+				  	<div class="control-group">
+				  		<div class="switch-field">
+				  			<input type="radio" name="input_manufacturer_link" id="link_status_on" value="1" {% if input_manufacturer_link == 1 %} checked="checked" {% endif %}/>
+				  			<label for="link_status_on">{{ text_enabled }}</label>
+				  			<input type="radio" name="input_manufacturer_link" id="link_status_off" value="0" {% if input_manufacturer_link == 0 %} checked="checked" {% endif %}/>
+				  			<label for="link_status_off">{{ text_disabled }}</label>
+				  		</div>
+				  	</div>
+				  </div>
+
+				  {# Display Type #}
+				  <div class="form-group parent-form">
+				  	<label class="control-label" for="input-display-type">{{ entry_display_type }}</label>
+				  	<div class="control-group">
+				  		<div class="switch-field">
+				  			<input type="radio" name="display_type" id="type_grid" onclick="GetOptionsSelect();" value="0" {% if display_type == 0 %} checked="checked" {% endif %}/>
+				  			<label for="type_grid">{{ entry_grid }}</label>
+				  			<input type="radio" name="display_type" id="type_slider" onclick="GetOptionsSelect();" value="1" {% if display_type == 1 %} checked="checked" {% endif %}/>
+				  			<label for="type_slider">{{ entry_slider }}</label>
+				  		</div>
+				  	</div>
+				  </div>
+
+          		  {# Responsive #}
+		          <div class="form-group">
+		          	<label class="control-label">{{ entry_responsive }}</label>
+		          	<div class="control-group">
+		          		<div class="form-content">
+		          			<label class="control-label" for="input-xxldevice"><i class="fa fa-desktop"></i> {{ entry_xxldevice }}</label>
+		          			<select name="xxldevice" id="input-xxldevice" class="form-control">
+		          				<option value="1" {% if xxldevice == 1 %} selected="selected"{% endif %}>1</option>
+		          				<option value="2" {% if xxldevice == 2 %} selected="selected"{% endif %}>2</option>
+		          				<option value="3" {% if xxldevice == 3 %} selected="selected"{% endif %}>3</option>
+		          				<option value="4" {% if xxldevice == 4 %} selected="selected"{% endif %}>4</option>
+		          				<option value="5" {% if xxldevice == 5 %} selected="selected"{% endif %}>5</option>
+		          				<option value="6" {% if xxldevice == 6 %} selected="selected"{% endif %}>6</option>
+		          			</select>
+		          		</div>
+		          		<div class="form-content">
+		          			<label class="control-label" for="input-xldevice"><i class="fa fa-desktop"></i> {{ entry_xldevice }}</label>
+		          			<select name="xldevice" id="input-xldevice" class="form-control">
+		          				<option value="1" {% if xldevice == 1 %} selected="selected"{% endif %}>1</option>
+		          				<option value="2" {% if xldevice == 2 %} selected="selected"{% endif %}>2</option>
+		          				<option value="3" {% if xldevice == 3 %} selected="selected"{% endif %}>3</option>
+		          				<option value="4" {% if xldevice == 4 %} selected="selected"{% endif %}>4</option>
+		          				<option value="5" {% if xldevice == 5 %} selected="selected"{% endif %}>5</option>
+		          				<option value="6" {% if xldevice == 6 %} selected="selected"{% endif %}>6</option>
+		          			</select>
+		          		</div>
+		          		<div class="form-content">
+		          			<label class="control-label" for="input-lgdevice"><i class="fa fa-laptop"></i> {{ entry_lgdevice }}</label>
+		          			<select name="lgdevice" id="input-lgdevice" class="form-control">
+		          				<option value="1" {% if lgdevice == 1 %} selected="selected"{% endif %}>1</option>
+		          				<option value="2" {% if lgdevice == 2 %} selected="selected"{% endif %}>2</option>
+		          				<option value="3" {% if lgdevice == 3 %} selected="selected"{% endif %}>3</option>
+		          				<option value="4" {% if lgdevice == 4 %} selected="selected"{% endif %}>4</option>
+		          				<option value="5" {% if lgdevice == 5 %} selected="selected"{% endif %}>5</option>
+		          			</select>
+		          		</div>
+		          		<div class="form-content">
+		          			<label class="control-label" for="input-mddevice"><i class="fa fa-tablet fa-rotate-270"></i> {{ entry_mddevice }}</label>
+		          			<select name="mddevice" id="input-mddevice" class="form-control">
+		          				<option value="1" {% if mddevice == 1 %} selected="selected"{% endif %}>1</option>
+		          				<option value="2" {% if mddevice == 2 %} selected="selected"{% endif %}>2</option>
+		          				<option value="3" {% if mddevice == 3 %} selected="selected"{% endif %}>3</option>
+		          				<option value="4" {% if mddevice == 4 %} selected="selected"{% endif %}>4</option>
+		          			</select>
+		          		</div>
+		          		<div class="form-content">
+		          			<label class="control-label" for="input-smdevice"><i class="fa fa-tablet"></i> {{ entry_smdevice }}</label>
+		          			<select name="smdevice" id="input-smdevice" class="form-control">
+		          				<option value="1" {% if smdevice == 1 %} selected="selected"{% endif %}>1</option>
+		          				<option value="2" {% if smdevice == 2 %} selected="selected"{% endif %}>2</option>
+		          				<option value="3" {% if smdevice == 3 %} selected="selected"{% endif %}>3</option>
+		          			</select>
+		          		</div>
+		          		<div class="form-content">
+		          			<label class="control-label" for="input-xsdevice"><i class="fa fa-mobile"></i> {{ entry_xsdevice }}</label>
+		          			<select name="xsdevice" id="input-xsdevice" class="form-control">
+		          				<option value="1" {% if xsdevice == 1 %} selected="selected"{% endif %}>1</option>
+		          				<option value="2" {% if xsdevice == 2 %} selected="selected"{% endif %}>2</option>
+		          			</select>
+		          		</div>
+		          	</div>
+		          </div>
+
+		          {# Slider Options #}
+		          <div class="type_slider_selected select-options">
+		          	<div class="form-group">
+		          		<label class="control-label" for="input-rows">{{ entry_rows }}</label>
+		          		<div class="control-group">
+		          			<input type="text" name="rows" value="{{ rows }}" placeholder="{{ entry_rows }}" id="input-rows" class="form-control" />
+		          		</div>
+		          	</div>
+		          	<div class="form-group">
+		          		<label class="control-label" for="input-navigation">{{ entry_navigation }}</label>
+		          		<div class="control-group">
+		          			<div class="switch-field">
+		          				<input type="radio" name="navigation" id="navigation_on" value="1" {% if navigation == 1 %} checked="checked" {% endif %}/>
+		          				<label for="navigation_on">{{ text_enabled }}</label>
+		          				<input type="radio" name="navigation" id="navigation_off" value="0" {% if navigation == 0 %} checked="checked" {% endif %}/>
+		          				<label for="navigation_off">{{ text_disabled }}</label>
+		          			</div>
+		          		</div>
+		          	</div>
+		          	<div class="form-group">
+		          		<label class="control-label" for="input-pagination">{{ entry_pagination }}</label>
+		          		<div class="control-group">
+		          			<div class="switch-field">
+		          				<input type="radio" name="pagination" id="pagination_on" value="1" {% if pagination == 1 %} checked="checked" {% endif %}/>
+		          				<label for="pagination_on">{{ text_enabled }}</label>
+		          				<input type="radio" name="pagination" id="pagination_off" value="0" {% if pagination == 0 %} checked="checked" {% endif %}/>
+		          				<label for="pagination_off">{{ text_disabled }}</label>
+		          			</div>
+		          		</div>
+		          	</div>
+		          	<div class="form-group">
+		          		<label class="control-label" for="input-autoplay">{{ entry_autoplay }}</label>
+		          		<div class="control-group">
+		          			<div class="switch-field">
+		          				<input type="radio" name="autoplay" id="autoplay_on" value="1" {% if autoplay == 1 %} checked="checked" {% endif %}/>
+		          				<label for="autoplay_on">{{ text_enabled }}</label>
+		          				<input type="radio" name="autoplay" id="autoplay_off" value="0" {% if autoplay == 0 %} checked="checked" {% endif %}/>
+		          				<label for="autoplay_off">{{ text_disabled }}</label>
+		          			</div>
+		          		</div>
+		          	</div>
+		          	<div class="form-group">
+		          		<label class="control-label" for="input-apdelay">{{ entry_apdelay }}</label>
+		          		<div class="control-group">
+		          			<input type="text" name="apdelay" value="{{ apdelay }}" placeholder="{{ entry_apdelay }}" id="input-apdelay" class="form-control" />
+		          		</div>
+		          	</div>
+		          </div>
+					<input type="hidden" name="saveandstay" id="saveandstay" value="0">
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{{ footer }}
+<script type="text/javascript"><!--
+$('input[name=\'manufacturer\']').autocomplete({
+	source: function(request, response) {
+		$.ajax({
+			url: 'index.php?route=extension/module/tdbrands/autocompletebrands&user_token={{ user_token }}&filter_name=' +	encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['manufacturer_id']
+					}
+				}));
+			}
+		});
+	},
+	select: function(item) {
+		$('input[name=\'manufacturer\']').val('');
+		$('#specific' + item['value']).remove();
+
+		$('#specific').append('<div id="specific' + item['value'] + '" class="manufacturer"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="manufacturer[]" value="' + item['value'] + '" /></div>');
+		$('#manufacturer').scrollTop(1000);
+
+		return false;
+	},
+});
+$('#specific').delegate('.fa-minus-circle', 'click', function() {
+    $(this).parent().remove();
+  });
+function GetOptionsSelect() {
+	$('.select-options').hide();
+	var parentForms = document.getElementsByClassName('parent-form');
+	for (var j = 0; j < parentForms.length; j++) {
+		var inputChilds = parentForms[j].getElementsByTagName('input');
+		for (var i = 0; i < inputChilds.length; i++) {
+			if (inputChilds[i].checked) {
+				var id = inputChilds[i].id;
+				var showSelected = $('.'+id+'_selected');
+				$(showSelected).show();
+			}
+		}
+	};
+}
+$(document).ready(function(){
+	GetOptionsSelect();
+});
+//--></script>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Bonus Reward Report</name>
+	<code>bonus_reward_report</code>
+	<version>2.6</version>
+	<author>IHOR1989</author>
+
+	<file path="admin/controller/common/column_left.php">
+		<operation>
+			<search><![CDATA[$report = array();]]></search>
+			<add position="after"><![CDATA[
+				if ($this->user->hasPermission('access', 'report/bonus_reward')) {
+					$report[] = array(
+						'name'	   => $this->language->get('text_bonus_reward'),
+						'href'     => $this->url->link('report/bonus_reward', 'user_token=' . $this->session->data['user_token'], true),
+						'children' => array()
+					);
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/language/en-gb/common/column_left.php">
+		<operation>
+			<search><![CDATA[<?php]]></search>
+			<add position="after"><![CDATA[
+				$_['text_bonus_reward'] = 'Bonus Reward Report';
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/language/ru-ru/common/column_left.php">
+		<operation>
+			<search><![CDATA[<?php]]></search>
+			<add position="after"><![CDATA[
+				$_['text_bonus_reward'] = 'Отчет о бонусных баллах';
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/language/uk-ua/common/column_left.php">
+		<operation>
+			<search><![CDATA[<?php]]></search>
+			<add position="after"><![CDATA[
+				$_['text_bonus_reward'] = 'Звіт про бонусні бали';
+			]]></add>
+		</operation>
+	</file>
+</modification>

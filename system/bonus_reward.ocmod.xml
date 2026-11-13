@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Bonus Reward</name>
+	<code>bonus_reward</code>
+	<version>2.6</version>
+	<author>IHOR1989</author>
+
+	<file path="admin/model/catalog/review.php">
+		<operation>
+			<search><![CDATA[public function editReview($review_id, $data) {]]></search>
+			<add position="after"><![CDATA[
+				$this->load->model('extension/module/bonus_reward');
+				$this->model_extension_module_bonus_reward->updateRewardForReview($review_id, $data['status']);
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[public function deleteReview($review_id) {]]></search>
+			<add position="after"><![CDATA[
+				$this->load->model('extension/module/bonus_reward');
+				$this->model_extension_module_bonus_reward->updateRewardForReview($review_id, false);
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/product/product.php">
+		<operation>
+			<search><![CDATA[$data['reward'] = $product_info['reward'];]]></search>
+			<add position="replace"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if (!$this->config->get('module_bonus_reward_product_if_special') && $product_info['special'] > 0) {
+						$data['reward'] = '';
+					} else {
+						if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+							$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+							$config_bonus_reward = isset($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+						} else {
+							$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+							$config_bonus_reward = isset($bonus_reward_config[$product_info['manufacturer_id']]) ? $bonus_reward_config[$product_info['manufacturer_id']] : 0;
+						}
+
+						if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+							$price = (float)($product_info['special'] > 0 ? $product_info['special'] : $product_info['price']);
+							$data['reward'] = (int)($price * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+						} else {
+							$data['reward'] = '';
+						}
+					}
+				} else {
+					$data['reward'] = $product_info['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$data['points'] = $product_info['points'];]]></search>
+			<add position="replace"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$data['points'] = '';
+				} else {
+					$data['points'] = $product_info['points'];
+					}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="system/library/cart/cart.php">
+		<operation>
+			<search><![CDATA[$product_data[] = array(]]></search>
+			<add position="after"><![CDATA[
+				'is_special' => ($product_special_query->num_rows) ? 1 : 0,
+				'manufacturer_id' => $product_query->row['manufacturer_id'],
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/checkout/cart.php">
+		<operation>
+			<search><![CDATA[public function index() {]]></search>
+			<add position="after"><![CDATA[
+				if ((!$this->config->get('module_bonus_reward_coupon_limit') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_voucher_limit') && !empty($this->session->data['voucher']))) {
+					unset($this->session->data['reward']);
+				}
+
+				if ($this->config->get('module_bonus_reward_min_cart_price') > 0 && $this->config->get('module_bonus_reward_max_cart_price') > 0 && ($this->cart->getTotal() < $this->config->get('module_bonus_reward_min_cart_price') || ($this->cart->getTotal() > $this->config->get('module_bonus_reward_max_cart_price')))) {
+					unset($this->session->data['reward']);
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/checkout/confirm.php">
+		<operation>
+			<search><![CDATA[$order_data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/extension/total/reward.php">
+		<operation>
+			<search><![CDATA[if ($product['points']) {]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					if ($this->config->get('module_bonus_reward_cart_percent') > 0 ) {
+						$product['points'] = (int)($product['quantity'] * $product['price'] * ($this->config->get('module_bonus_reward_cart_percent') / 100));
+					} else {
+						$product['points'] = $product['price'];
+					}
+
+					if (!$this->config->get('module_bonus_reward_special_limit') && $product['is_special']) {
+						$product['points'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_coupon_limit') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_voucher_limit') && !empty($this->session->data['voucher']))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+
+					if ($this->config->get('module_bonus_reward_min_cart_price') > 0 && $this->config->get('module_bonus_reward_max_cart_price') > 0 && ($this->cart->getTotal() < $this->config->get('module_bonus_reward_min_cart_price') || ($this->cart->getTotal() > $this->config->get('module_bonus_reward_max_cart_price')))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/model/extension/total/reward.php">
+		<operation>
+			<search><![CDATA[$total['totals'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart' && !empty($this->session->data['reward'])) {
+					$discount_total = $this->session->data['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->db->query("DELETE FROM " . DB_PREFIX . "customer_reward WHERE order_id = '" . (int)$order_id . "' AND points < 0");]]></search>
+			<add position="replace"><![CDATA[
+				$this->db->query("DELETE FROM " . DB_PREFIX . "customer_reward WHERE order_id = '" . (int)$order_id . "' AND points < 0 AND cron_order_id != '" . (int)$order_id . "'");
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/checkout/oct_smartcheckout.php">
+		<operation>
+			<search><![CDATA[$data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$order_data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if ($product['points']) {]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					if ($this->config->get('module_bonus_reward_cart_percent') > 0 ) {
+						$product['points'] = (int)($product['quantity'] * $product['price'] * ($this->config->get('module_bonus_reward_cart_percent') / 100));
+					} else {
+						$product['points'] = $product['price'];
+					}
+
+					if (!$this->config->get('module_bonus_reward_special_limit') && $product['is_special']) {
+						$product['points'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_coupon_limit') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_voucher_limit') && !empty($this->session->data['voucher']))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+
+					if ($this->config->get('module_bonus_reward_min_cart_price') > 0 && $this->config->get('module_bonus_reward_max_cart_price') > 0 && ($this->cart->getTotal() < $this->config->get('module_bonus_reward_min_cart_price') || ($this->cart->getTotal() > $this->config->get('module_bonus_reward_max_cart_price')))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/checkout/onepcheckout.php">
+		<operation>
+			<search index="1"><![CDATA[$data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id]) && $product['price'] > 1) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$order_data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id]) && $product['price'] > 1) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if ($product['points']) {]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart' && $product['price'] > 1) {
+					if ($this->config->get('module_bonus_reward_cart_percent') > 0 ) {
+						$product['points'] = (int)($product['quantity'] * $product['price'] * ($this->config->get('module_bonus_reward_cart_percent') / 100));
+					} else {
+						$product['points'] = $product['price'];
+					}
+
+					if (!$this->config->get('module_bonus_reward_special_limit') && $product['is_special']) {
+						$product['points'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_coupon_limit') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_voucher_limit') && !empty($this->session->data['voucher']))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+
+					if ($this->config->get('module_bonus_reward_min_cart_price') > 0 && $this->config->get('module_bonus_reward_max_cart_price') > 0 && ($this->cart->getTotal() < $this->config->get('module_bonus_reward_min_cart_price') || ($this->cart->getTotal() > $this->config->get('module_bonus_reward_max_cart_price')))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/checkout/simplecheckout.php">
+		<operation>
+			<search index="2"><![CDATA[$product_data[] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/checkout/simplecheckout_cart.php">
+		<operation>
+			<search><![CDATA[$this->_templateData['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if ($product['points']) {]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					if ($this->config->get('module_bonus_reward_cart_percent') > 0 ) {
+						$product['points'] = (int)($product['quantity'] * $product['price'] * ($this->config->get('module_bonus_reward_cart_percent') / 100));
+					} else {
+						$product['points'] = $product['price'];
+					}
+
+					if (!$this->config->get('module_bonus_reward_special_limit') && $product['is_special']) {
+						$product['points'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_coupon_limit') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_voucher_limit') && !empty($this->session->data['voucher']))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+
+					if ($this->config->get('module_bonus_reward_min_cart_price') > 0 && $this->config->get('module_bonus_reward_max_cart_price') > 0 && ($this->cart->getTotal() < $this->config->get('module_bonus_reward_min_cart_price') || ($this->cart->getTotal() > $this->config->get('module_bonus_reward_max_cart_price')))) {
+						$product['points'] = '';
+						unset($this->session->data['reward']);
+					}
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/extension/module/custom/cart.php">
+		<operation>
+			<search><![CDATA[public function index($setting) {]]></search>
+			<add position="after"><![CDATA[
+				if ((!$this->config->get('module_bonus_reward_coupon_limit') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_voucher_limit') && !empty($this->session->data['voucher']))) {
+					unset($this->session->data['reward']);
+				}
+
+				if ($this->config->get('module_bonus_reward_min_cart_price') > 0 && $this->config->get('module_bonus_reward_max_cart_price') > 0 && ($this->cart->getTotal() < $this->config->get('module_bonus_reward_min_cart_price') || ($this->cart->getTotal() > $this->config->get('module_bonus_reward_max_cart_price')))) {
+					unset($this->session->data['reward']);
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					$customer_group_id = $this->customer->isLogged() ? $this->customer->getGroupId() : $this->config->get('config_customer_group_id');
+
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('catalog/product');
+
+						$categories = $this->model_catalog_product->getCategories($product['product_id']);
+
+						if (!empty($categories)) {
+							foreach ($categories as $category) {
+								if (!empty($category['main_category']) && $category['main_category'] == 1) {
+									$category_id = $category['category_id'];
+									break;
+								}
+							}
+							if (!$category_id) {
+								$category_id = (int)end($categories)['category_id'];
+							}
+						}
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = !empty($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = !empty($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$customer_group_id])) {
+						$product['reward'] = (int)($product['quantity'] * $product['price'] * ($config_bonus_reward['customer_group'][$customer_group_id] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+
+					if ((!$this->config->get('module_bonus_reward_product_if_special') && $product['is_special']) || (!$this->config->get('module_bonus_reward_product_if_coupon') && !empty($this->session->data['coupon'])) || (!$this->config->get('module_bonus_reward_product_if_voucher') && !empty($this->session->data['voucher'])) || (!$this->config->get('module_bonus_reward_reward_limit') && !empty($this->session->data['reward']))) {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/model/account/customer.php">
+		<operation>
+			<search><![CDATA[public function editNewsletter($newsletter) {]]></search>
+			<add position="after"><![CDATA[
+				$this->load->model('extension/module/bonus_reward');
+				$this->model_extension_module_bonus_reward->updateRewardForNewsletter($this->customer->getId(), $newsletter);
+			]]></add>
+		</operation>
+		<operation>
+			<search index="0"><![CDATA[return $customer_id;]]></search>
+			<add position="before"><![CDATA[
+				$this->load->model('extension/module/bonus_reward');
+				$this->model_extension_module_bonus_reward->updateRewardForRegister($customer_id, isset($data['newsletter']) ? (int)$data['newsletter'] : 0);
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/api/order.php">
+		<operation>
+			<search><![CDATA[class ControllerApiOrder extends Controller {]]></search>
+			<add position="after"><![CDATA[
+				public function addBonusReward($order_status_id, $order_info) {
+					$this->load->language('extension/module/bonus_reward');
+
+					$this->load->model('extension/module/bonus_reward');
+
+					$data = [
+						'customer_id'	 => $order_info['customer_id'],
+						'order_id'		 => $order_info['order_id'],
+						'points'		 => 0,
+						'subject'		 => '',
+						'message'		 => ''
+					];
+
+					$total_points = $this->model_extension_module_bonus_reward->getTotalCustomerRewardsByOrderId($order_info['order_id']);
+
+					if (!in_array($order_status_id, $this->config->get('config_complete_status'))  && $order_info['customer_id'] != 0) {
+						if ($total_points > 0) {
+							$data['points']		 = -$total_points;
+							$data['subject']	 = $this->config->get('module_bonus_reward_remove_subject');
+							$data['message']	 = $this->config->get('module_bonus_reward_remove_message');
+
+							$this->model_extension_module_bonus_reward->addReward($order_info['customer_id'], sprintf($this->language->get('text_remove_for_order'), $order_info['order_id']), -$total_points, $order_info['order_id']);
+
+							if (!empty($this->config->get('module_bonus_reward_remove_subject')) && !empty($this->config->get('module_bonus_reward_remove_message'))) {
+								$this->model_extension_module_bonus_reward->sendBonusRewardEmail($data);
+							}
+						}
+					} else {
+						if ($this->config->get('module_bonus_reward_day_start') == 0 && $total_points == 0) {
+							$reward = 0;
+
+							$this->load->model('account/order');
+
+							$products = $this->model_account_order->getOrderProducts($order_info['order_id']);
+
+							foreach ($products as $product) {
+								$reward += $product['reward'];
+							}
+							if ($reward > 0) {
+								$data['points']		 = $reward;
+								$data['subject']	 = $this->config->get('module_bonus_reward_order_subject');
+								$data['message']	 = $this->config->get('module_bonus_reward_order_message');
+
+								$this->model_extension_module_bonus_reward->addReward($order_info['customer_id'], sprintf($this->language->get('text_add_for_order'), $order_info['order_id']), $reward, $order_info['order_id']);
+
+								if (!empty($this->config->get('module_bonus_reward_order_subject')) && !empty($this->config->get('module_bonus_reward_order_message'))) {
+									$this->model_extension_module_bonus_reward->sendBonusRewardEmail($data);
+								}
+							}
+						}
+					}
+				}
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override']);]]></search>
+			<add position="before"><![CDATA[
+				$this->addBonusReward($this->request->post['order_status_id'], $order_info);
+			]]></add>
+		</operation>
+	</file>
+</modification>

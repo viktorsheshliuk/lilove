@@ -1,0 +1,74 @@
+{% if mitems %}
+<div id="_desktop_megamenu" class="tdmegamenu">
+	<h3 class="cat-title hidden-lg-up">{{ categ_text }}</h3>
+	<ul class="td-horizontal-menu mobile-navigation">
+		{% if tophomelink == 'yes' %}
+			<li class="menu-item home"><a href=""><i class="fa fa-home"></i></a></li>
+		{% endif %}
+		{% for mitem in mitems %}
+			<li class="menu-item{% if mitem.children %} has-child{% if mitem.view == 'f0' %} dropdown{% else %} mega{% endif %}{% endif %}{% if mitem.tlstyle %} {{ mitem.tlstyle }}{% endif %}">
+				<a {% if mitem.tlcolor %}style="color: {{ mitem.tlcolor }};"{% endif %} {% if mitem.href %} href="{{ mitem.href }}"{% if mitem.tntab %} target="_blank"{% endif %}{% endif %}>
+					{{ mitem.name }}
+				</a>
+				{% if mitem.children %}
+					<span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>
+				{% endif %}
+				{% if mitem.children and (mitem.view == 'f0') %}
+					<ul class="sub-menu{% if mitem.mflyl %} flytoleft{% endif %}">
+						{% for mildren in mitem.children %}
+							<li class="menu-item{% if mildren.gchildren %} has-child{% endif %}">
+								<a href="{{ mildren.href }}">{{ mildren.name }}</a>
+								{% if mildren.gchildren %}<span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>{% endif %}
+								{% if mildren.gchildren %}
+									<ul class="sub-menu">
+										{% for gmildren in mildren.gchildren %}
+											<li class="menu-item{% if gmildren.ggchildren %} has-child{% endif %}">
+												<a href="{{ gmildren.href }}">{{ gmildren.name }}</a>
+												{% if gmildren.ggchildren %}<span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>{% endif %}
+												{% if gmildren.ggchildren %}
+													<ul class="sub-menu">
+														{% for ggmildren in gmildren.ggchildren %}
+															<li class="menu-item"><a href="{{ ggmildren.href }}">{{ ggmildren.name }}</a></li>
+														{% endfor %}
+													</ul>
+												{% endif %}
+											</li>
+										{% endfor %}
+									</ul>
+								{% endif %}
+							</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+				{% if (mitem.children) and (mitem.view != 'f0') %}
+					<ul class="sub-menu" {% if mitem.dwidth %}data-width="{{ mitem.dwidth }}" style="width: {{ mitem.dwidth }}px;"{% endif %}>
+						{% for mildren in mitem.children %}
+							<li class="menu-item{% if mildren.gchildren %} has-child{% endif %}" {% if mitem.iwidth %}style="width: {{ mitem.iwidth }}px;"{% endif %}>
+								{% if mitem.view  ==  '1' %}
+									<div class="image hidden-md-down">
+										<a href="{{ mildren.href }}"><img src="{{ mildren.thumb }}" alt="{{ mildren.name }}" title="{{ mildren.name }}" /></a>
+									</div>
+								{% endif %}
+								<a href="{{ mildren.href }}">{{ mildren.name }}</a>
+								{% if mildren.gchildren %}<span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>{% endif %}
+								{% if mildren.gchildren %}
+									<ul class="sub-menu">
+										{% for gmildren in mildren.gchildren %}
+											<li><a href="{{ gmildren.href }}">{{ gmildren.name }}</a></li>
+										{% endfor %}
+									</ul>
+								{% endif %}
+							</li>
+						{% endfor %}
+						{% if mitem.add %}
+							<li class="menu-item banner">
+								<a {% if mitem.addurl %}href="{{ mitem.addurl }}"{% endif %} ><img src="image/{{ mitem.add }}" alt="{{ mitem.name }}" /></a>
+							</li>
+						{% endif %}
+					</ul>
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endif %}

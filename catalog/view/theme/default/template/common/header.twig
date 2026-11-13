@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<!--[if IE 8 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie8"><![endif]-->
+<!--[if IE 9 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html dir="{{ direction }}" lang="{{ lang }}">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ title }}</title>
+<base href="{{ base }}" />
+{% if description %}
+<meta name="description" content="{{ description }}" />
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content="{{ keywords }}" />
+{% endif %}
+<meta property="og:title" content="{{ title }}" />
+{% if description %} <meta name="description" content="{{ description }}" /> <meta property="og:description" content="{{ description }}" /> {% endif %}
+ <link href="{{ config_icon }}" rel="icon">  
+<script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+{# <link href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,300,700" rel="stylesheet" type="text/css" /> #}
+{# <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"> #}
+<link href="catalog/view/theme/default/stylesheet/stylesheet.css" rel="stylesheet">
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+<script src="catalog/view/javascript/common.js" type="text/javascript"></script>
+{% for link in links %}
+<link href="{{ link.href }}" rel="{{ link.rel }}" />
+{% endfor %}
+{% for analytic in analytics %}
+{{ analytic }}
+{% endfor %}
+</head>
+<body class="{{ class }}">
+<div id="search_background"></div>
+<div id="menu_background"></div> 
+<div id="wrapper">
+<div id="main">
+<header>
+  <div class="container">
+
+    <div class="header_inner">
+      <div class="header_left_box">
+        <div class="header__burger"><span></span></div>
+        <img id="header_mobile_search_icon" src="image/icons/header-search.svg" alt="Search" title="Search">
+      </div>
+      <div id="logo">
+            {% if logo %}
+              {% if home == og_url %}
+                <img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-responsive" />
+              {% else %}
+                <a href="{{ home }}"><img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-responsive" /></a>
+              {% endif %}
+            {% else %}
+              <h1><a href="{{ home }}">{{ name }}</a></h1>
+            {% endif %}
+      </div>
+      <div style="display: none;" class="top-menu__wishlist" data-products="{{ wishlist.products }}"></div>
+      <div class="header_menu">
+        
+
+        <ul class="td-horizontal-menu mobile-navigation  list-unstyled header_list">
+          {% for category in categories %}
+            {% if category.children %}
+              <li class="menu-item has-child {% if category.column <= '1' %} dropdown{% else %} mega{% endif %}">
+                <a href="{{ category.href }}">{{ category.name }}</a>
+                <span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>
+                <ul class="sub-menu column-{{ category.column }}">
+                  {% for children in category.children|batch(category.children|length / category.column|round(1, 'ceil')) %}
+                    {% for child in children %}
+                      {% if child.children %}
+                        <li class="menu-item has-child">
+                          <a href="{{ child.href }}">{{ child.name }}</a>
+                          <span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>
+                          <ul class="sub-menu">
+                            {% for children in child.children %}
+                              <li class="menu-item">
+                                <a href="{{ children.href }}">{{ children.name }}</a>
+                              </li>
+                
+                            {% endfor %}
+                          </ul>
+                        </li>
+                      {% else %}
+                        <li class="menu-item"><a href="{{ child.href }}">{{ child.name }}</a></li>
+            
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                </ul>
+              </li>
+            {% else %}
+              <li><a href="{{ category.href }}">{{ category.name }}</a></li>
+        
+            {% endif %}
+          {% endfor %}
+          <li><a href="{{ category_id_208 }}">{{ text_category_id_208 }} </a></li>
+          <li><a class="color_red" href="{{ special }}">{{ text_special_1 }} </a></li> 
+          {% if informations %}
+              {% for information in informations %}
+              <li><a href="{{ information.href }}">{{ information.title }}</a></li>
+              {% endfor %}
+          {% endif %}
+          <li><a href="{{ contact }}">{{ text_contact }}</a></li>
+        </ul>
+      </div>
+      <div class="header_right_box">
+        <div id="header_search"><img src="image/icons/header-search.svg" alt="{{ text_search }}" title="{{ text_search }}"></div>
+        <a id="header_account" href="{{ account }}"><img src="image/icons/header-user.svg" alt="{{ text_account }}" title="{{ text_account }}" height="20px"></a>
+        <a href="{{ wishlist.href }}" id="wishlist-total" title="{{ text_wishlist }}"><img src="image/icons/header-wishlist.svg" alt="{{ text_wish }}" title="{{ text_wish }}" height="20px">
+            {% if text_wishlist %}
+            <span class="{# hidden-xs hidden-sm hidden-md #} ">{{ text_wishlist }}</span>
+            {% else %}
+            <span class="{# hidden-xs hidden-sm hidden-md #} no-items">{{ text_wishlist }}</span>
+            {% endif %}
+        </a>
+        {{ cart }}{{ language }}
+      </div>
+    </div> 
+    {{ search }} 
+     <nav class="header__menu-mobile">
+          <div class="header__menu-close"><img src="image/icons/mobile_close_icon.png"></div>
+          <div id="mobile__menu-logo">
+            {% if logo %}
+              {% if home == og_url %}
+                <img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-responsive" />
+              {% else %}
+                <a href="{{ home }}"><img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-responsive" /></a>
+              {% endif %}
+            {% else %}
+              <h1><a href="{{ home }}">{{ name }}</a></h1>
+            {% endif %}
+          </div>
+          {#<a href="{{ link_search }}"><div class="mobile__menu-search"><img src="image/catalog/header-search.png" alt="Search" title="Search">Search</div></a>
+          <div class="mobile__menu-delimeter"></div>#}
+
+          <div class="mobile__menu-list-title">{{ text_category }}</div>
+          <ul class="category-top-menu block_content list-unstyled">
+            <li class="category-item"><a href="{{ category_id_208 }}">{{ text_category_id_208 }}</a></li>  
+            {% for category in categories %}
+              {% if category.children %}
+                <li class="category-item category-dropdown-menu">
+                  <a href="javascript:void(0);{#{{ category.href }}#}" class="toggle-category">{{ category.name }}</a>
+                  <span class="toggle-category"><i class="fa fa-angle-down"></i></span>
+                  {% for children in category.children|batch(category.children|length) %}
+                    <ul class="category-sub-menu">
+                      {% for child in children %}
+                        {% if child.children %}
+                          <li class="category-item category-dropdown-menu">
+                            <a href="{{ child.href }}">{{ child.name }}</a>
+                            <span class="toggle-category"><i class="fa fa-angle-down"></i></span>
+                            <ul class="category-sub-menu">
+                              {% for children in child.children %}
+                              <li class="category-item">
+                                <a href="{{ children.href }}">{{ children.name }}</a>
+                              </li>
+                              {% endfor %}
+                            </ul>
+                          </li>
+                        {% else %}
+                        <li class="category-item"><a href="{{ child.href }}">{{ child.name }}</a></li>
+                       {% endif %}
+                     {% endfor %}
+                    </ul>
+                  {% endfor %}
+                </li>
+              {% else %}
+                li><a href="{{ category.href }}">{{ category.name }}</a></li>
+              {% endif %}
+            {% endfor %}
+            <li class="category-item"><a class="color_red" href="{{ special }}">{{ text_special_1 }}</a></li>  
+          </ul>
+          {# <div class="mobile__menu-delimeter"></div> #}
+          {# <button class="btn-black" onclick="location.href='{{ link_custom }}'">Custom Order</button> #}
+          <div class="mobile__menu-delimeter"></div>
+          {# {% if informations_mobile %} #}
+          <div class="mobile__menu-list-title">{{ text_information }}</div>
+            <ul class="list-unstyled">
+                {% for information in informations_mobile %}
+                <li><a href="{{ information.href }}">{{ information.title }}</a></li>
+                {% endfor %}
+                <li><a href="{{ contact }}">{{ text_contact }}</a></li>
+            </ul>
+          {# {% endif %} #}
+          <div class="mobile__menu-delimeter"></div>
+          <div class="mobile__menu-account-block">
+            <img src="image/icons/mobile-menu-user.png" alt="Account" title="Account" height="39px" width="39px">
+            <div class="mobile__menu-login-block">
+              <div><a href="{{ login }}">{{ text_login }}</a> | <a href="{{ register }}"><span>{{ text_register }}</span></a></div>
+              <div class="login-block-text">{{ text_register_1 }}</div>
+            </div>
+            
+          </div>
+          <div class="mobile__menu-delimeter"></div>
+          <div class="telephone_box">
+            <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.8328 10.3714V12.1214C12.8335 12.2838 12.8002 12.4446 12.7351 12.5935C12.6701 12.7423 12.5746 12.876 12.4549 12.9858C12.3352 13.0956 12.1938 13.1792 12.04 13.2313C11.8861 13.2833 11.723 13.3026 11.5612 13.288C9.76617 13.093 8.04193 12.4796 6.52701 11.4972C5.11758 10.6016 3.92263 9.40663 3.02701 7.99719C2.04117 6.47539 1.42766 4.74277 1.23618 2.93969C1.2216 2.77838 1.24077 2.6158 1.29247 2.46231C1.34417 2.30881 1.42726 2.16776 1.53646 2.04814C1.64566 1.92851 1.77857 1.83294 1.92672 1.7675C2.07488 1.70205 2.23505 1.66818 2.39701 1.66803H4.14701C4.43011 1.66524 4.70456 1.76549 4.91921 1.95009C5.13386 2.13468 5.27406 2.39104 5.31368 2.67136C5.38754 3.2314 5.52453 3.78128 5.72201 4.31053C5.8005 4.51931 5.81748 4.74623 5.77096 4.96437C5.72443 5.18252 5.61635 5.38276 5.45951 5.54136L4.71868 6.28219C5.54909 7.74259 6.75828 8.95178 8.21868 9.78219L8.95951 9.04136C9.11812 8.88452 9.31835 8.77644 9.5365 8.72991C9.75465 8.68339 9.98156 8.70037 10.1903 8.77886C10.7196 8.97635 11.2695 9.11333 11.8295 9.18719C12.1129 9.22717 12.3717 9.3699 12.5567 9.58823C12.7417 9.80657 12.8399 10.0853 12.8328 10.3714Z" stroke="black" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            <a href="tel:{{ telephone }}">{{ telephone }}</a>
+          </div> 
+          <div class="mobile__menu-delimeter"></div>
+          <div class="mobile__menu-list-title">{{ text_mobmenu_social }}</div>
+          <div class="mobile__menu-follow">
+            <a href="https://www.facebook.com/lilove.com.ua">
+                {# <img src="image/catalog/mobile-menu-facebook.png" alt="Facebook" title="Facebook"> #}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="#B9B9B9"/><path d="M13 8.99996C13 7.99996 13.5 7.99996 14 7.99996H14.6C14.7002 8.0013 14.7997 7.98257 14.8925 7.94485C14.9853 7.90713 15.0696 7.8512 15.1404 7.78036C15.2113 7.70952 15.2672 7.6252 15.3049 7.53238C15.3426 7.43957 15.3614 7.34014 15.36 7.23996V6.29996C15.3601 6.19931 15.3401 6.09966 15.3013 6.00679C15.2624 5.91393 15.2056 5.8297 15.1339 5.75899C15.0623 5.68829 14.9773 5.63252 14.884 5.59492C14.7906 5.55732 14.6907 5.53864 14.59 5.53996L13.17 5.51996C12.7566 5.50397 12.3446 5.57788 11.9624 5.73661C11.5803 5.89533 11.2372 6.13508 10.9567 6.43931C10.6762 6.74354 10.4651 7.105 10.338 7.49875C10.2108 7.89249 10.1705 8.30915 10.22 8.71996V10.17H9.43004C9.22848 10.17 9.03517 10.25 8.89264 10.3926C8.75012 10.5351 8.67004 10.7284 8.67004 10.93V11.87C8.67004 12.0715 8.75012 12.2648 8.89264 12.4074C9.03517 12.5499 9.22848 12.63 9.43004 12.63H10.22V18C10.22 18.1326 10.2727 18.2597 10.3665 18.3535C10.4603 18.4473 10.5874 18.5 10.72 18.5H12.53C12.6574 18.4923 12.777 18.4363 12.8644 18.3433C12.9517 18.2504 13.0003 18.1275 13 18V12.63H13.88C14.0816 12.63 14.2749 12.5499 14.4174 12.4074C14.56 12.2648 14.64 12.0715 14.64 11.87V10.93C14.64 10.7284 14.56 10.5351 14.4174 10.3926C14.2749 10.25 14.0816 10.17 13.88 10.17H13V8.99996Z" fill="#141414"/></svg>
+            </a>
+            {# <a href="#"><img src="image/catalog/mobile-menu-twitter.png" alt="Twitter" title="Twitter"></a> #}
+            <a href="https://www.instagram.com/lilove.ua">
+              {# <img src="image/catalog/mobile-menu-instagram.png" alt="Instagram" title="Instagram"> #}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="12" fill="#B9B9B9"/><g clip-path="url(#clip0_402_34068)"><path d="M12.0007 5C10.0996 5 9.86097 5.00831 9.11429 5.04229C8.36908 5.07642 7.8604 5.1944 7.41532 5.3675C6.95492 5.54629 6.56437 5.78546 6.17528 6.17469C5.7859 6.56377 5.54673 6.95431 5.36736 7.41456C5.19381 7.85979 5.07569 8.3686 5.04215 9.11352C5.00875 9.86019 5 10.0989 5 12C5 13.9011 5.00846 14.1389 5.04229 14.8856C5.07656 15.6308 5.19454 16.1395 5.3675 16.5846C5.54644 17.045 5.78561 17.4355 6.17485 17.8246C6.56379 18.214 6.95433 18.4537 7.41444 18.6325C7.85982 18.8056 8.36864 18.9236 9.11371 18.9577C9.86038 18.9917 10.0988 19 11.9998 19C13.901 19 14.1389 18.9917 14.8856 18.9577C15.6308 18.9236 16.14 18.8056 16.5854 18.6325C17.0457 18.4537 17.4356 18.214 17.8246 17.8246C18.214 17.4355 18.4531 17.045 18.6325 16.5847C18.8046 16.1395 18.9227 15.6307 18.9577 14.8857C18.9912 14.1391 19 13.9011 19 12C19 10.0989 18.9912 9.86033 18.9577 9.11367C18.9227 8.36846 18.8046 7.85979 18.6325 7.41471C18.4531 6.95431 18.214 6.56377 17.8246 6.17469C17.4352 5.78531 17.0458 5.54615 16.585 5.3675C16.1387 5.1944 15.6298 5.07642 14.8845 5.04229C14.1379 5.00831 13.9002 5 11.9985 5H12.0007ZM11.3727 6.26146C11.5591 6.26117 11.767 6.26146 12.0007 6.26146C13.8697 6.26146 14.0912 6.26817 14.8293 6.30171C15.5118 6.33292 15.8822 6.44696 16.1289 6.54277C16.4556 6.66965 16.6885 6.82131 16.9334 7.06631C17.1784 7.31131 17.33 7.54465 17.4572 7.87131C17.553 8.11777 17.6672 8.48819 17.6983 9.17069C17.7318 9.9086 17.7391 10.1303 17.7391 11.9984C17.7391 13.8665 17.7318 14.0882 17.6983 14.8261C17.6671 15.5086 17.553 15.879 17.4572 16.1255C17.3303 16.4521 17.1784 16.6847 16.9334 16.9296C16.6884 17.1746 16.4558 17.3263 16.1289 17.4531C15.8825 17.5494 15.5118 17.6631 14.8293 17.6944C14.0913 17.7279 13.8697 17.7352 12.0007 17.7352C10.1315 17.7352 9.90997 17.7279 9.17204 17.6944C8.48954 17.6629 8.11912 17.5488 7.87222 17.453C7.54555 17.3261 7.31221 17.1745 7.06721 16.9295C6.82221 16.6845 6.67054 16.4517 6.54337 16.1249C6.44756 15.8784 6.33337 15.508 6.30231 14.8255C6.26876 14.0876 6.26205 13.8659 6.26205 11.9966C6.26205 10.1274 6.26876 9.90685 6.30231 9.16894C6.33351 8.48644 6.44756 8.11602 6.54337 7.86927C6.67025 7.5426 6.82221 7.30927 7.06721 7.06427C7.31221 6.81927 7.54555 6.6676 7.87222 6.54044C8.11897 6.44419 8.48954 6.33044 9.17204 6.29908C9.8178 6.26992 10.0681 6.26117 11.3727 6.25971V6.26146ZM15.7372 7.42375C15.2735 7.42375 14.8972 7.79956 14.8972 8.26346C14.8972 8.72721 15.2735 9.10346 15.7372 9.10346C16.201 9.10346 16.5772 8.72721 16.5772 8.26346C16.5772 7.79971 16.201 7.42346 15.7372 7.42346V7.42375ZM12.0007 8.40521C10.0154 8.40521 8.40583 10.0148 8.40583 12C8.40583 13.9852 10.0154 15.5941 12.0007 15.5941C13.9859 15.5941 15.5949 13.9852 15.5949 12C15.5949 10.0148 13.9859 8.40521 12.0007 8.40521ZM12.0007 9.66667C13.2893 9.66667 14.334 10.7113 14.334 12C14.334 13.2886 13.2893 14.3333 12.0007 14.3333C10.7119 14.3333 9.6673 13.2886 9.6673 12C9.6673 10.7113 10.7119 9.66667 12.0007 9.66667Z" fill="#141414"/></g><defs><clipPath id="clip0_402_34068"><rect width="14" height="14" fill="white" transform="translate(5 5)"/></clipPath></defs></svg>
+            </a>
+          </div>
+           <div class="mobile__menu-delimeter"></div>
+           {{ language }}
+        </nav>
+        <div class="header__search-mobile">
+          <div class="top_box">
+            <img id="close_search_arrow" src="image/icons/arrow-left.png">
+            <input type="text" name="mobile_search" id="mobile_search" placeholder="{{ text_search }} ...">
+          </div> 
+          <div class="header__search-mobile-title">{{ text_search_matches }}</div>
+           <div class="product_matches"></div>
+        </div>
+  </div>
+<script>
+  const uniJsVars = {
+      compare_btn:  {text: '{{ button_compare }}',  text_remove: '{{ button_compare_delete }}'},
+      wishlist_btn: {text: '{{ button_wishlist }}', text_remove: '{{ button_wishlist_delete }}'},
+  };
+</script>   
+</header>
+{# {{ menu }}   #}
+

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Bonus Reward Order Info</name>
+	<code>bonus_reward_order_info</code>
+	<version>2.6</version>
+	<author>IHOR1989</author>
+
+	<file path="admin/controller/sale/order.php">
+		<operation>
+			<search><![CDATA[$data['products'][] = array(]]></search>
+			<add position="after"><![CDATA[
+				'reward' => $product['reward'],
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[class ControllerSaleOrder extends Controller {]]></search>
+			<add position="after"><![CDATA[
+				public function editProductReward() {
+					$this->load->language('sale/order');
+
+					if (!$this->user->hasPermission('modify', 'sale/order')) {
+						$json['error'] = $this->language->get('error_permission');
+					} else {
+						if (isset($this->request->get['order_id']) && isset($this->request->post['product_id']) && isset($this->request->post['reward'])) {
+							$order_id = $this->request->get['order_id'];
+							$product_id = $this->request->post['product_id'];
+							$reward = $this->request->post['reward'];
+
+							$this->load->model('sale/order');
+							$this->model_sale_order->updateRewardToProduct($order_id, $product_id, $reward);
+
+							$json['success'] = $this->language->get('text_success');
+						}
+					}
+
+					$this->response->addHeader('Content-Type: application/json');
+					$this->response->setOutput(json_encode($json));
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/model/sale/order.php">
+		<operation>
+			<search><![CDATA[class ModelSaleOrder extends Model {]]></search>
+			<add position="after"><![CDATA[
+				public function updateRewardToProduct($order_id, $product_id, $reward) {
+					$this->db->query("UPDATE " . DB_PREFIX . "order_product SET reward = '" . (int)$reward . "' WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$product_id . "'");
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/view/template/sale/order_info.twig">
+		<operation>
+			<search><![CDATA[<td class="text-right">{{ column_quantity }}</td>]]></search>
+			<add position="after"><![CDATA[
+				<td class="text-right">{{ text_reward }}</td>
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[<td colspan="4" class="text-right">{{ total.title }}</td>]]></search>
+			<add position="replace"><![CDATA[
+				<td colspan="5" class="text-right">{{ total.title }}</td>
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[<td class="text-right">{{ product.quantity }}</td>]]></search>
+			<add position="after"><![CDATA[
+				<td class="text-right">
+					<span id="reward-{{ product.product_id }}">{{ product.reward }}</span>&nbsp;&nbsp;
+					<button type="button" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-warning btn-sm" id="edit-reward-btn-{{ product.product_id }}" onclick="editReward({{ product.product_id }})"><i class="fa fa-pencil"></i></button>
+					<input type="number" id="reward-input-{{ product.product_id }}" class="form-control form-control-sm" style="width: 80px; display: none;" />
+					<button type="button" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm" id="save-reward-btn-{{ product.product_id }}" style="display: none;" onclick="saveReward({{ product.product_id }})"><i class="fa fa-save"></i></button>
+					<button type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-secondary btn-sm" id="cancel-reward-btn-{{ product.product_id }}" style="display: none;" onclick="cancelReward({{ product.product_id }})"><i class="fa fa-reply"></i></button>
+				</td>
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[{{ footer }} ]]></search>
+			<add position="before"><![CDATA[
+				<script>
+				function editReward(productId) {
+					document.getElementById('edit-reward-btn-' + productId).style.display = 'none';
+					document.getElementById('reward-' + productId).style.display = 'none';
+					document.getElementById('reward-input-' + productId).style.display = 'inline-block';
+					document.getElementById('save-reward-btn-' + productId).style.display = 'inline-block';
+					document.getElementById('cancel-reward-btn-' + productId).style.display = 'inline-block';
+
+					var rewardValue = document.getElementById('reward-' + productId).textContent;
+					document.getElementById('reward-input-' + productId).value = rewardValue;
+				}
+
+				function saveReward(productId) {
+					var reward = $('#reward-input-' + productId).val();
+					$.ajax({
+						url: 'index.php?route=sale/order/editProductReward&user_token={{ user_token }}&order_id={{ order_id }}',
+						type: 'POST',
+						data: {
+							product_id: productId,
+							reward: reward
+						},
+						dataType: 'json',
+						success: function(json) {
+							$('.alert-dismissible').remove();
+							if (json['error']) {
+								$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+							}
+							if (json['success']) {
+								$('#reward-' + productId).text(reward).show();
+								$('#reward-input-' + productId).hide();
+								$('#save-reward-btn-' + productId).hide();
+								$('#cancel-reward-btn-' + productId).hide();
+								$('#edit-reward-btn-' + productId).show();
+								$('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+							}
+						},
+						error: function(xhr, ajaxOptions, thrownError) {
+							alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+						}
+					});
+				}
+				function cancelReward(productId) {
+					document.getElementById('reward-input-' + productId).style.display = 'none';
+					document.getElementById('save-reward-btn-' + productId).style.display = 'none';
+					document.getElementById('cancel-reward-btn-' + productId).style.display = 'none';
+					document.getElementById('reward-' + productId).style.display = 'inline';
+					document.getElementById('edit-reward-btn-' + productId).style.display = 'inline';
+				}
+				</script>
+			]]></add>
+		</operation>
+	</file>
+</modification>

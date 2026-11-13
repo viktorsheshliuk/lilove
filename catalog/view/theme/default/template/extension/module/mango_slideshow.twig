@@ -1,0 +1,75 @@
+
+<div class="mango_slideshow {{ css_class }}" style="max-width: {{width}}px;/*max-height: {{height}}px;*/margin: 0 auto;">
+  <div id="mango_slideshow_{{ module }}" class="swiper-container" style="margin-top: 3px;">
+    <div class="swiper-wrapper">
+    {% for mango_slideshow in mango_slideshows %} 
+      <div class="mango_slideshow_item swiper-slide">
+        <div class="background-image" style="height: {{ height }}px" data-pc-style="background: url({{ mango_slideshow['image'] }}) no-repeat top center; height: calc( 100vw / calc({{width}}/{{height}}));background-size: contain;" data-mobile-style="background: url({{ mango_slideshow['image_mobile'] }}) no-repeat top center; height: calc(100vw  * 1.067);background-size: contain;">
+          {# <div class="container"> #}
+            {# <img src="{{ mango_slideshow['image'] }}" alt="" class="img-responsive" /> #}
+            <a href="{{ mango_slideshow['link'] }}" class="mango_slideshow_link link-unstyled">
+             {#  <div class="mango_slideshow_text title align-{{ mango_slideshow['align'] }}">
+                {% if mango_slideshow['text_1'] %}
+                  <div class="line-1" style="color: {{ mango_slideshow['text_1_color'] }}">{{ mango_slideshow['text_1'] }}</div>
+                  <div class="line-2" style="color: {{ mango_slideshow['text_2_color'] }}">{{ mango_slideshow['text_2'] }}</div>
+                  <div class="mango_slideshow_button btn btn-primary style-{{ mango_slideshow['button_style'] }}">{{ mango_slideshow['button_text'] }}</div>
+                {% endif %}
+              </div> #}
+            </a>
+          {# </div> #}
+        </div>
+      </div>
+    {% endfor %} 
+    </div>
+  </div>
+  <div class="swiper-pagination mango_slideshow_{{ module }}"></div>
+  <div class="swiper-pager">
+    <div class="swiper-button-next swiper-button-black mango_slideshow-button-next-{{ module }}"></div>
+    <div class="swiper-button-prev swiper-button-black mango_slideshow-button-prev-{{ module }}"></div>
+  </div>
+</div>
+<script><!--
+$(document).ready(function(){
+   if($(window).outerWidth() > 767){
+       $('.mango_slideshow_item').attr('style', 'max-height:{{ height }}px');
+   }    
+
+  $(window).resize(function(){
+    $('#mango_slideshow_{{ module }} .background-image').each(function(){
+      if($(window).outerWidth() > 767){
+        $(this).attr('style', $(this).data('pc-style')); 
+      }else{
+        $(this).attr('style', $(this).data('mobile-style')); 
+        $('.mango_slideshow').attr('style', 'max-height:{{ height_mobile }}px');
+      }
+    });
+  });
+  $(window).resize();
+  
+  mySwiper = new Swiper('#mango_slideshow_{{ module }}', {
+    direction: 'horizontal',
+    speed: 800,
+    pagination: {
+      el: '.mango_slideshow_{{ module }}',
+      clickable : true,
+    },
+    navigation: {
+        nextEl: '.mango_slideshow-button-next-{{ module }}',
+        prevEl: '.mango_slideshow-button-prev-{{ module }}',
+    },
+    autoplay: {
+       delay: 6000,
+    },
+    loop: true,
+    autoHeight: true
+
+  });
+
+  
+  mySwiper.on('slideChangeStart', function () {
+    var currentSlide = $('#mango_slideshow_{{ module }} .swiper-slide-active');
+    $('#mango_slideshow_{{ module }}').find('.line-1, .line-2, .btn').css('top', '-1000px');
+    currentSlide.find('.line-1, .line-2, .btn').css('top', '0');
+  });
+});
+--></script>

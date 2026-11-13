@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>Admin Products Recent First</name>
+  <code>AdminProductsRecentFirst20161117</code>
+  <version>1.0</version>
+  <author>Serge Tkach</author>
+  <link>http://web-jump.in.ua/?utm_source=OpenCartModule&amp;utm_medium=AuthorLink&amp;utm_campaign=AdminProductsRecentFirst</link>
+		<file path="admin/controller/catalog/product.php">
+      <operation>
+        <search><![CDATA[$sort = 'pd.name';]]></search>
+        <add position="replace"><![CDATA[$sort = 'p.product_id'; // customized
+        ]]></add>
+      </operation>
+
+      <operation>
+        <search><![CDATA[$order = 'ASC';]]></search>
+        <add position="replace"><![CDATA[$order = 'DESC'; // customized
+        ]]></add>
+      </operation>
+  	</file>
+  	<file path="admin/model/catalog/product.php">
+      <operation>
+        <search><![CDATA[$sql .= " ORDER BY pd.name";]]></search>
+        <add position="replace"><![CDATA[$sql .= " ORDER BY p.product_id"; // customized
+        ]]></add>
+      </operation>
+
+      <operation>
+        <search><![CDATA[if (isset($data['order']) && ($data['order'] == 'DESC')) {]]></search>
+        <add position="after" offset="1"><![CDATA[} elseif(isset($data['order']) && ($data['order'] == 'ASC')){
+        	$sql .= " ASC";
+        ]]></add>
+      </operation>
+  	</file>
+</modification>

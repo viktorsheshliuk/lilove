@@ -1,0 +1,77 @@
+#tdinstagram {
+	position: relative;
+	margin-bottom: 36px;
+	@include media-breakpoint-down(md) { /* max 991 */
+		margin-bottom: 16px;
+	}
+	.tdinstagram-heading {
+		background: rgba(17,17,17,0.6);
+		color: $light-color;
+		text-align: center;
+		font: 400 14px/20px $font-custom;
+		padding: 10px;
+		position: absolute;
+		left:0;
+		right: 0;
+		top:0;
+		bottom: 0;
+		margin:auto;
+		height: 40px;
+		letter-spacing:0.75px;
+		text-transform: capitalize;
+		z-index: 2;
+		max-width: 200px;
+	}
+	.item {
+		position: relative;
+		overflow: hidden;
+		img {
+			max-width: 100%;
+			@include scale3d(1, 1, 1);
+			@include transition(all 700ms ease-in 0s);
+		}
+		&:hover {
+			img {
+				@include scale3d(1.05, 1.05, 1.05);
+			}
+			.instagram_content {
+				opacity: 1;
+			}
+		}
+	}
+	.instagram_content {
+		color: $light-color;
+		opacity: 0;
+		@include transition(all 0.5s ease 0s);
+		&:before {
+			bottom: 0;
+			content: "";
+			left: 0;
+			position: absolute;
+			right: 0;
+		}
+		.insta_caption {
+			padding: 15px;
+			position: absolute;
+			top: 0;
+		}
+		.insta_likecomment {
+			bottom: 8px;
+			position: absolute;
+			right: 15px;
+			left: 15px;
+			.insta_likes {
+				float: left;
+				[dir="rtl"] &{
+					float: right;
+				}
+			}
+			.insta_comments {
+				float: right;
+				[dir="rtl"] &{
+					float: left;
+				}
+			}
+		}
+	}
+}

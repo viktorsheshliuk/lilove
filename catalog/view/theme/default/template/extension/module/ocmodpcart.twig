@@ -1,0 +1,340 @@
+<div id="ocmod-popup-okno">
+<div id="ocmod-popup-okno-inner">
+{% if products %}
+  <div class="ocmod-popup-heading">{# {{heading_cartpopup_title}}   #}</div>
+  <div class="title">{{cartpopup_title}}</div>
+  <div class="ocmod-popup-center">
+    {% if attention %}
+    <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{attention}}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{success}}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% else %}
+    <div id="success-message"></div>
+    {% endif %}
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{error_warning}}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+{#    <table class="display-products-cart">
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td class="image">
+            {% if product.thumb %}
+            <a href="{{product.href}}"><img src="{{product.thumb}}" alt="{{product.name}}" title="{{product.name}}" class="img-thumbnail" /></a>
+            {% endif %}
+          </td>
+          <td class="name">
+            <a href="{{product.href}}">{{product.name}}</a>
+            <span>{{product.length}}</span>
+            <span>{{product.weight}}</span>
+            {% if not product.stock %}
+            <span class="text-danger">***</span>
+            {% endif %}
+            {% if product.option %}
+            {% for option in product.option %}
+            <br />
+            {{option.name}}: {{option.value}}
+            {% endfor %}
+            {% endif %}
+            {% if product.reward %}
+            <br />
+            {{product.reward}}
+            {% endif %}
+          </td>
+          <td class="qt">
+            <div class="number">
+              <input name="product_id" value="{{product.key}}" style="display: none;" type="hidden" />
+              <div class="frame-change-count">
+                <div class="btn-plus">
+                  <button type="button" onclick="$(this).parent().parent().next().val(~~$(this).parent().parent().next().val()+1); update( this, 'update' );">
+                    +
+                  </button>
+                </div>
+                <div class="btn-minus">
+                  <button type="button" onclick="$(this).parent().parent().next().val(~~$(this).parent().parent().next().val()-1); update( this, 'update' );">
+                    -
+                  </button>
+                </div>
+              </div>
+              <input type="text" name="quantity" value="{{product.quantity}}" class="plus-minus" onchange="update_manual( this, '{{product.key}}' ); return validate(this);" onkeyup="update_manual( this, '{{product.key}}' ); return validate(this);" />
+            </div>
+          </td>
+          <td class="totals">{% if product.old_price %}<span class="price-old">{{ product.old_price}}</span>{% endif %} {{product.price}} </td>
+		  <td class="remove">
+            <button type="button" onclick="update( this, 'remove' );"><img src="/image/icon-close.png"></button>
+            <input name="product_key" value="{{product.key}}" style="display: none;" hidden />           
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>       
+    <div class="mobile-products-cart">
+    {% for product in products %}
+      <div>
+        <div class="image">
+          {% if product.thumb %}
+          <a href="{{product.href}}"><img src="{{product.thumb}}" alt="{{product.name}}" title="{{product.name}}" class="img-thumbnail" /></a>
+          {% endif %}
+        </div>
+        <div class="name">
+          <a href="{{product.href}}">{{product.name}}</a>
+          {% if not product.stock %}
+          <span class="text-danger">***</span>
+          {% endif %}
+          {% if product.option %}
+          {% for option in product.option %}
+          <br />
+          {{option.name}}: {{option.value}}
+          {% endfor %}
+          {% endif %}
+          {% if product.reward %}
+          <br />
+          {{product.reward}}
+          {% endif %}
+        </div>
+        <div class="qt">
+          <div class="number">
+              <input name="product_id" value="{{product.key}}" style="display: none;" type="hidden" />
+              <div class="frame-change-count">
+                <div class="btn-plus">
+                  <button type="button" onclick="$(this).parent().parent().next().val(~~$(this).parent().parent().next().val()+1); update( this, 'update' );">
+                    +
+                  </button>
+                </div>
+                <div class="btn-minus">
+                  <button type="button" onclick="$(this).parent().parent().next().val(~~$(this).parent().parent().next().val()-1); update( this, 'update' );">
+                    -
+                  </button>
+                </div>
+              </div>
+              <input type="text" name="quantity" value="{{product.quantity}}" class="plus-minus" onchange="update_manual( this, '{{product.key}}' ); return validate(this);" onkeyup="update_manual( this, '{{product.key}}' ); return validate(this);" />
+            </div>
+			<span class="remove">
+			  <button type="button" onclick="update( this, 'remove' );"><i class="fa fa-trash-o"></i></button>
+			  <input name="product_key" value="{{product.key}}" style="display: none;" hidden />
+			</span>
+        </div>
+        <div class="totals">
+          {{product.total}}
+        </div>		
+        </div>
+      {% endfor %}
+    </div>
+ #}
+
+
+
+    <div class="cart__container">
+            {% for product in products %}
+            <div class="cart__container-item image-item">
+                <div class="cart__image">
+                {% if product.thumb %}
+                    <a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" /></a>
+                {% endif %}
+                </div> 
+            </div>
+            <div class="cart__container-item name-item">
+                <div class="cart__name">
+                    <a href="{{ product.href }}">{{ product.name }}</a>
+                    {% if not product.stock %}
+                    <span class="text-danger">***</span>
+                    {% endif %}
+                {# <span>{{ product.length }}</span> #}
+                {# {% if product.length %}<span class="slash" style="display: none">/</span>{% endif %} #}
+                {# <span>{{ product.weight }}</span> #}
+                    <div class="options">
+                {% for option in product.option %}
+                    &nbsp;<small> - {{ option.name }}: {{ option.value }}</small><br />
+                {% endfor %}
+                {% if product.recurring is not empty %}
+                    - <small>{{ text_payment_profile }}: {{ product.profile_name }}</small>
+                {% endif %}
+                    </div>
+                {% if product.reward %}
+                    <small>{{ product.reward }}</small>
+                {% endif %}
+            </div>
+            </div>
+            <div class="cart__container-item quantity-item">
+                <div class="cart__quantity quantity qt">
+                    
+
+                  <input name="product_id" value="{{product.key}}" style="display: none;" type="hidden" />
+                  <div class="btn-minus">
+                          <button type="button" onclick="$(this).parent().next().val(~~$(this).parent().next().val()-1); update( this, 'update' );">
+                            -
+                          </button>
+                  </div>
+                  <input type="text" name="quantity" value="{{product.quantity}}" class="plus-minus" onchange="update_manual( this, '{{product.key}}' ); return validate(this);" />
+                  <div class="btn-plus">
+                          <button type="button" onclick="$(this).parent().prev().val(~~$(this).parent().prev().val()+1); update( this, 'update' );">
+                            +
+                          </button>
+                  </div>
+
+                    {#
+                    <div class="number">
+                      <input name="product_id" value="{{product.key}}" style="display: none;" type="hidden" />
+                      <div class="frame-change-count">
+                        <div class="btn-plus">
+                          <button type="button" onclick="$(this).parent().parent().next().val(~~$(this).parent().parent().next().val()+1); update( this, 'update' );">
+                            +
+                          </button>
+                        </div>
+                        <div class="btn-minus">
+                          <button type="button" onclick="$(this).parent().parent().next().val(~~$(this).parent().parent().next().val()-1); update( this, 'update' );">
+                            -
+                          </button>
+                        </div>
+                      </div>
+                      <input type="text" name="quantity" value="{{product.quantity}}" class="plus-minus" onchange="update_manual( this, '{{product.key}}' ); return validate(this);" onkeyup="update_manual( this, '{{product.key}}' ); return validate(this);" />
+                    </div>          #}
+                </div>
+            </div>
+            <div class="cart__container-item price-item">
+                <div class="cart__price">
+                {% if product.old_price is not empty %}
+                    <div class="price-old">{{ product.old_price }}</div>
+                {% endif %}
+                <div>{{ product.price }}</div>
+                </div>
+            </div>
+            <div class="cart__container-item remove-item">
+                <div class="cart__remove">
+                <button type="button" onclick="update( this, 'remove' );">
+                  <svg width="15" height="15" style="vertical-align: middle;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6L18 18M18 6L6 18" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  {# <img src="/image/icon-close.png"> #}
+                </button>
+                <input name="product_key" value="{{product.key}}" style="display: none;" hidden />
+            </div>
+            </div>
+        {% endfor %}    
+        </div>
+{#    <div class="all-total">
+      {% for total in totals %}
+		<div class="clear-total">
+		<div class="totals-right">{{total.text}}</div>
+        <div class="totals-left">{{total.title}}:</div>     
+        </div>
+      {% endfor %}
+    </div>    #}
+  </div>
+  <div class="text_total">{{ text_total }}<span class="summa">{{total_text}}</span></div>
+  <div class="ocmod-popup-footer">
+    
+    <button onclick="$.magnificPopup.close();">{{button_shopping}}</button>
+    <a href="{{checkout_link}}">{{button_checkout}}</a>
+  </div>
+{% else %}
+  <div class="ocmod-popup-heading">{#  {{heading_cartpopup_title_empty}}   #}</div>
+  <div class="title text-left">{{cartpopup_title}}</div>
+  <div class="ocmod-popup-center empty-cart">{{text_cartpopup_empty}}</div>
+  <div class="ocmod-popup-footer">
+    <button onclick="$.magnificPopup.close();">{{button_shopping}}</button>
+  </div>
+{% endif %}
+</div>
+<script type="text/javascript"><!--
+function masked(element, status) {
+  if (status == true) {
+    $('<div/>')
+    .attr({ 'class':'masked' })
+    .prependTo(element);
+    $('<div class="masked_loading" />').insertAfter($('.masked'));
+  } else {
+    $('.masked').remove();
+    $('.masked_loading').remove();
+  }
+}
+
+function validate( input ) {
+  input.value = input.value.replace( /[^\d,]/g, '' );
+}
+
+function update( target, status ) {
+  masked('#ocmod-popup-okno-inner', true);
+  var input_val    = $( target ).parent().parent().children( 'input[name=quantity]' ).val(),
+      quantity     = parseInt( input_val ),
+      product_id   = $( target ).parent().parent().children( 'input[name=product_id]' ).val(),
+      product_key  = $( target ).next().val(),
+      urls         = null;
+
+  if ( quantity <= 0 ) {
+    masked('#ocmod-popup-okno-inner', false);
+    quantity = $( target ).parent().parent().children( 'input[name=quantity]' ).val( 1 );
+    return;
+  }
+
+  if ( status == 'update' ) {
+    urls = 'index.php?route=extension/module/ocmodpcart&update=' + product_id + '&quantity=' + quantity;
+  } else if ( status == 'add' ) {
+    urls = 'index.php?route=extension/module/ocmodpcart&add=' + target + '&quantity=1';
+  } else {
+    urls = 'index.php?route=extension/module/ocmodpcart&remove=' + product_key;
+  }
+      
+  $.ajax({
+    url: urls,
+    type: 'get',
+    dataType: 'html',
+    success: function( data ) {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocmodpcart/status_cart',
+        type: 'get',
+        dataType: 'json',
+        success: function( json ) {
+          masked('#ocmod-popup-okno-inner', false);
+          if (json['total']) {
+            $('#cart-total' ).html(json['total']);
+            $('.header__mobmenu_button span.quantity').html(json['count_products']);
+			      $('#cart > ul').load('index.php?route=common/cart/info ul li');
+          }
+          $('#ocmod-popup-okno-inner').html( $( data ).find( '#ocmod-popup-okno-inner > *' ) );
+        } 
+      });
+    } 
+  });
+}
+function update_manual( target, product_id ) {
+  masked('#ocmod-popup-okno-inner', true);
+  var input_val = $( target ).val(),
+      quantity  = parseInt( input_val );
+      console.log(input_val);
+    
+  if (( quantity <= 0 ) || ( quantity.isNaN)) {
+    masked('#ocmod-popup-okno-inner', false);
+    quantity = $( target ).val( 1 );
+    return;
+  }
+  
+  $.ajax({
+    url: 'index.php?route=extension/module/ocmodpcart&update=' + product_id + '&quantity=' + quantity,
+    type: 'get',
+    dataType: 'html',
+    success: function( data ) {
+      $.ajax({
+        url: 'index.php?route=extension/module/ocmodpcart/status_cart',
+        type: 'get',
+        dataType: 'json',
+        success: function( json ) {
+          masked('#ocmod-popup-okno-inner', false);
+          if (json['total']) {
+            $('.header__mobmenu_button span.quantity').html(json['count_products']);
+            $('#cart-total' ).html(json['total']);
+            $('#cart > ul').load('index.php?route=common/cart/info ul li');
+          }
+          $('#ocmod-popup-okno-inner').html( $( data ).find( '#ocmod-popup-okno-inner > *' ) );
+        } 
+      });
+    } 
+  });
+}
+//--></script>
+</div>

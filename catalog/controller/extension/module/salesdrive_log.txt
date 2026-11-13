@@ -1,0 +1,245 @@
+06/24/2022 11:31:25 am. 176.105.195.62
+ORDER:
+Array
+(
+    [order_id] => 960
+    [invoice_no] => 0
+    [invoice_prefix] => INV-2019-00
+    [store_id] => 0
+    [store_name] => LiLove
+    [store_url] => https://lilove.com.ua/
+    [customer_id] => 0
+    [firstname] => Тест
+    [lastname] => Тест
+    [email] => test@test.com
+    [telephone] => +380501234567
+    [custom_field] => Array
+        (
+        )
+
+    [payment_firstname] => Тест
+    [payment_lastname] => Тест
+    [payment_company] => 
+    [payment_address_1] => 1
+    [payment_address_2] => 
+    [payment_postcode] => 12101
+    [payment_city] => Отделение №1: ул. Героев Украины, 51
+    [payment_zone_id] => 200150
+    [payment_zone] => Хорошев
+    [payment_zone_code] => 266
+    [payment_country_id] => 300005
+    [payment_country] => Житомирская область
+    [payment_iso_code_2] => UA
+    [payment_iso_code_3] => UKR
+    [payment_address_format] => 
+    [payment_custom_field] => Array
+        (
+        )
+
+    [payment_method] => Наложенный платеж
+    [payment_code] => cod
+    [shipping_firstname] => Тест
+    [shipping_lastname] => Тест
+    [shipping_company] => 
+    [shipping_address_1] => 1
+    [shipping_address_2] => 
+    [shipping_postcode] => 12101
+    [shipping_city] => Отделение №1: ул. Героев Украины, 51
+    [shipping_zone_id] => 200150
+    [shipping_zone] => Хорошев
+    [shipping_zone_code] => 266
+    [shipping_country_id] => 300005
+    [shipping_country] => Житомирская область
+    [shipping_iso_code_2] => UA
+    [shipping_iso_code_3] => UKR
+    [shipping_address_format] => 
+    [shipping_custom_field] => Array
+        (
+        )
+
+    [shipping_method] => Отправка службой "Новая почта"
+    [shipping_code] => novaposhta.novaposhta
+    [comment] => Це тестове замовлення!
+    [total] => 830.0000
+    [order_status_id] => 1
+    [order_status] => Принят
+    [affiliate_id] => 0
+    [commission] => 0.0000
+    [language_id] => 3
+    [language_code] => ru-ru
+    [currency_id] => 4
+    [currency_code] => UAH
+    [currency_value] => 1.00000000
+    [ip] => 176.105.195.62
+    [forwarded_ip] => 
+    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36
+    [accept_language] => uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6,es;q=0.5
+    [date_added] => 2022-06-24 14:31:22
+    [date_modified] => 2022-06-24 14:31:25
+)
+
+06/24/2022 01:31:35 pm. 176.105.195.62
+ORDER:
+Array
+(
+    [order_id] => 961
+    [invoice_no] => 0
+    [invoice_prefix] => INV-2019-00
+    [store_id] => 0
+    [store_name] => LiLove
+    [store_url] => https://lilove.com.ua/
+    [customer_id] => 0
+    [firstname] => Тест
+    [lastname] => Тест
+    [email] => test@test.com
+    [telephone] => +380501234567
+    [custom_field] => Array
+        (
+        )
+
+    [payment_firstname] => Тест
+    [payment_lastname] => Тест
+    [payment_company] => 
+    [payment_address_1] => asdas
+    [payment_address_2] => 
+    [payment_postcode] => 12101
+    [payment_city] => Отделение №1: ул. Героев Украины, 51
+    [payment_zone_id] => 200150
+    [payment_zone] => Хорошев
+    [payment_zone_code] => 266
+    [payment_country_id] => 300005
+    [payment_country] => Житомирская область
+    [payment_iso_code_2] => UA
+    [payment_iso_code_3] => UKR
+    [payment_address_format] => 
+    [payment_custom_field] => Array
+        (
+        )
+
+    [payment_method] => Наложенный платеж
+    [payment_code] => cod
+    [shipping_firstname] => Тест
+    [shipping_lastname] => Тест
+    [shipping_company] => 
+    [shipping_address_1] => asdas
+    [shipping_address_2] => 
+    [shipping_postcode] => 12101
+    [shipping_city] => Отделение №1: ул. Героев Украины, 51
+    [shipping_zone_id] => 200150
+    [shipping_zone] => Хорошев
+    [shipping_zone_code] => 266
+    [shipping_country_id] => 300005
+    [shipping_country] => Житомирская область
+    [shipping_iso_code_2] => UA
+    [shipping_iso_code_3] => UKR
+    [shipping_address_format] => 
+    [shipping_custom_field] => Array
+        (
+        )
+
+    [shipping_method] => УкрПочта
+    [shipping_code] => xshipping.xshipping1
+    [comment] => Це тестове замволення!
+    [total] => 430.0000
+    [order_status_id] => 1
+    [order_status] => Принят
+    [affiliate_id] => 0
+    [commission] => 0.0000
+    [language_id] => 3
+    [language_code] => ru-ru
+    [currency_id] => 4
+    [currency_code] => UAH
+    [currency_value] => 1.00000000
+    [ip] => 176.105.195.62
+    [forwarded_ip] => 
+    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36
+    [accept_language] => uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6,es;q=0.5
+    [date_added] => 2022-06-24 16:31:31
+    [date_modified] => 2022-06-24 16:31:35
+)
+
+08/14/2023 09:56:44 am. 185.177.189.248
+ORDER:
+Array
+(
+    [order_id] => 1918
+    [invoice_no] => 0
+    [invoice_prefix] => INV-2022-00
+    [store_id] => 0
+    [store_name] => LiLove
+    [store_url] => https://lilove.ua/
+    [customer_id] => 0
+    [firstname] => Тест
+    [lastname] => Тест
+    [email] => zz@jj.ll
+    [telephone] => +38 123 456 98 99
+    [custom_field] => Array
+        (
+            [account] => Array
+                (
+                    [1] => 
+                )
+
+        )
+
+    [payment_firstname] => Тест
+    [payment_lastname] => Тест
+    [payment_company] => 
+    [payment_address_1] => Відділення №3: вул. Тюрінська (ран. Якіра), 124
+    [payment_address_2] => 
+    [payment_postcode] => 
+    [payment_city] => Харків
+    [payment_zone_id] => 0
+    [payment_zone] => 
+    [payment_zone_code] => 
+    [payment_country_id] => 0
+    [payment_country] => 
+    [payment_iso_code_2] => 
+    [payment_iso_code_3] => 
+    [payment_address_format] => 
+    [payment_custom_field] => Array
+        (
+        )
+
+    [payment_method] => На розрахунковий рахунок
+    [payment_code] => requisites
+    [shipping_firstname] => Тест
+    [shipping_lastname] => Тест
+    [shipping_company] => 
+    [shipping_address_1] => Відділення №3: вул. Тюрінська (ран. Якіра), 124
+    [shipping_address_2] => 
+    [shipping_postcode] => 
+    [shipping_city] => Харків
+    [shipping_zone_id] => 0
+    [shipping_zone] => 
+    [shipping_zone_code] => 
+    [shipping_country_id] => 0
+    [shipping_country] => 
+    [shipping_iso_code_2] => 
+    [shipping_iso_code_3] => 
+    [shipping_address_format] => 
+    [shipping_custom_field] => Array
+        (
+        )
+
+    [shipping_method] => Доставка у відділення Нової пошти
+    [shipping_code] => novaposhta.department
+    [comment] => 
+    [total] => 990.0000
+    [order_status_id] => 0
+    [order_status] => 
+    [affiliate_id] => 0
+    [commission] => 0.0000
+    [language_id] => 5
+    [language_code] => uk-ua
+    [currency_id] => 4
+    [currency_code] => UAH
+    [currency_value] => 1.00000000
+    [ip] => 185.177.189.248
+    [forwarded_ip] => 
+    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0
+    [accept_language] => uk-UA,uk;q=0.8,en-US;q=0.5,en;q=0.3
+    [date_added] => 2023-08-14 12:56:35
+    [date_modified] => 2023-08-14 12:56:44
+)
+

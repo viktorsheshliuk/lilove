@@ -1,0 +1,88 @@
+.quickview {
+  .modal-dialog {
+    width: calc(100% - 20px);
+    max-width: 1024px;
+  }
+  .modal-content {
+    position: relative;
+    background: $light-background;
+    .modal-header {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      border: none;
+      padding: 0;
+      z-index: 2;
+      [dir="rtl"] &{
+        left: 10px;
+        right: auto;
+      }
+      button.close {
+        span {
+          i {
+            font-size: 22px;
+          }
+        }
+      }
+    }
+    .modal-body {
+      .product-quickview {
+        .block-1 {
+          @include media-breakpoint-up(md) { /* min 768 */
+            &.left-sticky {
+              position: -webkit-sticky;
+              position: sticky;
+              top:20px;
+            }
+          }
+          @include media-breakpoint-down(sm) { /* max 767 */
+            margin-bottom: 15px;
+          }
+          .quick-inner {
+            width: 100%;
+            position: relative;
+            @include media-breakpoint-down(sm) { /* max 767 */
+              max-width: 400px;
+              margin: 0 auto;
+            }
+            @include media-breakpoint-down(xs) { /* max 543 */
+              max-width: 250px;
+              margin: 0 auto;
+            }
+            .item {
+              text-align: center;
+              a {
+                overflow: hidden;
+                img {
+                  max-width: 100%;
+                }
+              }
+            }
+            #img-carousel.owl-carousel {
+              .owl-dots {
+                bottom: 15px;
+                left: 0;
+                margin: auto;
+                position: absolute;
+                right: 0;
+                text-align: center;
+              }
+            }
+          }
+        }
+        .product-info-main {
+          .product-quantity {
+            @media (max-width: 331px) {
+              padding: 12px;
+            }
+            .quantity {
+              @media (max-width: 411px) {
+                margin-bottom: 8px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

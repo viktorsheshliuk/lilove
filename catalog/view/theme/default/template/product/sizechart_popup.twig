@@ -1,0 +1,46 @@
+<div class="sizechart__button">
+	<button type="button" class="btn btn-clear" data-toggle="modal" data-target="#SizeChartModal">
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_256_728)"><path d="M6.80934 19.1163L0.883759 13.1907L13.1907 0.883789L19.1163 6.80937L6.80934 19.1163Z" stroke="black" stroke-width="1.5"/><path d="M10.2279 3.84656L12.7349 6.35356" stroke="black" stroke-width="1.5"/>
+	<path d="M3.8465 10.2279L6.3535 12.7349" stroke="black" stroke-width="1.5"/><path d="M7.03717 7.03723L9.54417 9.54423" stroke="black" stroke-width="1.5"/></g><defs><clipPath id="clip0_256_728"><rect width="20" height="20" fill="white"/></clipPath></defs></svg>
+	{{ sizechart_title }}
+</button>
+</div>
+<div id="SizeChartModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        	<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_261_1634)"><path d="M17.3571 1.14307L0.64286 17.8574" stroke="black" stroke-linecap="round" stroke-linejoin="round"/><path d="M0.64286 1.14307L17.3571 17.8574" stroke="black" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_261_1634"><rect width="18" height="18" fill="white" transform="translate(0 0.5)"/></clipPath></defs></svg>
+        </button>
+        <h4 class="modal-title">{{ sizechart_title }}</h4>
+      </div>
+      <div class="modal-body">
+			{% if sizechart_description  and  sizechart_description != '<p><br></p>' %}
+				{{ sizechart_description }}
+			{% endif %}
+			{% if sizechart_rows %}
+			<div class="table-responsive">
+				<table class="table table-bordered table-hover">
+					<tbody>
+						{% for key, sizechart_column in sizechart_rows %}
+						<tr>
+							{% set i = 1 %}
+							{% for sizechart_value in sizechart_column %}
+								{% if key == '0' %}
+									<th class="{% if sizechart_column|length == i %}{{ 'text-center' }}{% else %}{{ 'text-center' }}{% endif %}">{{ sizechart_value.value }}</th>
+								{% else %}
+									<td class="{% if sizechart_column|length == i %}{{ 'text-center' }}{% else %}{{ 'text-center' }}{% endif %}">{{ sizechart_value.value }}</td>
+								{% endif %}
+								{% set i = i + 1 %}
+							{% endfor %}
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			{% endif %}
+		</div>
+    </div>
+
+  </div>
+</div>

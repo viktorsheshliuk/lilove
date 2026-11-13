@@ -1,0 +1,196 @@
+.custom-panel .panel-heading {
+  background: #20285c;
+  color: #fff;
+}
+.custom-panel .panel-body {
+  background: #f5f6f9;
+  padding: 0;
+}
+.custom-panel .panel-body .form-group {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #DFDFDF;
+}
+.custom-panel .panel-body .products_type {
+  border-top: 5px solid #DFDFDF;
+  border-bottom: 5px solid #DFDFDF;
+}
+.custom-panel .panel-body .form-group > .control-label {
+  padding: 10px;
+  max-width: 220px;
+  width: 100%;
+  display: inline-block;
+  vertical-align: middle;
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .custom-panel .panel-body .form-group > .control-label {
+    max-width: 200px;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .custom-panel .panel-body .form-group > .control-label {
+    max-width: 120px;
+  }
+}
+.custom-panel .panel-body .form-group > .control-group {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 700px;
+  width: 100%;
+  padding: 10px;
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .custom-panel .panel-body .form-group > .control-group {
+    max-width: 500px;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .custom-panel .panel-body .form-group > .control-group {
+    max-width: 360px;
+  }
+}
+.custom-panel .panel-body .form-group > .control-group .input-category_name ~ .fa-times {
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+    font-size: 17px;
+    height: 30px;
+    right: 13px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    line-height: 30px;
+    position: absolute;
+    text-align: center;
+    width: 30px;
+    z-index: 9;
+}
+.switch-field input {
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  width: 1px;
+  border: 0;
+  overflow: hidden;
+}
+
+.switch-field label {
+  float: left;
+}
+
+.switch-field label {
+  display: inline-block;
+  min-width: 60px;
+  color: #fff;
+  background-color:#a0a7d8;
+  font-size: 13px;
+  font-weight: normal;
+  text-align: center;
+  text-shadow: none;
+  padding: 6px 10px;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition:    all 0.1s ease-in-out;
+  -ms-transition:     all 0.1s ease-in-out;
+  -o-transition:      all 0.1s ease-in-out;
+  transition:         all 0.1s ease-in-out;
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .switch-field label {
+    font-size: 12px;
+  }
+}
+
+.switch-field label:hover {
+  cursor: pointer;
+}
+
+.switch-field input:checked + label {
+  background-color: #20285c;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+  border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+  border-radius: 0 4px 4px 0;
+}
+
+.form-content, .form-content label, .form-content select {
+  display: inline-block;
+  vertical-align: middle;
+}
+.form-content .control-label {
+  padding: 0;
+  margin: 0 5px;
+}
+.form-content select {
+  width: auto;
+  min-width: 70px;
+}
+.select-options {
+  padding: 0;
+}
+.td-product {
+  padding: 5px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+.td-product:last-child {
+  border-bottom: none;
+}
+.td-product  i {
+  height: 20px;
+  width: 20px;
+  text-align: center;
+}
+.td-product  > img {
+  margin-right: 10px;
+}
+.tab-container .tab-heading {
+  background: #20285c;
+  border-bottom: 2px solid #f5f6f9;
+  color: #fff;
+  padding: 12px 15px;
+  font-size: 15px;
+}
+.tab-container .tab-heading::after {
+  content: "\f107";
+  font-family: "FontAwesome";
+  font-size: 16px;
+  margin-left: 20px;
+}
+.tab-container .tab-heading .delete_tab {
+  float: right;
+}
+.button-addnew {
+  margin: 10px;
+}
+.control-group .td-number-field {
+ display: inline-block;
+ vertical-align: middle;
+ max-width: 80px;
+ width: auto;
+ padding: 8px 13px;
+}
+.note-toolbar.panel-heading {
+  background: #f6f6f6;
+}
+
+.addTypeInner {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #dcdcdc;
+}
+.addtypeimage {
+  margin: 10px;
+}
+.img-item {
+  padding: 10px;
+}
+.addTypeInner .input-group { margin-bottom: 5px; }
+.addTypeInner .input-group:last-child { margin-bottom: 0px; }

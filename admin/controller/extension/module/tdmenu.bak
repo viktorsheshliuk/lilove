@@ -1,0 +1,324 @@
+<?php
+class ControllerExtensionModuleTdmenu extends Controller {
+
+	private $error = array();
+	private $sets = array();
+	private function getSetting($i) {
+		return isset($this->sets[$i]) ? $this->sets[$i] : null;
+	}
+
+	public function index() {
+
+		$this->load->language('extension/module/tdmenu');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('setting/setting');
+		$this->load->model('catalog/category');
+		$this->load->model('catalog/information');
+		$this->load->model('localisation/language');
+		$this->load->model('tool/image');
+		$this->load->model('setting/store');
+
+		if (!empty($this->request->get['registerEvents'])) {
+			$this->uninstall();
+			$this->install();
+		}
+
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+			$redirect = '';
+			$sid = 0;
+
+			if (isset($this->request->get['store']) && (int)$this->request->get['store']) {
+				$redirect = '&store=' . (int)$this->request->get['store'];
+				$sid = (int)$this->request->get['store'];
+			}
+
+			$this->model_setting_setting->editSetting('tdmenu', $this->request->post, $sid);
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$this->cache->delete('tdmenu');
+
+			$this->response->redirect($this->url->link('extension/module/tdmenu', 'user_token=' . $this->session->data['user_token'] . $redirect, true));
+		}
+
+		$data['store'] = (isset($this->request->get['store']) && (int)$this->request->get['store']) ? (int)$this->request->get['store'] : 0;
+
+		$this->sets = $this->model_setting_setting->getSetting('tdmenu', $data['store']);
+
+		$data['heading_title'] = $this->language->get('heading_title');
+
+		$data['stores'] = $this->model_setting_store->getStores();
+
+		$data['user_token'] = $this->session->data['user_token'];
+
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+
+		if (isset($this->request->get['nopermissiontodelete']) && $this->request->get['nopermissiontodelete']) {
+			$data['error_warning']  = $this->language->get('error_permission');
+		}
+
+		if (!$this->validate()) {
+			$data['error_warning']  = $this->language->get('error_permission_instructions');
+		}
+
+		if (!$this->checkTdmenuEvents()) {
+			$data['error_warning']  = 'The tdmenu events dont seem to be registered. Please <a href="'.$this->url->link('extension/module/tdmenu', 'registerEvents=1&user_token=' . $this->session->data['user_token'], true).'">click here</a> to rezolve the issue';
+		}
+
+		if (isset($this->session->data['success'])) {
+			$data['success'] = $this->session->data['success'];
+
+			unset($this->session->data['success']);
+		} else {
+			$data['success'] = '';
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text'      => $this->language->get('text_home'),
+			'href'      => $this->url->link('common/home', 'user_token=' . $this->session->data['user_token'], true),
+			'separator' => false
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text'      => $this->language->get('text_extension'),
+			'href'      => $this->url->link('marketplace/extension', 'type=module&user_token=' . $this->session->data['user_token'], true),
+			'separator' => ' :: '
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text'      => $this->language->get('heading_title'),
+			'href'      => $this->url->link('extension/module/tdmenu', 'user_token=' . $this->session->data['user_token'], true),
+			'separator' => ' :: '
+		);
+
+		if ($data['store']) {
+			$data['action'] = $this->url->link('extension/module/tdmenu', 'user_token=' . $this->session->data['user_token'] . '&store=' . $data['store'], true);
+		} else {
+			$data['action'] = $this->url->link('extension/module/tdmenu', 'user_token=' . $this->session->data['user_token'], true);
+		}
+
+		$data['module_url'] = $this->url->link('extension/module/tdmenu', 'user_token=' . $this->session->data['user_token'], true);
+
+		$data['cancel'] = $this->url->link('marketplace/extension', 'type=module&user_token=' . $this->session->data['user_token'], true);
+
+		$data['no_image'] = $this->model_tool_image->resize('no_image.png', 100, 100);
+
+		$data['http_catalog_url'] = HTTP_CATALOG;
+
+		$data['modules'] = array();
+		$data['items'] = array();
+		$data['categories'] = array();
+		$data['informations'] = array();
+		$data['languages'] = $this->model_localisation_language->getLanguages();
+
+		/* Categories */
+		$filter_data = array(
+			'sort'  => 'name',
+			'order' => 'ASC'
+		);
+		$categ = $this->model_catalog_category->getCategories($filter_data);
+		foreach ($categ as $cate) {
+			$data['categories'][$cate['category_id']] = array(
+				'category_id' => $cate['category_id'],
+				'name'        => $cate['name']
+			);
+		}
+
+		/* Information Links */
+		$infos = $this->model_catalog_information->getInformations();
+		foreach ($infos as $info) {
+			$data['informations'][] = array(
+				'information_id' => $info['information_id'],
+				'name'           => $info['title']
+			);
+		}
+
+		if (isset($this->request->post['tdmenu_item'])) {
+			$data['items'] = $this->request->post['tdmenu_item'];
+		} elseif ($this->getSetting('tdmenu_item')) {
+			$data['items'] = $this->getSetting('tdmenu_item');
+		}
+
+		if (isset($this->request->post['tdmenu_settings_status'])) {
+			$data['tdmenu_settings_status'] = $this->request->post['tdmenu_settings_status'];
+		} elseif ($this->getSetting('tdmenu_settings_status')) {
+			$data['tdmenu_settings_status'] = $this->getSetting('tdmenu_settings_status');
+		} else {
+			$data['tdmenu_settings_status'] = '';
+		}
+
+		if (isset($this->request->post['tdmenu_tdmenuisresponsive'])) {
+			$data['tdmenu_tdmenuisresponsive'] = $this->request->post['tdmenu_tdmenuisresponsive'];
+		} elseif ($this->getSetting('tdmenu_tdmenuisresponsive')) {
+			$data['tdmenu_tdmenuisresponsive'] = $this->getSetting('tdmenu_tdmenuisresponsive');
+		} else {
+			$data['tdmenu_tdmenuisresponsive'] = 0;
+		}
+
+		if (isset($this->request->post['tdmenu_more_view'])) {
+			$data['tdmenu_more_view'] = $this->request->post['tdmenu_more_view'];
+		} elseif ($this->getSetting('tdmenu_more_view')) {
+			$data['tdmenu_more_view'] = $this->getSetting('tdmenu_more_view');
+		} else {
+			$data['tdmenu_more_view'] = '';
+		}
+
+		if (isset($this->request->post['tdmenu_more_title'])) {
+			$data['tdmenu_more_title'] = $this->request->post['tdmenu_more_title'];
+		} else {
+			$data['tdmenu_more_title'] = $this->getSetting('tdmenu_more_title');
+		}
+
+		if (isset($this->request->post['tdmenu_more2_title'])) {
+			$data['tdmenu_more2_title'] = $this->request->post['tdmenu_more2_title'];
+		} else {
+			$data['tdmenu_more2_title'] = $this->getSetting('tdmenu_more2_title');
+		}
+
+		if (isset($this->request->post['tdmenu_more_status'])) {
+			$data['tdmenu_more_status'] = $this->request->post['tdmenu_more_status'];
+		} elseif ($this->getSetting('tdmenu_more_status')) {
+			$data['tdmenu_more_status'] = $this->getSetting('tdmenu_more_status');
+		} else {
+			$data['tdmenu_more_status'] = '';
+		}
+
+		if (isset($this->request->post['tdmenu_image_width'])) {
+			$data['tdmenu_image_width'] = $this->request->post['tdmenu_image_width'];
+		} elseif ($this->getSetting('tdmenu_image_width')) {
+			$data['tdmenu_image_width'] = $this->getSetting('tdmenu_image_width');
+		} else {
+			$data['tdmenu_image_width'] = 120;
+		}
+
+		if (isset($this->request->post['tdmenu_image_height'])) {
+			$data['tdmenu_image_height'] = $this->request->post['tdmenu_image_height'];
+		} elseif ($this->getSetting('tdmenu_image_height')) {
+			$data['tdmenu_image_height'] = $this->getSetting('tdmenu_image_height');
+		} else {
+			$data['tdmenu_image_height'] = 120;
+		}
+
+		if (isset($this->request->post['tdmenu_showstatus'])) {
+			$data['tdmenu_showstatus'] = $this->request->post['tdmenu_showstatus'];
+		} elseif ($this->getSetting('tdmenu_showstatus')) {
+			$data['tdmenu_showstatus'] = $this->getSetting('tdmenu_showstatus');
+		} else {
+			$data['tdmenu_showstatus'] = 0;
+		}
+
+		if (isset($this->request->post['tdmenu_mobilemenuname'])) {
+			$data['tdmenu_mobilemenuname'] = $this->request->post['tdmenu_mobilemenuname'];
+		} elseif ($this->getSetting('tdmenu_mobilemenuname')) {
+			$data['tdmenu_mobilemenuname'] = $this->getSetting('tdmenu_mobilemenuname');
+		} else {
+			$data['tdmenu_mobilemenuname'] = array();
+		}
+
+		if (isset($this->request->post['tdmenu_infodname'])) {
+			$data['tdmenu_infodname'] = $this->request->post['tdmenu_infodname'];
+		} elseif ($this->getSetting('tdmenu_infodname')) {
+			$data['tdmenu_infodname'] = $this->getSetting('tdmenu_infodname');
+		} else {
+			$data['tdmenu_infodname'] = array();
+		}
+
+		if (isset($this->request->post['tdmenu_brandsdname'])) {
+			$data['tdmenu_brandsdname'] = $this->request->post['tdmenu_brandsdname'];
+		} elseif ($this->getSetting('tdmenu_brandsdname')) {
+			$data['tdmenu_brandsdname'] = $this->getSetting('tdmenu_brandsdname');
+		} else {
+			$data['tdmenu_brandsdname'] = array();
+		}
+
+		if (isset($this->request->post['tdmenu_tophomelink'])) {
+			$data['tdmenu_tophomelink'] = $this->request->post['tdmenu_tophomelink'];
+		} elseif ($this->getSetting('tdmenu_tophomelink')) {
+			$data['tdmenu_tophomelink'] = $this->getSetting('tdmenu_tophomelink');
+		} else {
+			$data['tdmenu_tophomelink'] = 'no';
+		}
+
+		if (isset($this->request->post['tdmenu_cache'])) {
+			$data['tdmenu_cache'] = $this->request->post['tdmenu_cache'];
+		} elseif ($this->getSetting('tdmenu_cache')) {
+			$data['tdmenu_cache'] = $this->getSetting('tdmenu_cache');
+		} else {
+			$data['tdmenu_cache'] = 0;
+		}
+
+		$data['featcats'] = $data['feat2cats'] = array();
+		if (isset($this->request->post['tdmenu_more'])) {
+			$tdmenu_more = $this->request->post['tdmenu_more'];
+		} elseif ($this->getSetting('tdmenu_more')) {
+			$tdmenu_more = $this->getSetting('tdmenu_more');
+		} else {
+			$tdmenu_more = array();
+		}
+		if (isset($this->request->post['tdmenu_more2'])) {
+			$tdmenu_more2 = $this->request->post['tdmenu_more2'];
+		} elseif ($this->getSetting('tdmenu_more2')) {
+			$tdmenu_more2 = $this->getSetting('tdmenu_more2');
+		} else {
+			$tdmenu_more2 = array();
+		}
+
+		foreach ($tdmenu_more as $category_id) {
+			$category_info = $this->model_catalog_category->getCategory($category_id);
+			if ($category_info) {
+				$data['featcats'][] = array(
+					'category_id' => $category_info['category_id'],
+					'name'        => ($category_info['path']) ? $category_info['path'] . ' &gt; ' . $category_info['name'] : $category_info['name']
+				);
+			}
+		}
+
+		foreach ($tdmenu_more2 as $category_id) {
+			$category_info = $this->model_catalog_category->getCategory($category_id);
+			if ($category_info) {
+				$data['feat2cats'][] = array(
+					'category_id' => $category_info['category_id'],
+					'name'        => ($category_info['path']) ? $category_info['path'] . ' &gt; ' . $category_info['name'] : $category_info['name']
+				);
+			}
+		}
+
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdmenu', $data));
+	}
+
+	private function validate() {
+		if (!$this->user->hasPermission('modify', 'extension/module/tdmenu')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		return !$this->error;
+	}
+
+	public function install() {
+		$this->load->model('setting/event');
+		$this->model_setting_event->addEvent('tdmegamenu', 'catalog/controller/common/header/before', 'extension/module/tdmenu/beforeHeader');
+		$this->model_setting_event->addEvent('tdmegamenu', 'catalog/view/common/header/before', 'extension/module/tdmenu/afterHeader');
+	}
+
+	public function uninstall() {
+		$this->load->model('setting/event');
+		$this->model_setting_event->deleteEventByCode('tdmegamenu');
+	}
+
+	private function checkTdmenuEvents() {
+		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "event` where code = 'tdmegamenu'");
+		return $query->num_rows != 2 ? false : true;
+	}
+}

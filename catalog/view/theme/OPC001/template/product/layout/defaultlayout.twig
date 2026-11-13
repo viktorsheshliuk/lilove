@@ -1,0 +1,65 @@
+<div class="product-thumb">
+  <div class="thumbnail-container">
+    <div class="image">
+    	<a href="{{ product.href }}" class="product-thumbnail">
+    		{#<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src ="{{ product.thumb }}" title="{{ product.name }}" alt="{{ product.name }}" class="lazy img-responsive" data-lazyloading="0" width="{{ product.width }}" height="{{ product.height }}" />#}
+        <img src ="{{ product.thumb }}" title="{{ product.name }}" alt="{{ product.name }}" class="lazy img-responsive" data-lazyloading="0" width="{{ product.width }}" height="{{ product.height }}" />
+      {% if (product.thumb_swap) %}
+    		{#<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ product.thumb_swap }}" title="{{ product.name }}" alt="{{ product.name }}" class="img-responsive img_1 lazy" width="{{ product.width }}" height="{{ product.height }}"/>#}
+        <img src="{{ product.thumb_swap }}" title="{{ product.name }}" alt="{{ product.name }}" class="img-responsive img_1 lazy" width="{{ product.width }}" height="{{ product.height }}"/>
+    		{% endif %}
+      </a>
+      {% if product.rate_special %}
+      <div class="price-left">
+        <span>{{ '-' ~ product.rate_special ~ '%' }}</span>
+      </div>
+      {% endif %}
+      <div class="button-container">
+        <div class="quick-view-wrapper">
+          <button class="btn btn-primary btn-quickview" type="button"  data-hover="tooltip" title="{{ button_quickview }}" onclick="tdquickview.ajaxView('{{ product.href }}')"></button>
+        </div>
+        <div class="compare">
+          <button class="btn btn-primary btn-compare" type="button" data-hover="tooltip" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');"></button>
+        </div>
+        <div class="wishlist">
+          <button class="btn btn-primary btn-wishlist" type="button" data-hover="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">
+    <div class="product-title"><a href="{{ product.href }}">{{ product.name }}</a></div>
+    <p class="product-desc">{{ product.description }}</p>
+    {% if product.price %}
+      <div class="price">
+        {% if not product.special %}
+          {{ product.price }}
+        {% else %}
+          <span class="price-new">{{ product.special }}</span>
+          <span class="price-old">{{ product.price }}</span>
+        {% endif %}
+        {% if product.tax %}
+          <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+    <div class="cart-content">
+      <div class="product-add-to-cart">
+        <button class="btn btn-primary add-to-cart" type="button" data-hover="tooltip" data-loading-text="{{ text_loading }}" title="{{ button_cart }}" onclick="cart.add('{{ product.product_id }}');">
+          <span>{{ button_cart }}</span>
+        </button>
+      </div>
+      {% if product.rating %}
+      <div class="rating">
+        {% for j in 1..5 %}
+          {% if product.rating < j %}
+            <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
+          {% else %}
+            <span class="fa fa-stack"><i class="fa fa-star fa-stack-1x"></i><i class="fa fa-star-o fa-stack-1x"></i></span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

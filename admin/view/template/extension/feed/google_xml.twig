@@ -1,0 +1,483 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+  <div class="container-fluid">
+    <div class="pull-right">
+        <button type="submit" form="form-edit" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{  text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+	  
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-edit" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+            <!-- <li><a href="#tab-available" data-toggle="tab">{{ tab_available }}</a></li> -->
+            <li><a href="#tab-categories" data-toggle="tab">{{ tab_categories }}</a></li>
+            <!-- <li><a href="#tab-attributes" data-toggle="tab">{{ tab_attributes }}</a></li> -->
+           
+          </ul>
+
+        <div class="tab-content">
+		
+        <div class="tab-pane active" id="tab-general">
+				
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+				<div class="col-sm-10">
+				  <select name="google_xml_status" id="input- status" class="form-control">
+					{% if google_xml_status %}
+					<option value="1" selected="selected">{{ text_enabled }}</option>
+					<option value="0">{{ text_disabled }}</option>
+					{% else %}
+					<option value="1">{{ text_enabled }}</option>
+					<option value="0" selected="selected">{{ text_disabled }}</option>
+					{% endif %}
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_token_help }}">{{ entry_token }}</span></label>
+				<div class="col-sm-10">
+					<input type="text" name="google_xml_token" value="{{ google_xml_token }}" id="input-token" class="form-control" />
+				</div>
+			</div>
+			
+<div class="form-group">
+				<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_data_feed_help }}">{{ entry_data_feed }}</span></label>
+				<div class="col-sm-10">
+					<b><a href="{{ data_feed }}{% if google_xml_token %}&token={{ google_xml_token }}{% endif %}" target="_blank" id="xml_feed_url">
+                        Merchant: {{ data_feed }}{% if google_xml_token %}&token={{ google_xml_token }}{% endif %}</a></b><br>
+                        Fb: <a href="{{ data_feed }}{% if google_xml_token %}&token={{ google_xml_token }}{% endif %}&target=fb" target="_blank" id="xml_feed_url">{{ data_feed }}{% if google_xml_token %}&token={{ google_xml_token }}{% endif %}&target=fb</a></b>
+				</div>
+			</div>
+			
+<!-- 			<div class="form-group">
+				<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_cron_run_help }}">{{ entry_cron_run }}</span></label>
+				<div class="col-sm-10">
+					<b>{{ cron_path }}</b>
+				</div>
+			</div>			 -->
+			
+<!-- 			<div class="form-group">
+				<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_export_url_help }}">{{ entry_export_url }}</span></label>
+				<div class="col-sm-10">
+					<b id="yml_static_file">{{ export_url ~ CONFIG_PREFIX ~ google_xml_token }}.xml</b>
+				</div>
+			</div> -->
+
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-ocstore"><span data-toggle="tooltip" title="{{ entry_ocstore_help }}">{{ entry_ocstore }}</span></label>
+				<div class="col-sm-10">
+				<div class="checkbox">
+				<label><input type="checkbox" name="google_xml_ocstore" id="input-ocstore" value="1"{{ google_xml_ocstore ? ' checked="checked"' : '' }}></label>
+				</div>
+				</div>
+			</div>
+			
+
+				
+		<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-name-field">{{ entry_name_field }}</label>
+				<div class="col-sm-10">
+					<select name="google_xml_name_field" id="input-name-field" class="form-control">
+                    {% for key,name in oc_fields %}
+					<option value="{{ key }}"{% if key == google_xml_name_field %} selected="selected"{% endif %}>
+					{{ name }}
+					</option>
+                    {% endfor %}
+					</select>
+				</div>
+			</div>
+	<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-description-field">{{ entry_description_field }}</label>
+				<div class="col-sm-10">
+					<select name="google_xml_description_field" id="input-description-field" class="form-control">
+					<option value="">{{ entry_dont_export }}</option>
+                    {% for key,name in oc_desc_fields %}
+					<option value="{{ key }}"{% if key == google_xml_description_field %} selected="selected"{% endif %}>
+					{{ name }}
+					</option>
+                    {% endfor %}
+					</select>
+				</div>
+			</div>
+<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-currency"><span data-toggle="tooltip" title="{{ entry_currency_help }}">{{ entry_currency }}</span></label>
+				<div class="col-sm-10">
+                    <select name="google_xml_currency" id="input-currency" class="form-control">
+                    {% for currency in currencies %}
+                        {% if currency.code == google_xml_currency %}
+                        <option value="{{ currency.code }}" selected="selected">({{ currency.code }}) {{ currency.title }}</option>
+                        {% else %}
+                        <option value="{{ currency.code }}">({{ currency.code }}) {{ currency.title }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+				</div>
+			</div>
+				
+		<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-groupprice"><span data-toggle="tooltip" title="{{ entry_groupprice_help }}">{{ entry_groupprice }}</span></label>
+				<div class="col-sm-10">
+				<select name="google_xml_groupprice" id="input-groupprice" class="form-control">
+				{% for customer_group in customer_groups %}
+                    {% if customer_group.customer_group_id == google_xml_groupprice %}
+                    <option value="{{ customer_group.customer_group_id }}" selected="selected">{{ customer_group.name }}</option>
+                    {% else %}
+                    <option value="{{ customer_group.customer_group_id }}">{{ customer_group.name }}</option>
+                    {% endif %}
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+				
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-changeprice"><span data-toggle="tooltip" title="{{ entry_changeprice_help }}">{{ entry_changeprice }}</span></label>
+				<div class="col-sm-10">
+				<label><input type="text" class="form-control" name="google_xml_changeprice" id="input-changeprice" value="{{ google_xml_changeprice }}"></label>
+				</div>
+			</div>
+				
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-condition"><span data-toggle="tooltip" title="{{ entry_condition_help }}">Condition (Состояние)</span></label>
+				<div class="col-sm-10">
+					<input type="text" name="google_xml_condition" value="{{ google_xml_condition }}" id="input-condition" maxlength="50" class="form-control" />
+				</div>
+			</div>
+				
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-numpictures"><span data-toggle="tooltip" title="{{ entry_numpictures_help }}">{{ entry_numpictures }}</span></label>
+				<div class="col-sm-10">
+					<label><input type="text" name="google_xml_numpictures" value="{{ google_xml_numpictures }}" id="input-numpictures" class="form-control" /></label>
+				</div>
+			</div>
+				
+		</div>
+		
+		<div class="tab-pane" id="tab-categories">
+			
+			
+			<div class="form-group">
+				<label class="col-sm-2 control-label">
+					<span data-toggle="tooltip" title="{{ entry_category_help }}">{{ entry_category }}</span><br>
+					<a href="http://www.google.com/basepages/producttype/taxonomy-with-ids.ru-RU.xls" target="_blank">Скачать список категорий Google</a>
+				</label>
+				<div class="col-sm-10">
+					<div class="well well-sm" style="height: 465px; overflow: auto;">
+					
+					{% for category in categories %}
+					<div class="checkbox row-fluid">
+					
+						{% if category.category_id in google_xml_categories %}
+						<label><input type="checkbox" name="google_xml_categories[]" value="{{ category.category_id}}" checked="checked" class="categ-cb" /></label>
+						{{ category.name }}
+						 {% else %}
+						<label><input type="checkbox" name="google_xml_categories[]" value="{{ category.category_id }}" class="categ-cb" /></label>
+						{{ category.name }}
+						{% endif %}
+						
+						<i class="fa fa-toggle-down expand-categ pull-right" rel="#categ_ctrls_{{ category.category_id }}"> </i>
+						<div>
+						<table class="table table-striped table-bordered table-hover categ-ctrls"  id="categ_ctrls_{{ category.category_id }}"  style="display: none;">
+						<tr>
+						<td class="text-left">Google category id: <a href="https://support.google.com/merchants/answer/6324436?hl=ru" target="_blank">HELP</a><input type="text" name="google_xml_categ_category_id[{{ category.category_id }}]" value="{{ google_xml_categ_category_id[category.category_id]}}"  size="50" maxlength="50" class="form-control categ-ctrl input-sm" /></td>
+						<td class="text-left">Product type: <a href="https://support.google.com/merchants/answer/6324406?hl=ru" target="_blank">HELP</a><input type="text" name="google_xml_categ_product_type[{{ category.category_id }}]" value="{{ google_xml_categ_product_type[category.category_id]}}"  size="50" maxlength="50" class="form-control categ-ctrl input-sm" /></td>
+						<td class="text-left">Condition: <a href="https://support.google.com/merchants/answer/6324469?hl=ru" target="_blank">HELP</a><input type="text" name="google_xml_categ_condition[{{ category.category_id }}]" value="{{ google_xml_categ_condition[category.category_id]}}"  size="50" maxlength="50" class="form-control categ-ctrl input-sm" /></td>
+						</tr>
+						</table>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+				<a onclick="$(this).parent().find('.categ-cb').attr('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find('.categ-cb').attr('checked', false);">{{ text_unselect_all }}</a>
+				</div>
+			</div>
+			
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_manufacturers_help }}">{{ entry_manufacturers }}</span></label>
+					<div class="col-sm-10">
+					<div class="well well-sm" style="height: 465px; overflow: auto;">
+					{% for manufacturer in manufacturers %}
+					<div>
+						<div class="checkbox">{% if manufacturer.manufacturer_id in google_xml_manufacturers %}
+						<label><input type="checkbox" name="google_xml_manufacturers[]" value="{{ manufacturer.manufacturer_id}}" checked="checked" /></label>
+						{{ manufacturer.name }}
+						{% else %}
+						<label><input type="checkbox" name="google_xml_manufacturers[]" value="{{ manufacturer.manufacturer_id }}" /></label>
+						{{ manufacturer.name }}
+						{% endif %} 
+						<i class="fa fa-toggle-down expand-categ pull-right" rel="#manuf_ctrls_{{ manufacturer.manufacturer_id }}"> </i>
+						</div>
+						<div>
+						<table class="table table-striped table-bordered table-hover categ-ctrls"  id="manuf_ctrls_{{ manufacturer.manufacturer_id }}"  style="display: none;">
+						<tr>
+						<td class="text-left">Condition:<input type="text" name="google_xml_manuf_condition[{{ manufacturer.manufacturer_id }}]" value="{{ google_xml_manuf_condition[manufacturer.manufacturer_id]}}"  size="50" maxlength="50" class="form-control categ-ctrl input-sm" /></td>
+						</tr>
+						</table>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+				<a onclick="$(this).parent().find(':checkbox').attr('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);">{{ text_unselect_all }}</a>
+					</div>
+				</div>
+				
+						
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="blacklist-type-select">{{ entry_blacklist_type }}</label>
+					<div class="col-sm-10">
+					<select name="google_xml_blacklist_type" id="blacklist-type-select" class="form-control">
+						<option value="black"{% if blacklist_type == 'black' %} selected{% endif %}>{{ text_blacklist }}</option>
+						<option value="white"{% if blacklist_type == 'white' %} selected{% endif %}>{{ text_whitelist }}</option>
+					  </select>
+					</div>
+				</div>
+
+		        	<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-yandex-yml-product-blacklist">&nbsp;</label>
+					<div class="col-sm-10">
+					<input type="text" name="google_xml_product_blacklist" value="" id="input-yandex-yml-product-blacklist" class="form-control"/>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<div id="blacklist-product-label"><span data-toggle="tooltip" title="{{ entry_blacklist_help }}">{{ entry_blacklist }}</span></div>
+						<div id="whitelist-product-label"><span data-toggle="tooltip" title="{{ entry_whitelist_help }}">{{ entry_whitelist }}</span></div>
+					</label>
+					<div class="col-sm-10">
+						<div id="blacklist-product" class="well well-sm" style="height: 200px; overflow: auto;">
+				        {% for product_bl in blacklist %}
+                            <div id="blacklist-product{{ product_bl.product_id }}"><i class="fa fa-minus-circle"></i> {{ product_bl.name }}
+                            <input type="hidden" name="google_xml_blacklist[]" value="{{ product_bl.product_id }}" />
+                            </div>
+						{% endfor %}
+						</div>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-pricefrom"><span data-toggle="tooltip" title="{{ entry_pricefrom_help }}">{{ entry_pricefrom }}</span></label>
+					<div class="col-sm-10">
+						<label>
+							<input name="google_xml_pricefrom" value="{{ google_xml_pricefrom }}" id="input-pricefrom" class="form-control" />
+						</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-priceto"><span data-toggle="tooltip" title="{{ entry_priceto_help }}">{{ entry_priceto }}</span></label>
+					<div class="col-sm-10">
+						<label>
+							<input name="google_xml_priceto" value="{{ google_xml_priceto }}" id="input-priceto" class="form-control" />
+						</label>
+					</div>
+				</div>
+			
+			</div>
+	        <div class="tab-pane" id="tab-tailor">
+				<div class="col-sm-12">
+					{{ tab_tailor_description }}
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_color_option_help }}">{{ entry_color_option }}</span></label>
+					<div class="col-sm-10">
+						<div class="well well-sm" style="height: 200px; overflow: auto;">
+                            {% for option in options %}
+                            <div>
+                            <div class="checkbox">
+                                {% if option.option_id in google_xml_color_options %}
+                                <label><input type="checkbox" name="google_xml_color_options[]" value="{{ option.option_id }}" checked="checked" /></label>
+                                {% else %}
+                                <label><input type="checkbox" name="google_xml_color_options[]" value="{{ option.option_id }}" /></label>
+                                {% endif %}
+                                {{ option.name }}
+                            </div>
+                            </div>
+                            {% endfor %}
+				        </div>
+				<a onclick="$(this).parent().find(':checkbox').attr('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);">{{ text_unselect_all }}</a>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_size_option_help }}">{{ entry_size_option }}</span><br/><span data-toggle="tooltip" title="{{ entry_size_unit_help }}">{{ entry_size_unit }}</span></label>
+					<div class="col-sm-10">
+						<div class="well well-sm" style="height: 200px; overflow: auto;">
+                            {% for option in options %}
+                            <div>
+                            <div class="checkbox row-fluid">
+                                {% if option.option_id in google_xml_size_options %}
+                                <label><input type="checkbox" name="google_xml_size_options[]" value="{{ option.option_id }}" checked="checked" /></label>
+                                {% else %}
+                                <label><input type="checkbox" name="google_xml_size_options[]" value="{{ option.option_id }}" /></label>
+                                {% endif %}
+                                {{ option.name }}
+                                
+								<select name="google_xml_size_units[{{ option.option_id }}]" style="float:right;">
+								{% set google_xml_size_unit = google_xml_size_units[ option.option_id ] %}
+								<option value=""{% if not google_xml_size_unit %} selected="selected"{% endif %}>{{ text_no }}</option>
+								{% for key,item in size_units_orig %}
+								<option value="{{ key }}"{% if google_xml_size_unit == key %} selected="selected"{% endif %}>{{ item }}</option>
+								{% endfor %}
+								{% for key,item in size_units_type %}
+								<option value="{{ key }}"{% if google_xml_size_unit == key %} selected="selected"{% endif %}>{{ item }}</option>
+								{% endfor %}
+								</select>
+                                
+                            </div>
+                            </div>
+                            {% endfor %}
+						</div>
+						<a onclick="$(this).parent().find(':checkbox').attr('checked', true);">{{ text_select_all }}</a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);">{{ text_unselect_all }}</a>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ entry_optioned_name_help }}">{{ entry_optioned_name }}</span></label>
+					<div class="col-sm-10">
+						<label><input type="radio" name="google_xml_optioned_name" value="no"{% if not google_xml_optioned_name or google_xml_optioned_name == 'no' %} checked="checked"{% endif %}>
+						{{ optioned_name_no }}</label><br />
+                        
+						<label><input type="radio" name="google_xml_optioned_name" value="short1"{% if google_xml_optioned_name == 'short1' %} checked="checked"{% endif %}>
+						{{ optioned_name_short1 }}</label><br />
+                        
+						<label><input type="radio" name="google_xml_optioned_name" value="short"{% if google_xml_optioned_name == 'short' %} checked="checked"{% endif %}>
+						{{ optioned_name_short }}</label><br />
+                        
+						<label><input type="radio" name="google_xml_optioned_name" value="long1"{% if google_xml_optioned_name == 'long1' %} checked="checked"{% endif %}>
+						{{ optioned_name_long1 }}</label><br />
+                        
+						<label><input type="radio" name="google_xml_optioned_name" value="long"{% if google_xml_optioned_name == 'long' %} checked="checked"{% endif %}>
+						{{ optioned_name_long }}</label>
+					</div>
+				</div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-option_image">{{ entry_option_image }}</label>
+                    <div class="col-sm-10">
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="google_xml_option_image" id="input-option_image" value="1"
+                            {% if google_xml_option_image %} checked="checked"{% endif %} />
+                        </label>
+                    </div>
+                    </div>
+                </div>
+				
+			</div>
+		  </div>
+		  <input type="submit" id="submitting_submit" style="display: none;" />
+        </form>
+      </div>
+    </div>
+  </div>
+<script type="text/javascript"><!--
+$('#input-token').change(function() {
+	var token = $(this).val().replace(/[^A-z0-9]/g, '');
+	$(this).val(token);
+	var url_tail = token ? '&token=' + token : '';
+	$('#xml_feed_url').text('{{ data_feed }}' + url_tail);
+	$('#xml_feed_url').attr('href', '{{ data_feed }}' + url_tail);
+	
+//	$('#yml_static_file').text('{{ export_url ~ CONFIG_PREFIX }}' + token + '.xml');
+})
+$('#form-edit').submit(function() {
+	$('.categ-ctrl').each(function() {
+		if ($(this).val() == '')
+			$(this).attr('disabled', 'disabled');
+	})
+	return true;
+});
+$('#unavailable').change(function() {
+	if ($(this).attr('checked')) {
+		$('#in_stock').attr('disabled', 'disabled');
+	}
+	else {
+		$('#in_stock').attr('disabled', false);
+		$(this).removeAttr('disabled');
+	}
+})
+
+$('.categ-ctrls').each(function() {
+	var tbl = $(this);
+	$(this).find('input[type="text"]').each(function() {
+		if ($(this).val() != '') {
+			tbl.show();
+		}
+	})
+	$(this).find('input[type="checkbox"]:checked').each(function() {
+		tbl.show();
+	})
+})
+
+$('.expand-categ').click(function() {
+	var rel = $($(this).attr('rel'));
+	rel.toggle();
+})
+
+$('#blacklist-type-select').change(function() {
+	if ($(this).val() == 'black') {
+		$('#blacklist-product-label').show();
+		$('#whitelist-product-label').hide();
+	}
+	else {
+		$('#whitelist-product-label').show();
+		$('#blacklist-product-label').hide();
+	}
+})
+$('#blacklist-type-select').trigger('change');
+
+$('input[name="google_xml_product_blacklist"]').autocomplete({
+	delay: 0,
+	source: function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&token={{ token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {		
+				response($.map(json, function(item) {
+					return {
+						label: item.name,
+						value: item.product_id
+					}
+				}));
+			}
+		});
+	}, 
+	select: function(item) {
+		$('#blacklist-product' + item.value).val('');
+		$('#blacklist-product' + item.value).remove();
+
+		$('#blacklist-product').append('<div id="blacklist-product' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="google_xml_blacklist[]" value="' + item['value'] + '" /></div>');	
+
+		$('input[name="google_xml_product_blacklist"]').val('');
+		
+		return false;
+	}
+});
+
+$('#blacklist-product div i').on('click', function() {
+	$(this).parent().remove();
+});
+//--></script> 
+{{ footer }}

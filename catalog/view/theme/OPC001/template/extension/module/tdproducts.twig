@@ -1,0 +1,98 @@
+<div class="tdproductsblock{% if config_module.prostyle == 1 %} block{% endif %} hb-animate-element bottom-to-top clearfix">
+	{% if config_module.title[code].title %}
+	<span class="homepage-heading title_block">
+		{{ config_module.title[code].title }}
+	</span>
+	{% endif %}
+
+	{% if config_module.subtitle[code].subtitle %}
+	<div class="sub-heading">
+		{{ config_module.subtitle[code].subtitle }}
+	</div>
+	{% endif %}
+
+	<div class="block_content">
+		<div class="row">
+			{% if config_module.type == 0 %}
+				{% set classes = ' grid cols-xs-' ~ config_module.xsdevice ~ ' cols-sm-' ~ config_module.smdevice ~ ' cols-md-' ~ config_module.mddevice ~ ' cols-lg-' ~ config_module.lgdevice ~ ' cols-xl-' ~ config_module.xldevice ~ ' cols-xxl-' ~ config_module.xxldevice %}
+			{% elseif config_module.type == 1 %}
+				{% set classes = ' owl-carousel owl-theme ' %}
+			{% else %}
+				{% set classes = ''%}
+			{% endif %}
+			{% if products|length > 0 %}
+				{% set count = 0 %}
+				{% if config_module.rows %}
+					{% set rows = config_module.rows %}
+				{% else %}
+					{% set rows = 1 %}
+				{% endif %}
+				<div id="tdproductsblock-{{ module }}" class="tdproducts {{ classes }}">
+					{% for product in products %}
+						{% if config_module.type == 1 %}
+							{% if count % rows == 0 %}
+								<div class="row_items">
+							{% endif %}
+							{% set count = count + 1 %}
+						{% endif %}
+						{% if config_module.prostyle == 0 %}
+							<div class="product-layout col-xs-12">
+								{% include themedir ~ '/template/product/layout/defaultlayout.twig' %}
+							</div>
+						{% else %}
+							<div class="product-layout col-xs-12">
+								{% include themedir ~ '/template/product/layout/style2.twig' %}
+							</div>
+						{% endif %}
+						{% if config_module.type == 1 %}
+							{% if (count % rows == 0) or (count == products|length ) %}
+								</div>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</div>
+			{% else %}
+				<div class="col-xs-12">
+					<div class="alert alert-info text-xs-center">{{ text_empty }}</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% if config_module.type == 1 and products|length > 0 %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#tdproductsblock-{{ module }}").owlCarousel({
+				autoplay: {% if config_module.autoplay %}true{% else %}false{% endif %},
+				autoplayTimeout: {% if config_module.apdelay %}{{ config_module.apdelay }}{% else %}2000{% endif %},
+				autoplayHoverPause: true,
+				dots: {% if config_module.pagination %}true{% else %}false{% endif %},
+				nav: {% if config_module.navigation %}true{% else %}false{% endif %},
+				navElement: 'div',
+				navText: ['<i class="fa icon"></i>', '<i class="fa icon"></i>'],
+				rtl:($("html").attr('dir')=="rtl") ? true : false,
+				rewind: true,
+				responsive:{
+					0:{
+						items: {{ config_module.xsdevice }}
+					},
+					544:{
+						items: {{ config_module.smdevice }}
+					},
+					768:{
+						items: {{ config_module.mddevice }}
+					},
+					992:{
+						items: {{ config_module.lgdevice }}
+					},
+					1200:{
+						items: {{ config_module.xldevice }}
+					},
+					1560:{
+						items: {{ config_module.xxldevice }}
+					}
+				},
+			});
+		});
+	</script>
+{% endif %}

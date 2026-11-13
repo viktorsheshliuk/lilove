@@ -1,0 +1,134 @@
+{% if list_type == 'list-view' %}
+    {% set class = 'product-layout product-list col-xs-12' %}
+{% elseif list_type == 'grid-view' %}
+    {% set class = 'product-layout product-grid col-lg-4 col-md-4 col-sm-6 col-xs-12' %}
+{% else %}
+    {% set class = 'product-layout col-lg-3 col-md-3 col-sm-6 col-xs-12' %}
+{% endif %}
+<div class="{{ class }}">
+    <div class="product-thumb">
+        <div class="image">
+            {% if product.product_group.color %}
+                {% for product_group in product.product_group.color %}
+                    <div class="product-groups-list">
+                        <div class="product-groups-list-wrap">
+                            {% set product_iterator = 0 %}
+                            {% for group_product_key,group_product in product_group.products %}
+                                {% set product_iterator = product_iterator + 1 %}
+                                <a class="product-groups-product product-groups-color {% if product_iterator > 3 %} product-group-hide{% endif %}{% if group_product.product_id == product.product_id %} current{% endif%} {% if group_product.second_color %}two-colors{% endif%}" href="{{ group_product.href }}" title="{{ group_product.name }}" data-product="{{ group_product.product_id }}">
+                                    <div class="product-groups-color-wrap">
+                                        <div class="first-color" style="background-color:{{ group_product.first_color }};"></div>
+                                        {% if group_product.second_color %}
+                                            <div class="second-color" style="background-color: {{ group_product.second_color }};"></div>
+                                        {% endif%}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        {% if product_group.products|length > 3 %}
+                            <a class="product-group-expand" onclick="$(this).parent().addClass('expanded');">+</a>
+                            <a class="product-group-hide" onclick="$(this).parent().removeClass('expanded');">-</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <a href="{{ product.href }}">
+                <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" />
+            </a>
+        </div>
+        <div>
+            <div class="caption">
+                <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                {% for product_type,product_type_group in product.product_group %}
+                    {% if product_type == 'select' %}
+                        {% for product_group in product_type_group %}
+                            <div class="product-group-select product-group-select-list">
+                                <div class="product-groups-list-text">
+                                    <div class="product-groups-text-title">{{ product_group.name }}</div>
+                                </div>
+                                <div class="product-group-select-current">
+                                    {% for group_product in product_group.products %}
+                                        {% if group_product.product_id == product.product_id %}
+                                            <div class="product-group-select-option">
+                                                <div class="product-group-select-option-image">
+                                                    <img src="{{ group_product.image_small_select }}" alt="{{ group_product.name_in_group }}" title="{{ group_product.name_in_group }}" >
+                                                </div>
+                                                <div class="product-group-select-option-name">{{ group_product.name_in_group }}</div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='2.5 5.5 11 6.21' width="10px" height="10px">
+                                        <path fill='#000' d='M3.354 5.646a.5.5 0 1 0-.708.708l.708-.708ZM8 11l-.354.354.354.353.354-.353L8 11Zm5.354-4.646a.5.5 0 0 0-.708-.708l.708.708Zm-10.708 0 5 5 .708-.708-5-5-.708.708Zm5.708 5 5-5-.708-.708-5 5 .708.708Z'/>
+                                    </svg>
+                                </div>
+                                <div class="product-group-select-options">
+                                    {% for group_product in product_group.products %}
+                                        <a class="product-group-select-option product-groups-product {% if group_product.product_id == product.product_id %}current{% endif %}" href="{{ group_product.href }}" data-product="{{ group_product.product_id }}">
+                                            <div class="product-group-select-option-image">
+                                                <img src="{{ group_product.image_small_select }}" alt="{{ group_product.name_in_group }}" title="{{ group_product.name_in_group }}" >
+                                            </div>
+                                            <div class="product-group-select-option-name">{{ group_product.name_in_group }}</div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% elseif product_type == 'product' %}
+                        {% for product_group in product_type_group %}
+                            <div class="product-groups-list-text">
+                                <div class="product-groups-text-title">{{ product_group.name }}</div>
+                                <div class="product-groups-text-list">
+                                    {% for group_product in product_group.products %}
+                                        <a class="product-groups-product product-groups-image-item {% if group_product.product_id == product.product_id %} current {% endif%}" href="{{ group_product.href }}" data-product="{{ group_product.product_id }}">
+                                            <img src="{{ group_product.attr_image ?: group_product.image_small }}" alt="{{ group_product.name }}" title="{{ group_product.name_in_group }}" >
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% elseif product_type != 'color' %}
+                        {% for product_group in product_type_group %}
+                            <div class="product-groups-list-text">
+                                <div class="product-groups-text-title">{{ product_group.name }}</div>
+                                <div class="product-groups-text-list">
+                                    {% for group_product in product_group.products %}
+                                        <a class="product-groups-product product-groups-text-item {% if group_product.product_id == product.product_id %} current {% endif%}" href="{{ group_product.href }}" data-product="{{ group_product.product_id }}">
+                                            {{ group_product.name_in_group }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <p>{{ product.description }}</p>
+                {% if product.price %}
+                    <p class="price">
+                        {% if not product.special %}
+                            {{ product.price }}
+                        {% else %}
+                            <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+                        {% endif %}
+                        {% if product.tax %}
+                            <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
+                        {% endif %}
+                    </p>
+                {% endif %}
+                {% if product.rating %}
+                    <div class="rating"> {% for i in 1..5 %}
+                            {% if product.rating < i %}
+                                <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-2x"></i></span>
+                            {% else %}
+                                <span class="fa fa-stack"><i class="fa fa-star fa-stack-2x"></i><i class="fa fa-star-o fa-stack-2x"></i></span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %} </div>
+            <div class="button-group">
+                <button type="button" onclick="cart.add('{{ product.product_id }}', '{{ product.minimum }}');"><i class="fa fa-shopping-cart"></i> <span class="hidden-xs hidden-sm hidden-md">{{ button_cart }}</span></button>
+                <button type="button" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><i class="fa fa-heart"></i></button>
+                <button type="button" data-toggle="tooltip" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');"><i class="fa fa-exchange"></i></button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,94 @@
+.tdmanufacturer {
+	margin-bottom: 70px;
+	position: relative;
+	@include media-breakpoint-down(md) { /* max 991 */
+		margin-bottom: 50px;
+	}
+	.owl-nav {
+		left: 0;
+		margin: 0;
+		position: absolute;
+		right: 0;
+		top: 50%;
+		z-index: 1;
+		> div  {
+			width:30px;
+			height:30px;
+			position: absolute;
+			margin: -15px 0 0;
+			background: #ffffff;
+		    color: #9c9c9c;
+			border:1px solid $base-border-color;
+			@include transition(all 0.3s ease 0s);
+			&:hover {
+				@include transition(all 0.3s ease 0s);
+				color: $light-color;
+				border-color: $link-hover-color;
+				background: $link-hover-color;
+			}
+		}
+		.owl-prev {
+			left: -30px;
+			right:auto;
+			padding: 3px 10px;
+			i {
+				font-size: 18px;
+				&:before {
+					content: "\f104";
+				}
+			}
+			[dir="rtl"] &{
+				left: auto;
+				right: -30px;
+				i {
+					&:before {
+						content: "\f105";
+					}
+				}
+			}
+		}
+		.owl-next {
+			right: -30px;
+			left: auto;
+			padding: 3px 12px;
+			i {
+				font-size: 18px;
+				&:before {
+					content: "\f105";
+				}
+			}
+			[dir="rtl"] &{
+				right: auto;
+				left: -30px;
+				i {
+					&:before {
+						content: "\f104";
+					}
+				}
+			}
+		}
+	}
+	.block_content {
+		margin: 0 30px;
+	}
+	.tdbrand {
+		.product-layout {
+			padding: 0 15px;
+			text-align: center;
+			.brand-image {
+				img {
+					max-width: 100%;
+					opacity: 0.6;
+					@include transition(all 0.3s ease 0s);
+				}
+			}
+			&:hover {
+				.brand-image {
+					img {
+						opacity: 1;
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,318 @@
+.search-widget {
+	float: right;
+	position: relative;
+	padding: 18px 0 18px 25px;
+	z-index: 10;
+	@include media-breakpoint-down(md) { /* max 991 */
+		padding: 16px 0 16px 25px;
+	}
+	[dir="rtl"] &{
+		float: left;
+		padding: 18px 25px 18px 0;
+		@include media-breakpoint-down(md) { /* max 991 */
+			padding: 16px 25px 16px 0;
+		}
+	}
+	.current {
+		cursor: pointer;
+		position: relative;
+		&:before {
+			content:"\e610";
+			font-family: $font-themify;
+			font-size: 24px;
+			position: relative;
+			display: inline-block;
+			vertical-align: middle;
+			text-align: center;
+			width: 24px;
+			height: 24px;
+			color: $gray-dark-color;
+		}
+		&.active {
+			&:before {
+				content:"\e646";
+			}
+		}
+	}
+	.toogle_content {
+		position: absolute;
+		display: none;
+		right: 0;
+		top:57px;
+		@include media-breakpoint-down(md) { /* max 991 */
+			top:56px;
+		}
+		[dir="rtl"] &{
+			right: auto;
+			left: 0;
+		}
+		.search-container {
+			border: 1px solid $base-border-color;
+			display: inline-block;
+			vertical-align: middle;
+			min-width: 400px;
+			@include media-breakpoint-down(xs) {
+				min-width: 250px;
+				max-width: 250px;
+			}
+			button[type=button] {
+				float: right;
+				background: $light-color;
+				border:medium none;
+				border-radius:0;
+				cursor: pointer;
+				color: $gray-dark;
+			    padding: 10px 15px;
+			    height: 40px;
+				&:hover {
+					color: $brand-primary;
+				}
+				i {
+					font-size: 16px;
+				}
+				[dir="rtl"] &{
+					float: left;
+				}
+			}
+			.input-wrapper {
+				overflow: hidden;
+				position: relative;
+				input[type=text] {
+					&:focus {
+						outline: none;
+						color: $gray-darker;
+					}
+					background: $light-color;
+					border: medium none;
+					border-radius: 0;
+					font-size: 14px;
+					height: 40px;
+					padding: 10px 20px;
+					color: $gray;
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+/* category search */
+#search-by-category {
+	.search-container {
+		.categories-container {
+			float: left;
+			overflow: hidden;
+		    position: relative;
+		    width: 90px;
+		    &:before{
+		    	background: #cbcbcb none repeat scroll 0 0;
+		    	content: "";
+		    	height: 40px;
+		    	position: absolute;
+		    	right: 0;
+		    	top: 0px;
+		    	bottom: 0;
+		    	margin: auto;
+		    	width: 1px;
+		    }
+		    &:after{
+		    	bottom: 0;
+		    	content: "\f107";
+		    	font-family: $font-icon;
+		    	height: 40px;
+		    	margin: auto;
+		    	padding:10px;
+		    	pointer-events: none;
+		    	position: absolute;
+		    	right: 15px;
+		    	top: 0;
+		    	width: 10%;
+		    }
+		    .search_category {
+		    	-webkit-appearance: none;
+		    	-moz-appearance: none;
+		    	appearance: none;
+		    	padding: 10px 30px 10px 10px;
+		    	border: medium none;
+		    	background: #f5f5f5;
+		    	line-height:normal;
+		    	color: $gray;
+		    	height: 40px;
+		    	overflow: auto;
+		    	width: 100%;
+		    	@include text-truncate();
+				option {
+					padding:2px;
+					text-transform: capitalize;
+				}
+			}
+			[dir="rtl"] &{
+				float: right;
+				&:before{
+					left: 0;
+					right: auto;
+				}
+				&:after{
+					left: 15px;
+					right: auto;
+				}
+				.search_category {
+					padding: 10px 10px 10px 30px;
+				}
+			}
+		}
+		.input-wrapper {
+			.ajax-loader-container{
+				background: transparent url(../image/searchloader.gif) no-repeat scroll center center;
+				bottom: 0;
+				height: 30px;
+				margin: auto;
+				position: absolute;
+				right: 0px;
+				top: 0px;
+				width: 30px;
+				z-index: 1;
+				[dir="rtl"] &{
+					right: auto;
+					left: 0;
+				}
+			}
+		}
+	}
+	.search-ajax {
+		position: relative;
+		.ajax-result-container {
+			display: none;
+			position: absolute;
+			width: 100%;
+			top: 0;
+			background: #FFF;
+			z-index: 12;
+			border: 1px solid $base-border-color;
+			.ajax-result-msg {
+				overflow-wrap:break-word;
+				padding: 10px;
+			}
+			.ajax-result-list {
+				padding: 10px;
+				.ajax-result-item{
+					.product-info {
+						a {
+							padding: 5px;
+							display: inline-block;
+							vertical-align: middle;
+							width: 100%;
+							border: medium none;
+							border-radius: 0;
+							margin: 0;
+							cursor: pointer;
+							text-align: left;
+							[dir="rtl"] &{
+								text-align: right;
+							}
+							.search-image {
+								float: left;
+								height: auto;
+								margin: 0 15px 0 0;
+								max-width: 80px;
+								[dir="rtl"] &{
+									float: right;
+									margin: 0 0 0 15px;
+								}
+							}
+							.product-name {
+								display: block;
+								font-size: 14px;
+								font-weight: 400;
+								margin: 0 0 5px;
+							}
+							.price {
+								color: $gray-dark-color;
+								display: block;
+								font-weight: 400;
+								.price-new {
+									color: $gray-dark-color;
+								}
+								.price-old {
+									color: #999999;
+									text-decoration: line-through;
+								}
+								.price-tax {
+							        display: none;
+							    }
+							}
+							&:hover {
+								.product-name {
+									color: $brand-secondary;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+//search product
+@include media-breakpoint-down(xs) { /* max 543 */
+	#input-search {
+		margin-bottom: 10px;
+	}
+}
+.select-category {
+	position: relative;
+	@include media-breakpoint-down(xs) { /* max 543 */
+		margin-bottom: 10px;
+	}
+	&:after {
+		bottom: 0;
+		content: "\f0d7";
+		font-family: $font-icon;
+		height: 40px;
+		line-height: 40px;
+		margin: auto;
+		pointer-events: none;
+		position: absolute;
+		padding: 0 10px;
+		right: 0;
+		top: 0;
+		width: 40px;
+		z-index: 1;
+		[dir="rtl"] &{
+			right: auto;
+			left: 0;
+		}
+	}
+	.search-cat {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		cursor: pointer;
+		line-height:normal;
+		overflow: auto;
+		padding: 8px 30px 8px 8px;
+		width: 100%;
+		@include text-truncate();
+		[dir="rtl"] &{
+			padding: 8px 8px 8px 30px;
+		}
+	}
+}
+.checkbox-inline {
+	margin: 15px 0;
+	@include media-breakpoint-down(xs) { /* max 543 */
+		margin: 0 0 10px;
+	}
+}
+#button-search {
+	margin-bottom: 15px;
+	@include media-breakpoint-down(xs) { /* max 543 */
+		margin-bottom: 10px;
+	}
+}
+.search-heading {
+	margin: 0 0 20px 0;
+	@include media-breakpoint-down(xs) { /* max 543 */
+		margin: 0 0 10px 0;
+	}
+}

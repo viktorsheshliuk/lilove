@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<!--[if IE 8 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie8"><![endif]-->
+<!--[if IE 9 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html dir="{{ direction }}" lang="{{ lang }}">
+<!--<![endif]-->
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="facebook-domain-verification" content="giwweryx30zrk47uphtp4jygl9muwo" />
+  <title>{{ title }}</title>
+  <meta property="og:title" content="{{ title }}" />
+  <base href="{{ base }}" />
+  {% if description %}
+    <meta name="description" content="{{ description }}" />
+    <meta property="og:description" content="{{ description }}" />
+  {% endif %}
+  {% if keywords %}
+    <meta name="keywords" content="{{ keywords }}" />
+  {% endif %}
+
+  {% if ogimage %} <meta property="og:image" content="{{ ogimage }}" /> {% endif %}
+
+  {% if ogurl %} <meta property="og:url" content="{{ ogurl }}" /> {% endif %}
+  <link href="{{ config_icon }}" rel="icon">  
+
+  {#<link rel="stylesheet" href="catalog/view/theme/OPC001/stylesheet/stylesheet10.css" media="none" onload="if(media!='all')media='all'"><noscript><link rel="stylesheet" href="catalog/view/theme/OPC001/stylesheet/stylesheet10.css"></noscript>#}
+    <link rel="stylesheet" href="catalog/view/theme/OPC001/stylesheet/stylesheet10.css">
+
+  {#<link rel="stylesheet" href="catalog/view/theme/OPC001/stylesheet/stylesheet11.css" media="none" onload="if(media!='all')media='all'"><noscript><link rel="stylesheet" href="catalog/view/theme/OPC001/stylesheet/stylesheet11.css"></noscript>#}
+
+  {% for style in styles %}
+    <link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="none" onload="if(media!='all')media='all'" />
+  {% endfor %}
+  {% if direction == 'rtl' %}
+    <link href="catalog/view/theme/OPC001/stylesheet/rtl.css" rel="stylesheet" media="none" onload="if(media!='all')media='all'">
+  {% endif %}
+  {% for link in links %}
+    <link href="{{ link.href }}" rel="{{ link.rel }}" media="none" onload="if(media!='all')media='all'" />
+  {% endfor %}
+
+  {% if (is_home) %}
+
+    <!-- Scripts -->
+    <script src="catalog/view/javascript/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/tether.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/bootstrap.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/addons.js" type="text/javascript"></script>
+    <script defer src="catalog/view/javascript/themedelights/responsive.js" type="text/javascript"></script>
+    <script defer src="catalog/view/javascript/themedelights/tdquickview.js" type="text/javascript"></script>
+    <script defer src="catalog/view/javascript/themedelights/common.js" type="text/javascript"></script>
+    <script defer src="catalog/view/javascript/themedelights/custom.js" type="text/javascript"></script>
+
+  {% else %}
+
+    <!-- Scripts -->
+    <script src="catalog/view/javascript/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/tether.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/bootstrap.min.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/addons.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/responsive.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/tdquickview.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/common.js" type="text/javascript"></script>
+    <script src="catalog/view/javascript/themedelights/custom.js" type="text/javascript"></script>
+
+  {% endif %}
+
+
+
+  <!-- Google Tag Manager -->
+
+  {% if fb_success %}
+    {{fb_success}}
+  {% endif %}
+
+  {% for script in scripts %}
+    <script src="{{ script }}" type="text/javascript"></script>
+  {% endfor %}
+
+{% if show_transaction %}
+  <script>
+    window.dataLayer = window.dataLayer || []
+    dataLayer.push({
+      'transactionId': "{{ order_id + 100 }}",
+      'transactionTotal': {{ order_sum }},
+      'transactionProducts': [
+        {% for product in order_info %}
+        {
+          'sku': "{{ product['product_id'] }}",
+          'name': "{{ product['name'] }}",
+          'category': "{{ product['category'] }}",
+          'price': {{ product['price'] }},
+          'quantity': {{ product['quantity'] }}
+        },
+        {% endfor %}
+      ]
+    });
+  </script>
+{% endif %}
+
+  {% for analytic in analytics %}
+    {{ analytic }}
+  {% endfor %}
+</head>
+<body class="{{ class }}">
+
+<!-- отключение лоадера
+<div id="page-loader"></div>  -->
+
+<header id = "header">
+  <div class="header-top">
+    <div class="container">
+      <div id="header_logo" style="position: relative;" itemscope="" itemtype="http://schema.org/Organization">
+        {% if logo %}<a itemprop="url" href="{{ home }}"><img itemprop="logo"  src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-responsive" /></a>
+        {% else %}
+          <h1>
+            <a href="{{ home }}">{{ name }}</a>
+          </h1>
+        {% endif %}
+        <p class="phone">{{ text_svyaz }}: <a href="tel:{{ telephone }}">{{ telephone }}</a></p>
+      </div>
+      {{ menu }}
+      <div class="right_content">
+        {{ cart }}
+        {{ search }}
+        <div id="_desktop_user_info">
+          <div class="user-info">
+            <div class="user-info-inner">
+              <span class="current">
+                <i class="ti-settings"></i>
+              </span>
+              <div class="toogle_content">
+                {% if logged %}
+                  <a href="{{ account }}">{{ text_account }}</a>
+                  <a href="{{ order }}">{{ text_order }}</a>
+                  <a href="{{ transaction }}">{{ text_transaction }}</a>
+                  <a href="{{ download }}">{{ text_download }}</a>
+                  <a href="{{ logout }}">{{ text_logout }}</a>
+                {% else %}
+                  <a href="{{ register }}">{{ text_register }}</a>
+                  <a href="{{ login }}">{{ text_login }}</a>
+                {% endif %}
+                <a href="{{ wishlist }}" id="wishlist-total" title="{{ text_wishlist }}">
+                  <span class="">{{ text_wishlist }}</span>
+                </a>
+                {{ language }}
+                {{ currency }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="responsive-content mobile" style="position: relative">
+        <div class="header-toggle hidden-lg-up">
+          <i class="ti-menu"></i>
+        </div>
+
+        <div id="_mobile_cart" class=""></div>
+
+        <div id="_mobile_search" class=""></div>
+
+        <div id="_mobile_user_info" class=""></div>
+        <span class="phone-mobile">{{ text_svyaz }} <a href="tel:{{ telephone }}">{{ telephone }}</a></span>
+        <div class="mobile-header-overlay hidden-lg-up"></div>
+        <div class="mobile-header-wrapper hidden-lg-up">
+          <a href="javascript:void(0);" id="header-nav-close" class=""><i class="fa fa-close"></i></a>
+          <div class="header-collapse">
+            <div id="_mobile_menu" class="megamenu"></div>
+            <div id="_mobile_megamenu" class="tdmegamenu"></div>
+            
+          </div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</header>

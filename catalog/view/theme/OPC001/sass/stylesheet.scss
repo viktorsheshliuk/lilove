@@ -1,0 +1,196 @@
+@import "./bootstrap/_bootstrap";
+@import "custom/font-awesome/font-awesome";
+@import "custom/owl.carousel.min";
+@import "custom/_animate";
+@import "partials/_variables";
+@import "partials/_mixins";
+@import "partials/_fonts";
+@import "custom/_themify-icons";
+@import "custom/_products";
+@import "custom/_tdproducttab";
+@import "custom/_tdbanners";
+@import "custom/_global";
+@import "custom/_tdtestimonial";
+@import "custom/_tdinstagram";
+@import "components/_footer";
+@import "components/_featuredproducts";
+@import "components/_category";
+@import "components/_cart";
+@import "components/_customer";
+@import "custom/_tdcmsblock";
+@import "custom/_tdblog";
+@import "custom/_tdbrand";
+@import "custom/_custom";
+@import "custom/_menu";
+@import "custom/_megamenu";
+@import "custom/_search";
+@import "custom/_tdquickview";
+@import "custom/_tdslideshow";
+@import "custom/_tooltip";
+@import "custom/_inview";
+@import "custom/_tdpagebuilder";
+
+#page-loader {
+  background: #fafafa url(../image/loader.gif) no-repeat scroll 50% 50%;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 1001;
+}
+body {
+  font-family: $font-family;
+  font-weight: 400;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: $gray;
+  line-height: 24px;
+}
+img, embed, object, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+img.lazy:not([data-lazyloading='1']) {
+  background: #f5f5f5 url(../image/prdLoader.gif) no-repeat scroll 50% 50%;
+}
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+a:hover, a:focus, a:active, a.active {
+  text-decoration: none;
+  outline: none !important;
+}
+a, button {
+  outline: none !important;
+}
+a {
+  color: $gray;
+  &:hover {
+    color: $brand-primary;
+  }
+}
+p {
+  font-size: 14px;
+}
+b, strong {
+  font-weight: 600;
+  color: $brand-primary;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: $gray-darker;
+  font-weight: 600;
+}
+
+h1, .h1 {
+  font-size: 1.375rem;
+}
+
+h2, .h2 {
+  font-size: 1.25rem;
+}
+
+h3, .h3 {
+  font-size: 1.125rem;
+}
+
+h4, .h4 {
+  font-size: 1.125rem;
+}
+
+h5, .h5 {
+  font-size: 1rem;
+}
+
+h6, .h6 {
+  font-size: 0.9375rem;
+}
+/* default font size */
+
+.fa {
+  font-size: 14px;
+}
+
+legend {
+  font-size: 18px;
+  padding: 7px 0px;
+}
+
+label {
+  text-align: right;
+  color: $gray-darker;
+  font-size: 14px;
+  font-weight: normal;
+}
+.form-control {
+  background: $light-color;
+  color: $gray;
+  border: 1px solid $base-border-color;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 0;
+  &:focus {
+    border-color: $brand-primary;
+  }
+}
+.input-group {
+  input, select, .dropdown-menu, .popover {
+    font-size: 12px;
+  }
+  .input-group-addon {
+    font-size: 12px;
+    height: 30px;
+  }
+}
+
+
+/* alert */
+.alert {
+  padding: 15px;
+  border-radius: 0;
+  .close {
+    right: 0;
+    [dir="rtl"] &{
+      right: auto;
+      left: 0;
+    }
+  }
+}
+
+/* buttons */
+
+.btn-primary {
+  background: $button-bkg-color;
+  border: 1px solid $button-bkg-color;
+  border-radius: 0;
+  color: $button-text-color;
+  text-transform: capitalize;
+  padding: 6px 12px;
+  @include transition(all 0.3s ease 0s);
+  &:hover, &:active, &:focus, &:disabled:hover {
+    background: $button-bkg-hover-color;
+    color: $button-text-hover-color;
+    border-color: $button-bkg-hover-color;
+  }
+}
+
+.btn-secondary {
+  @extend .btn-primary;
+  background:$button-bkg-hover-color;
+  color: $button-text-hover-color;
+  border: 1px solid $button-bkg-hover-color;
+  &:hover, &:active, &:focus {
+    background: $button-bkg-color;
+    border-color: $button-bkg-color;
+    color: $button-text-color;
+  }
+}
+.btn-tertiary {
+  @extend .btn-secondary;
+  text-transform: capitalize;
+  margin: 4px 0;
+  font-weight: 400;
+}

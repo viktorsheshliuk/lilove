@@ -1,0 +1,73 @@
+<div class="testimonial-container hb-animate-element bottom-to-top clearfix">
+	<div class="parallax" data-source-url="image/{{ config_module.pimg }}">
+		<div class="testimonial_inner">
+			<div class="module-title">
+				<h2>
+					{{ title }}
+				</h2>
+			</div>
+			{% if items %}
+				<div class="block-content">
+					<div id="slides-testimonial-{{ module }}" class="owl-carousel owl-theme">
+						{% for item in items %}
+							<div class="item">
+								<div class="left_block col-lg-3 col-md-12">
+									<div class="testimonial-image">
+										{#<img data-src="{{ item.image }}" alt="{{ item.name }}">#}
+										<img src="{{ item.image }}" alt="{{ item.name }}" loading="lazy">
+									</div>
+								</div>
+								<div class="right_block  col-lg-9 col-md-12">
+									<div class="testimonial-content">
+										<div class="testimonial-userinfo">
+											<span class="testimonial-name">{{ item.name }}</span>
+											<span class="testimonial-designation">{{ item.designation }}</span>
+										</div>
+										<div class="testimonial-text">
+											<div style="background: url('/image/sprite.png') no-repeat !important; background-position: -460px -8px !important;" class="quote-left"></div>
+											{{ item.description }}
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div><!--block-content-->
+			{% else %}
+				<p class="text_empty">{{ text_empty }}</p>
+			{% endif %}
+		</div>
+	</div>
+</div><!--testimonial-container-->
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#slides-testimonial-{{ module }}").owlCarousel({
+		dots: {% if config_module.pagination %}true{% else %}false{% endif %},
+		autoplay: {% if config_module.auto %}true{% else %}false{% endif %},
+		autoplayTimeout: {% if config_module.speed %}{{ config_module.speed }}{% else %}2000{% endif %},
+		autoplayHoverPause: true,
+		nav: {% if config_module.navigation %}true{% else %}false{% endif %},
+		navElement: 'div',
+		navText: ['<i class="fa icon"></i>', '<i class="fa icon"></i>'],
+		rtl:($("html").attr('dir')=="rtl") ? true : false,
+		rewind: true,
+		responsive:{
+			0:{
+				items: 1
+			},
+			544:{
+				items: 1
+			},
+			768:{
+				items: 1
+			},
+			992:{
+				items: 1
+			},
+			1200:{
+				items: 1
+			}
+		},
+	});
+});
+</script>

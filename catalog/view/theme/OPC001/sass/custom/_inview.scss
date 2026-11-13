@@ -1,0 +1,31 @@
+.hb-animate-element {
+  opacity: 0;
+  &.hb-in-viewport {
+    &.right-to-left {
+      @include animation(1s ease 0s normal none 1 fadeInRight);
+      opacity: 1;
+      .lang-rtl & {
+      	@include animation(1s ease 0s normal none 1 fadeInLeft);
+      }
+    }
+    &.left-to-right {
+      @include animation(1s ease 0s normal none 1 fadeInLeft);
+      opacity: 1;
+      .lang-rtl & {
+      	@include animation(1s ease 0s normal none 1 fadeInRight);
+      }
+    }
+    &.bottom-to-top {
+      @include animation(1s ease 0s normal none 1 fadeInUp);
+      opacity: 1;
+    }
+    &.top-to-bottom {
+      @include animation(1s ease 0s normal none 1 fadeInDown);
+      opacity: 1;
+    }
+    &.zoom-in {
+      @include animation(1s ease 0s normal none 1 zoomIn);
+      opacity: 1;
+    }
+  }
+}

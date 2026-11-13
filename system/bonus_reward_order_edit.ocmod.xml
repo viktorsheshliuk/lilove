@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Bonus Reward Order Edit</name>
+	<code>bonus_reward_order_edit</code>
+	<version>2.6</version>
+	<author>IHOR1989</author>
+
+	<file path="catalog/controller/api/reward.php">
+		<operation>
+			<search><![CDATA[if ($product['points']) {]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_cart_percent') > 0 ) {
+					$product['points'] = (int)($product['quantity'] * $product['price'] * ($this->config->get('module_bonus_reward_cart_percent') / 100));
+				} else {
+					$product['points'] = $product['price'];
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/controller/api/order.php">
+		<operation>
+			<search><![CDATA[$order_data['products'][] = array(]]></search>
+			<add position="before"><![CDATA[
+				if ($this->config->get('module_bonus_reward_status') && $this->config->get('module_bonus_reward_method') == 'cart') {
+					if ($this->config->get('module_bonus_reward_calculation_source') == 'category') {
+						$this->load->model('extension/module/bonus_reward');
+
+						$main_category = $this->config->get('module_bonus_reward_category_method');
+						$category_id = $this->model_extension_module_bonus_reward->getProductCategory($product['product_id'], $main_category);
+
+						$bonus_reward_config = $this->config->get('module_bonus_reward_category');
+						$config_bonus_reward = isset($bonus_reward_config[$category_id]) ? $bonus_reward_config[$category_id] : 0;
+					} else {
+						$bonus_reward_config = $this->config->get('module_bonus_reward_manufacturer');
+						$config_bonus_reward = isset($bonus_reward_config[$product['manufacturer_id']]) ? $bonus_reward_config[$product['manufacturer_id']] : 0;
+					}
+
+					if (!empty($config_bonus_reward['customer_group'][$order_data['customer_group_id']])) {
+						$product['reward'] = (int)($product['price'] * $product['quantity'] * ($config_bonus_reward['customer_group'][$order_data['customer_group_id']] / 100));
+					} else {
+						$product['reward'] = '';
+					}
+				} else {
+					$product['reward'] = $product['reward'];
+				}
+			]]></add>
+		</operation>
+	</file>
+</modification>

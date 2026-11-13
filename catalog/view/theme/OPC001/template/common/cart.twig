@@ -1,0 +1,84 @@
+<div id="_desktop_cart">
+  <div id="cart" class="blockcart">
+    <span class="current">
+      <i class="ti-shopping-cart"></i>
+      <span id="cart-total">{{ text_items }}</span>
+    </span>
+    <ul class="toogle_content">
+        {% if products or vouchers %}
+        <li class="products">
+          {% for product in products %}
+          <div class="cart-info">
+            {% if product.thumb %}
+            <a href="{{ product.href }}" class="cart-images">
+              <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" />
+            </a>
+            {% endif %}
+            <div class="cart-content">
+              <div class="product-name">
+                <span class="quantity-formated">
+                  {{ product.quantity }} x
+                </span>
+                <a href="{{ product.href }}">{{ product.name }}</a>
+              </div>
+              <div class="price">
+                {{ product.total }}
+              </div>
+              <div class="product-attribute">
+                {% if product.option %}
+                {% for option in product.option %}
+                {{ option.name }} {{ option.value }}
+                {% endfor %}
+                {% endif %}
+                {% if product.recurring %}
+                {{ text_recurring }} {{ product.recurring }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="remove_link">
+              <button type="button" onclick="cart.remove('{{ product.cart_id }}');" title="{{ button_remove }}" class="remove-from-cart">
+                <i class="fa fa-trash-o"></i>
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+          {% for voucher in vouchers %}
+            <div class="cart-info">
+              <div class="cart-content">
+                <div class="product-name">
+                  <span class="quantity-formated">1&nbsp;x</span>
+                  {{ voucher.description }}
+                </div>
+                <div class="vprice">
+                  {{ voucher.amount }}
+                </div>
+              </div>
+              <div class="remove_link">
+                <button type="button" onclick="voucher.remove('{{ voucher.key }}');" title="{{ button_remove }}" class="remove-from-cart">
+                  <i class="fa fa-trash-o"></i>
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+        </li>
+        <li>
+          <div class="cart-prices">
+            {% for total in totals %}
+            <div class="price subtotal">
+              <span class="label">{{ total.title }}</span>
+              <span class="value">{{ total.text }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="cart-buttons">
+            <a class="checkout-btn"href="{{ checkout }}"><i class="fa fa-share"></i> {{ text_checkout }}</a>
+          </div>
+        </li>
+        {% else %}
+        <li>
+          <p class="text-xs-center">{{ text_empty }}</p>
+        </li>
+        {% endif %}
+    </ul>
+  </div>
+</div>

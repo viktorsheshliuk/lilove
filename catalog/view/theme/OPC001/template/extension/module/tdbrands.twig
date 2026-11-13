@@ -1,0 +1,90 @@
+<div class="tdmanufacturer hb-animate-element bottom-to-top clearfix{% if config_module.rows >=2 and config_module.type == 1 %}{{' row_items'}}{% endif %}" id="tdmanufacturerblock-{{ module }}">
+	<h2 class="homepage-heading">
+		{% if config_module.title[code].title %}
+			{{ config_module.title[code].title }}
+		{% else %}
+			{{ heading_title }}
+		{% endif %}
+	</h2>
+	<div class="sub-heading">
+		{% if config_module.subtitle[code].subtitle %}
+			{{ config_module.subtitle[code].subtitle }}
+		{% else %}
+			{{ heading_title }}
+		{% endif %}
+	</div>
+	{% if brands|length > 0 %}
+		<div class="block_content row">
+			{% if config_module.type == 0 %}
+				{% set classes = ' grid cols-xs-' ~ config_module.xsdevice ~ ' cols-sm-' ~ config_module.smdevice ~ ' cols-md-' ~ config_module.mddevice ~ ' cols-lg-' ~ config_module.lgdevice ~ ' cols-xl-' ~ config_module.xldevice %}
+			{% elseif config_module.type == 1 %}
+				{% set classes = ' owl-carousel owl-theme ' %}
+			{% else %}
+				{% set classes = ''%}
+			{% endif %}
+			{% set count = 0 %}
+			{% if config_module.rows %}
+				{% set rows = config_module.rows %}
+			{% else %}
+				{% set rows = 1 %}
+			{% endif %}
+			<div id="carouselbrand-{{ module }}" class="tdbrand tdproducts {{ classes }}">
+				{% for brand in brands %}
+					{% if config_module.type == 1 %}
+                        {% if count % rows == 0 %}
+                            <div class="row_items">
+                        {% endif %}
+                        {% set count = count + 1 %}
+                    {% endif %}
+                    <div class="product-layout">
+                    	<div class="brand-image">{% if config_module.input_manufacturer_link %}<a href="{{ brand.href }}"><img src="{{ brand.thumb }}" alt="{{ brand.name }}" class="img-responsive" /></a>{% else %}<img src="{{ brand.thumb }}" alt="{{ brand.name }}" class="img-responsive" />{% endif %}</div>
+                    </div>
+					{% if config_module.type == 1 %}
+						{% if (count % rows == 0) or (count == brands|length ) %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	{% else %}
+		<p class="text_empty">{{ text_empty }}</p>
+	{% endif %}
+</div>
+{% if config_module.type == 1 and brands|length > 0 %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#carouselbrand-{{ module }}").owlCarousel({
+			dots: {% if config_module.pagination %}true{% else %}false{% endif %},
+			autoplay: {% if config_module.autoplay %}true{% else %}false{% endif %},
+			autoplayTimeout: {% if config_module.apdelay %}{{ config_module.apdelay }}{% else %}2000{% endif %},
+			autoplayHoverPause: true,
+			nav: {% if config_module.navigation %}true{% else %}false{% endif %},
+			navElement: 'div',
+			navText: ['<i class="fa icon"></i>', '<i class="fa icon"></i>'],
+			rewind: true,
+			rtl:($("html").attr('dir')=="rtl") ? true : false,
+			responsive:{
+				0:{
+					items: {{ config_module.xsdevice }}
+				},
+				544:{
+					items: {{ config_module.smdevice }}
+				},
+				768:{
+					items: {{ config_module.mddevice }}
+				},
+				992:{
+					items: {{ config_module.lgdevice }}
+				},
+				1200:{
+					items: {{ config_module.xldevice }}
+				},
+				1560:{
+					items: {{ config_module.xxldevice }}
+				}
+			},
+		});
+	});
+</script>
+{% endif %}

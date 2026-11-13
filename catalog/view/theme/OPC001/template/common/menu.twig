@@ -1,0 +1,41 @@
+{% if categories %}
+<div id="_desktop_menu" class="megamenu">
+  <h3 class="cat-title hidden-lg-up">Menu</h3>
+  <ul class="td-horizontal-menu mobile-navigation">
+    {% for category in categories %}
+      {% if category.children %}
+        <li class="menu-item has-child {% if category.column <= '1' %} dropdown{% else %} mega{% endif %}">
+          <a href="{{ category.href }}">{{ category.name }}</a>
+          <span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>
+          <ul class="sub-menu column-{{ category.column }}">
+            {% for children in category.children|batch(category.children|length / category.column|round(1, 'ceil')) %}
+              {% for child in children %}
+                {% if child.children %}
+                  <li class="menu-item has-child">
+                    <a href="{{ child.href }}">{{ child.name }}</a>
+                    <span class="toggle-submenu hidden-lg-up"><i class="fa fa-angle-down"></i></span>
+                    <ul class="sub-menu">
+                      {% for children in child.children %}
+                        <li class="menu-item">
+                          <a href="{{ children.href }}">{{ children.name }}</a>
+                        </li>
+					
+                      {% endfor %}
+                    </ul>
+                  </li>
+                {% else %}
+                  <li class="menu-item"><a href="{{ child.href }}">{{ child.name }}</a></li>
+			
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </li>
+      {% else %}
+        <li><a href="{{ category.href }}">{{ category.name }}</a></li>
+	
+      {% endif %}
+    {% endfor %}
+  </ul>
+  </div>
+{% endif %}

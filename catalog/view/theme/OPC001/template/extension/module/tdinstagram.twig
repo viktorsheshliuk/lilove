@@ -1,0 +1,36 @@
+<div id="tdinstagram" class="tdinstagram-{{ module }} hb-animate-element bottom-to-top clearfix">
+  <div class="tdinstagram-heading">
+  	<i class="fa fa-instagram" aria-hidden="true"></i>
+    {{ heading_title }}
+  </div>
+  <div class="block_content">
+     <noindex><a href="https://www.instagram.com/{{ module_tdinstagram_username }}" rel="nofollow">{{ module_tdinstagram_username }}</a></noindex>
+    <div id="instagram-carousel" class="owl-carousel owl-loaded"></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+var tdinstauserid = "{{ module_tdinstagram_userid }}";
+var tdinstatoken = "{{ module_tdinstagram_usertoken }}";
+var tdinstatag = "{{ module_tdinstagram_hashtag }}";
+var tdinstasort = "{{ module_tdinstagram_sort }}";
+var tdinstalimit = "{{ module_tdinstagram_noofdisplayimg }}";
+var tdinstaimage = "{{ module_tdinstagram_size }}";
+var tdinstalike = "{{ module_tdinstagram_imglikes }}";
+var tdinstacomment = "{{ module_tdinstagram_imgcomments }}";
+var tdinstacaption = "{{ module_tdinstagram_imgcaptions }}";
+
+
+// setTimeout(function() {
+//   [].forEach.call(document.querySelectorAll('img.insta-img[data-src]'), function(img) {
+//     console.log(img);
+//     img.setAttribute('src', img.getAttribute('data-src'));
+//     img.onload = function() {
+//       img.removeAttribute('data-src');
+//     };
+//   });
+// },1000);
+
+
+
+</script>

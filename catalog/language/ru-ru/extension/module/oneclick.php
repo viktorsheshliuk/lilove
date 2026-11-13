@@ -1,0 +1,31 @@
+<?php
+
+// Text
+$_['text_tax']                   = 'Без НДС:';
+$_['text_discount']      	     = ' или более: ';
+$_['text_manufacturer']          = 'Производитель:';
+$_['text_model']                 = 'Модель:';
+$_['text_ean']                   = 'EAN:';
+$_['text_jan']                   = 'JAN:';
+$_['text_isbn']                  = 'ISBN:';
+$_['text_mpn']                   = 'MPN:';
+$_['text_location']              = 'Location:';
+$_['text_require_information']   = 'Я прочитал и согласен с <a target="_blank" href="%s">%s</a>';
+$_['text_stock']                 = 'Наличие:';
+$_['text_instock']               = 'Есть в наличии';
+$_['text_reward']                = 'Бонусные баллы:';
+$_['text_points']                = 'Цена в бонусных баллах:';
+$_['text_oc_head_label']         = 'Быстрое оформление';
+$_['text_wait_callback']         = '';//'Ожидайте звонка нашего менеджера'; 
+
+// Error
+$_['error_firstname']               = 'Введите Ваше имя!';
+$_['error_lastname']               = 'Введите фамилию!';
+$_['error_telephone']               = 'Введите телефон!';
+$_['error_email']               = 'E-mail введен неверно!';
+$_['error_address_1']               = 'Введите адрес!';
+$_['error_comment']               = 'Введите комментарий!';
+$_['error_option']               = 'Выберите "%s"!';
+$_['error_agree']  = 'Вы должны согласиться с %s!';
+
+?>

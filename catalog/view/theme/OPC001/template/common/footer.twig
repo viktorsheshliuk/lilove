@@ -1,0 +1,129 @@
+<div class="container">
+  <div id="_mobile_left_column"></div>
+  <div id="_mobile_right_column"></div>
+  <div class="clearfix"></div>
+</div>
+<footer id="footer">
+  <div class="footer-container-before">
+    <div class="container">
+      <div class="row">
+        {% if footertop %}
+          {{ footertop }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="footer-container">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-lg-3 hb-animate-element left-to-right">
+          {% if footerleft %}
+            {{ footerleft }}
+          {% endif %}
+        </div>
+        {% if informations %}
+          <div class="col-xs-12 col-lg-2 hb-animate-element bottom-to-top">
+            <h4 class="title_block">{{ text_information }}</h4>
+            <ul class="toggle-footer list-unstyled">
+              {% for information in informations %}
+                <li><a href="{{ information.href }}">{{ information.title }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        <div class="col-xs-12 col-lg-2 hb-animate-element bottom-to-top">
+          <h4 class="title_block">{{ text_service }}</h4>
+          <ul class="toggle-footer list-unstyled">
+            <li><a href="{{ contact }}">{{ text_contact }}</a></li>
+            <li><a href="{{ return }}">{{ text_return }}</a></li>
+            <li><a href="{{ sitemap }}">{{ text_sitemap }}</a></li>
+          </ul>
+        </div>
+        <div class="col-xs-12 col-lg-2 hb-animate-element bottom-to-top">
+          <!-- <h4 class="title_block">{{ text_extra }}</h4>
+          <ul class="toggle-footer list-unstyled">
+            <li><a href="{{ manufacturer }}">{{ text_manufacturer }}</a></li>
+            <li><a href="{{ voucher }}">{{ text_voucher }}</a></li>
+            <li><a href="{{ affiliate }}">{{ text_affiliate }}</a></li>
+            <li><a href="{{ special }}">{{ text_special }}</a></li>
+          </ul> -->
+          <h4 class="title_block">{{ text_account }}</h4>
+          <ul class="toggle-footer list-unstyled">
+            <li><a href="{{ account }}">{{ text_account }}</a></li>
+            <li><a href="{{ order }}">{{ text_order }}</a></li>
+            <li><a href="{{ wishlist }}">{{ text_wishlist }}</a></li>
+            <li><a href="{{ newsletter }}">{{ text_newsletter }}</a></li>
+          </ul>
+        </div>
+        <div id="tdcontactinfo" class="col-xs-12 col-lg-3 hb-animate-element right-to-left">
+          <h4 class="title_block">{{ text_storeinformation }}</h4>
+          <div class="toggle-footer">
+            <div class="info addresses">
+              <div class="icon address-icon">
+                <i class="fa fa-map-marker"></i>
+              </div>
+              <div class="data tdaddress">
+                {{ address }}
+              </div>
+            </div>
+            <div class="info phones">
+              <div class="icon phone-icon">
+                <i class="fa fa-phone"></i>
+              </div>
+              <div class="data tdphone">
+                {{ telephone }}
+              </div>
+            </div>
+            <div class="info emails">
+              <div class="icon email-icon">
+                <i class="fa fa-envelope"></i>
+              </div>
+              <div class="data tdemail">
+                {{ store_email }}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% if footerright %}
+          {{ footerright }}
+        {% endif %}
+      </div>
+    </div>
+    <div class="footer-container-after">
+      <div class="container">
+        <div class="copyright">{{ powered }}</div>
+        {% if footerbottom %}
+          {{ footerbottom }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+<a class="backtotop" href="#" style="display:none;">
+  <i class="fa fa-angle-up"></i>
+</a>
+
+{% for script in scripts %}
+  <script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+
+<script src="/catalog/view/javascript/insta_footer.js"></script>
+
+<script>
+  // $(function() {
+
+  //   setTimeout(function() {
+  //     [].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
+
+  //       img.setAttribute('src', img.getAttribute('data-src'));
+  //       img.onload = function() {
+  //         img.removeAttribute('data-src');
+  //       };
+  //     });
+  //   },1000);
+  // });
+
+</script>
+<script src="https://kit.fontawesome.com/208613fd8a.js" crossorigin="anonymous"></script>
+</body>
+</html>

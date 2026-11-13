@@ -1,0 +1,201 @@
+.table-responsive {
+	margin-bottom: 20px;
+	.cart-detail,table {
+		margin-bottom: 0;
+	}
+}
+table {
+	tbody {
+		tr {
+			.qty {
+				input[type="text"] {
+					text-align: center;
+					@include media-breakpoint-down(sm) { /* max 767 */
+						display: block;
+						margin-bottom: 8px;
+					}
+				}
+				.input-group-btn {
+					font-size: 14px;
+					@include media-breakpoint-down(sm) { /* max 767 */
+						display: inline-block;
+						vertical-align: middle;
+						width: 100%;
+						text-align: center;
+					}
+					.btn-update {
+						margin: 0 0 0 5px;
+						@include media-breakpoint-down(sm) { /* max 767 */
+							margin: 0;
+						}
+						[dir="rtl"] &{
+							margin: 0 5px 0 0;
+							@include media-breakpoint-down(sm) { /* max 767 */
+								margin: 0;
+							}
+						}
+					}
+					.btn-remove {
+						margin: 0 0 0 2px;
+						[dir="rtl"] &{
+							margin: 0 2px 0 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+.next-desc {
+	margin: 0 0 10px 0;
+}
+.panel-group {
+	margin-bottom: 20px;
+	.panel {
+		width: 100%;
+		.panel-heading {
+			.panel-title {
+				background: #f5f5f5;
+				border-left: 3px solid $brand-primary;
+				color: $brand-primary;
+				font:400 14px/20px $font-family;
+				padding: 10px;
+				margin: 0 0 10px 0;
+				[dir="rtl"] &{
+					border-right:3px solid $brand-primary;
+					border-left: medium none;
+				}
+				a {
+					i {
+						float: right;
+						line-height: 20px;
+						[dir="rtl"] &{
+							float: left;
+						}
+					}
+				}
+			}
+		}
+		#collapse-coupon, #collapse-voucher, #collapse-reward {
+			.panel-body {
+				background: #f5f5f5;
+				padding: 15px;
+				margin: 0 0 10px 0;
+				.btn-primary {
+					padding: 10px 12px;
+				}
+			}
+		}
+		#collapse-shipping, #collapse-payment-address, #collapse-shipping-address,
+		#collapse-shipping-method, #collapse-payment-method, #collapse-checkout-confirm{
+			.panel-body {
+				background: #f5f5f5;
+				padding: 15px;
+				margin: 0 0 10px 0;
+				> p {
+					margin: 0 0 10px 0;
+				}
+				.form-group {
+					.shipping-tax, .shipping-add {
+						@include media-breakpoint-up(md) { /* min 768 */
+							padding-top: 7px;
+						}
+					}
+				}
+				#payment-new {
+					.control-label {
+						@include media-breakpoint-up(md) { /* min 768 */
+							padding-top: 7px;
+						}
+					}
+				}
+				.select-category {
+					position: relative;
+					&:after {
+						bottom: 0;
+				        content: "\f0d7";
+				        font-family: $font-icon;
+				        height: 40px;
+				        line-height: 40px;
+				        margin: auto;
+				        pointer-events: none;
+				        position: absolute;
+				        padding: 0 10px;
+				        right: 0;
+				        top: 0;
+				        width: 40px;
+				        z-index: 1;
+				        [dir="rtl"] &{
+				        	right: auto;
+				        	left: 0;
+				        }
+					}
+				}
+				#payment-existing, #shipping-existing {
+					margin-bottom: 10px;
+				}
+				#input-zone, #input-country, #input-payment-country,
+			    #input-payment-zone, .payment-exit, .shipping-exit,
+			    #input-shipping-country, #input-shipping-zone {
+					-webkit-appearance: none;
+			    	-moz-appearance: none;
+			    	appearance: none;
+			    	cursor: pointer;
+			    	line-height:normal;
+			    	overflow: auto;
+			    	padding: 8px 30px 8px 8px;
+			    	width: 100%;
+			    	@include text-truncate();
+			    	[dir="rtl"] &{
+			    		padding: 8px 8px 8px 30px;
+			    	}
+				}
+				.buttons {
+					display: inline-block;
+					vertical-align: middle;
+					width: 100%;
+				}
+			}
+		}
+		#collapse-checkout-option {
+			.panel-body {
+				background: #f5f5f5;
+				padding: 15px;
+				margin: 0 0 10px 0;
+				.form-group {
+					#input-password {
+						margin-bottom: 5px;
+					}
+				}
+				#button-account {
+					@include media-breakpoint-down(sm) { /* max 767 */
+						margin-bottom: 20px;
+					}
+				}
+			}
+		}
+	}
+}
+.viewcart-list {
+	background: #f5f5f5;
+	margin-bottom: 20px;
+}
+.buttons-last {
+	@include media-breakpoint-down(md) { /* max 991 */
+		margin-bottom: 20px;
+	}
+}
+.voucher-qty {
+	.form-control {
+		padding: 6px 12px;
+		text-align: center;
+	}
+	.input-group-btn, .btn {
+		.btn {
+			margin: 0 0 0 5px;
+			[dir="rtl"] &{
+				margin: 0 5px 0 0;
+			}
+		}
+	}
+}

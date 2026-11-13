@@ -1,0 +1,640 @@
+{{ header }}
+<div id="product-product" class="container">
+  {#<ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>#}
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <div class="product__flex-container">
+        <div class="product__images">
+        {% if thumb or images %}
+          <ul class="thumbnails">
+            {% if thumb %}
+            <li><a class="thumbnail" data-fancybox="gallery" href="{{ popup }}" title="{{ heading_title }}"><img src="{{ thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" /></a></li>
+            {% endif %}
+            {% if images %}
+            {% for image in images %}
+            <li class="image-additional"><a class="thumbnail" data-fancybox="gallery" href="{{ image.popup }}" title="{{ heading_title }}"> <img src="{{ image.thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" /></a></li>
+            {% endfor %}
+            {% endif %}
+          </ul>
+        {% endif %}
+        </div>
+<div class="right-box">
+        <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>        
+        <div class="product__price">
+           {% if price %}
+          <ul class="list-unstyled">
+            {% if not special %}
+            <li>
+              <div class="price">{{ price }}</div>
+            </li>
+            {% else %}
+            <li><span class="price" style="text-decoration: line-through;">{{ price }}</span></li>
+            <li>
+              <div class="special">{{ special }}</div>
+            </li>
+            {% endif %}
+{#            {% if tax %}
+            <li>{{ text_tax }} {{ tax }}</li>
+            {% endif %}
+            {% if points %}
+            <li>{{ text_points }} {{ points }}</li>
+            {% endif %}
+            {% if discounts %}
+            <li>
+              <hr>
+            </li>
+            {% for discount in discounts %}
+            <li>{{ discount.quantity }}{{ text_discount }}{{ discount.price }}</li>
+            {% endfor %}
+            {% endif %}
+          #}</ul>
+          {% endif %} 
+          <h1>{{ heading_title }}</h1>
+           <p>{{ text_model }} {{ model }}</p>
+{#          <ul class="list-unstyled">
+            {% if manufacturer %}
+            <li>{{ text_manufacturer }} <a href="{{ manufacturers }}">{{ manufacturer }}</a></li>
+            {% endif %} #}
+ {#           <li>{{ text_model }} {{ model }}</li>  #}
+{#            {% if reward %}
+            <li>{{ text_reward }} {{ reward }}</li>
+            {% endif %}   #}
+             
+            {# <li>{{ text_stock }} {{ stock }}</li>  
+          </ul> #}
+          <div id="product">
+
+          {% if options %}        
+{#            <h3>{{ text_option }}</h3>  #}
+            {% for option in options %}
+              {% if option.type == 'select' %}
+              <div class="form-group{% if option.required %} required {% endif %}">
+                <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+                <select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" class="form-control">
+                  <option value="">{{ text_select }}</option>
+                  {% for option_value in option.product_option_value %}
+                  <option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}
+                  {% if option_value.price %}
+                  ({{ option_value.price_prefix }}{{ option_value.price }})
+                  {% endif %} </option>
+                  {% endfor %}
+                </select>
+              </div>
+             
+            {% endif %}
+            {% if option.type == 'radio' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              {# <label class="control-label">{{ option.name }}</label> #}
+              <div id="input-option{{ option.product_option_id }}">
+                  <ul id="list_option{{option.option_id }}" class="list-unstyled">
+
+                  {% for option_value in option.product_option_value %}
+                    {% if (option_value.image or option_value.color) %}
+                      {% if (option.status_color_type == '1') %}
+                          {% if option_value.color %}
+                            <div class="image-radio">
+                              <label {% if (option_value['price']) %}data-toggle="tooltip" title="{{ option_value.price_prefix ~ option_value.price }}"{% endif %}>
+                            
+                                <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" />
+                              
+                                <span class="color-option" {% if (option_value['price']) %}data-toggle="tooltip" title="{{ option_value.price_prefix ~ option_value.price }}"{% endif %} style="background-color:{{ option_value.color}}"></span> 
+                                {# <span class="option-name">{{ option_value.name }}</span> #}
+                              </label>
+                            </div>
+                          {% endif %}
+                          {% if option_value.image %}
+                            <div class="image-radio">
+                              <label {% if (option_value['price']) %}data-toggle="tooltip" title="{{ option_value.price_prefix ~ option_value.price }}"{% endif %}>
+                            
+                                <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" />
+                              
+                                <span class="color-option" {% if (option_value['price']) %}data-toggle="tooltip" title="{{ option_value.price_prefix ~ option_value.price }}"{% endif %} ><img src="{{ option_value.image }}" style="max-width: 100%;"></span> 
+                                {# <span class="option-name">{{ option_value.name }}</span> #}
+                              </label>
+                            </div>
+                          {% endif %}
+                            
+
+
+                      {% else %}
+                        <div class="image-radio">
+                          <label>
+                          <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" />
+                          <img onclick="optionimage('{{ option_value.image_click }}','{{ option_value.image_zoom }}','{{ option_value.image_thumb }}')" src="{{ option_value.image }}" alt="{{ option_value.name ~ option_value.price ? ' ' ~ option_value.price_prefix ~ option_value.price : '' }}" class="img-thumbnail" {% if (option_value['price']) %}data-toggle="tooltip" title="{{ option_value.price_prefix ~ option_value.price }}"{% endif %} />
+                          </label>
+                        </div>
+                      {% endif %}
+                    {% else %}
+                      <li>
+                        <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" class="" id="{{option.option_id }}_{{ option_value.product_option_value_id }}"/>
+                        <label for="{{option.option_id }}_{{ option_value.product_option_value_id }}">{{ option_value.name }}</label>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                  </ul>
+
+
+
+
+
+           {#      <ul id="list_option{{option.option_id }}" class="list-unstyled">
+                {% for option_value in option.product_option_value %}
+                  <li>
+                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" class="" id="{{option.option_id }}_{{ option_value.product_option_value_id }}"/>
+                          {# {% if option_value.image %} <img src="{{ option_value.image }}" alt="{{ option_value.name }} {% if option_value.price %} {{ option_value.price_prefix }} {{ option_value.price }} {% endif %}" class="img-thumbnail" /> {% endif %}                   #}
+      {#              <label for="{{option.option_id }}_{{ option_value.product_option_value_id }}">{{ option_value.name }}</label>
+                  </li>
+                {% endfor %}
+                </ul>  #}
+
+
+              </div>     
+            </div>
+            {% endif %}
+            {% if option.type == 'checkbox' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label">{{ option.name }}</label>
+              <div id="input-option{{ option.product_option_id }}"> {% for option_value in option.product_option_value %}
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" name="option[{{ option.product_option_id }}][]" value="{{ option_value.product_option_value_id }}" />
+                    {% if option_value.image %} <img src="{{ option_value.image }}" alt="{{ option_value.name }} {% if option_value.price %} {{ option_value.price_prefix }} {{ option_value.price }} {% endif %}" class="img-thumbnail" /> {% endif %}
+                    {{ option_value.name }}
+                    {% if option_value.price %}
+                    ({{ option_value.price_prefix }}{{ option_value.price }})
+                    {% endif %} </label>
+                </div>
+                {% endfor %} </div>
+            </div>
+            {% endif %}
+            {% if option.type == 'text' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+              <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" placeholder="{{ option.name }}" id="input-option{{ option.product_option_id }}" class="form-control" />
+            </div>
+            {% endif %}
+            {% if option.type == 'textarea' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+              <textarea name="option[{{ option.product_option_id }}]" rows="5" placeholder="{{ option.name }}" id="input-option{{ option.product_option_id }}" class="form-control">{{ option.value }}</textarea>
+            </div>
+            {% endif %}
+            {% if option.type == 'file' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label">{{ option.name }}</label>
+              <button type="button" id="button-upload{{ option.product_option_id }}" data-loading-text="{{ text_loading }}" class="btn btn-default btn-block"><i class="fa fa-upload"></i> {{ button_upload }}</button>
+              <input type="hidden" name="option[{{ option.product_option_id }}]" value="" id="input-option{{ option.product_option_id }}" />
+            </div>
+            {% endif %}
+            {% if option.type == 'date' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+              <div class="input-group date">
+                <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" data-date-format="YYYY-MM-DD" id="input-option{{ option.product_option_id }}" class="form-control" />
+                <span class="input-group-btn">
+                <button class="btn btn-default" type="button"><i class="fa fa-calendar"></i></button>
+                </span></div>
+            </div>
+            {% endif %}
+            {% if option.type == 'datetime' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+              <div class="input-group datetime">
+                <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" data-date-format="YYYY-MM-DD HH:mm" id="input-option{{ option.product_option_id }}" class="form-control" />
+                <span class="input-group-btn">
+                <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+                </span></div>
+            </div>
+            {% endif %}
+            {% if option.type == 'time' %}
+            <div class="form-group{% if option.required %} required {% endif %}">
+              <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+              <div class="input-group time">
+                <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" data-date-format="HH:mm" id="input-option{{ option.product_option_id }}" class="form-control" />
+                <span class="input-group-btn">
+                <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+                </span></div>
+            </div>
+            {% endif %}
+            {% endfor %}  
+            {% endif %}
+        
+            <div class="form-group mb-30">
+  {#            <label class="control-label" for="input-quantity">{{ entry_qty }}</label>   #}
+                <div class="product__count-block">
+                  <span class="product__count-minus">-</span>
+                  <input type="text" name="quantity" value="{{ minimum }}" size="2" id="input-quantity" class="" />
+                   <span class="product__count-plus">+</span>
+                </div> 
+              <input type="hidden" name="product_id" value="{{ product_id }}" />
+                <div class="product__cart-button-block">
+                  <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn-black">{{ button_cart }}</button>
+                  <button type="button" data-toggle="tooltip" id="product_wishlist_add" class="product-page__wishlist-btn" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product_id }}');">
+                  {#<img src="image/catalog/header-wishlist.png"  height="20px"> #}
+                  </button>
+                </div>  
+            </div>
+          
+            {% if minimum > 1 %}
+            <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ text_minimum }}</div>
+            {% endif %}</div>
+          {% if review_status %}
+          <div class="rating">
+            <p>{% for i in 1..5 %}
+              {% if rating < i %}<span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>{% else %}<span class="fa fa-stack"><i class="fa fa-star fa-stack-1x"></i><i class="fa fa-star-o fa-stack-1x"></i></span>{% endif %}
+              {% endfor %} <a href="" onclick="$('a[href=\'#tab-review\']').trigger('click'); return false;">{{ reviews }}</a> / <a href="" onclick="$('a[href=\'#tab-review\']').trigger('click'); return false;">{{ text_write }}</a></p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="product__tabs">
+          {# <div class="link_to_custom">Looking for a unique design? <a href="{{ link_custom }}">Customize your product now!</a></div> #}
+          <div id="accordion" class="panel-group" role="tablist">
+              <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingOne">
+                      <a data-toggle="collapse" href="#tab-description" data-parent="{# accordion #}" aria-expanded="false"> {{ tab_description }} </a>
+                  </div>
+                  <div id="tab-description" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                      <div class="tab-description">{{ description }}</div>
+                      <ul class="product__details-list list-unstyled">
+                        {#{% if sku %}
+                        <li>{{ text_sku }} <span class="product__details-list-item">{{ sku }}</span> </li>
+                        {% endif %}  #}
+                        {% if attribute_groups %}
+                        {% for attribute_group in attribute_groups %}
+                        {% for attribute in attribute_group.attribute %}    
+                        <li>{{ attribute.name }}: <span class="product__details-list-item">{{ attribute.text }}</span></li>
+                        {% endfor %}
+                        {% endfor %}
+                        {% endif %}
+                        {# {% if weight %}
+                        <li>{{ text_weight }} <span class="product__details-list-item">{{ weight }}</span></li>
+                        {% endif %} #}
+                      </ul>   
+                  </div>
+              </div>
+              <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingTwo">
+                      <a data-toggle="collapse" href="#tab-shipping" data-parent="{# accordion #}" aria-expanded="false" class="collapsed"> {{ tab_shipping }} </a>
+                  </div>
+                  <div id="tab-shipping" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingTwo" aria-expanded="false">
+                      <div class="tab-shipping">
+                       {{ text_tab_shipping }}
+                      {#     <ul>
+                          <li>Free Shipping</li>
+                          <li>14 days for exchange & returns</li>
+                        </ul>
+                      <div class="payment_cards_title">Safe and secure payment with:</div>
+                         <div class="description_cards">
+                          <img src="image/catalog/logo_visa_2.png" alt="Visa" title="Visa">
+                          <img src="image/catalog/logo_mastercard_2.png" alt="MasterCard" title="MasterCard">
+                         <img src="image/catalog/logo_american_2.png" alt="American" title="American">
+                          <img src="image/catalog/logo_discover_2.png" alt="Discover" title="Discover">
+                          <img src="image/catalog/logo_jcb_2.png" alt="Jcb" title="Jcb">
+                      </div> #}
+                       
+                      </div>
+                  </div>
+              </div>
+          </div>
+           <div class="share">
+              <div class="share_list_title">{{ text_share }}</div>
+              <div class="icons">
+                  <a href="#"><img src="image/catalog/footer_facebook.png" alt="Facebook" title="Facebook"></a>
+                  <a href="#"><img src="image/catalog/footer_twitter.png" alt="Twitter" title="Twitter"></a>
+                  <a href="#"><img src="image/catalog/footer_instagram.png" alt="Instagram" title="Instagram"></a>
+              </div> 
+          </div>
+        </div>
+
+      
+</div>
+      </div>
+      <div class="product__tabs-copy">
+          {# <div class="link_to_custom">Looking for a unique design? <a href="{{ link_custom }}">Customize your product now!</a></div> #}
+          <div id="accordion2" class="panel-group" role="tablist">
+              <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingThree">
+                      <a data-toggle="collapse" href="#tab-description-copy" data-parent="{# accordion2 #}" aria-expanded="false"> {{ tab_description }} </a>
+                  </div>
+                  <div id="tab-description-copy" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                      <div class="tab-description">{{ description }}</div>
+                      <ul class="product__details-list list-unstyled">
+                        {% if sku %}
+                        <li>{{ text_sku }} <span class="product__details-list-item">{{ sku }}</span> </li>
+                        {% endif %}
+                        {% if attribute_groups %}
+                        {% for attribute_group in attribute_groups %}
+                        {% for attribute in attribute_group.attribute %}    
+                        <li>{{ attribute.name }}: <span class="product__details-list-item">{{ attribute.text }}</span></li>
+                        {% endfor %}
+                        {% endfor %}
+                        {% endif %}
+                        {% if weight %}
+                        <li>{{ text_weight }} <span class="product__details-list-item">{{ weight }}</span></li>
+                        {% endif %}
+                      </ul>   
+                  </div>
+              </div>
+              <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="headingFour">
+                      <a data-toggle="collapse" href="#tab-shipping-copy" data-parent="{# accordion2 #}" aria-expanded="false" class="collapsed"> {{ tab_shipping }} </a>
+                  </div>
+                  <div id="tab-shipping-copy" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingFour" aria-expanded="false">
+                      <div class="tab-shipping">
+                        {{ text_tab_shipping }}
+                        {# <ul>
+                          <li>Free Shipping</li>
+                          <li>14 days for exchange & returns</li>
+                        </ul> #}
+                     {#   <div class="payment_cards_title">Safe and secure payment with:</div>
+                        <div class="description_cards">
+                          <img src="image/catalog/logo_visa_2.png" alt="Visa" title="Visa">
+                          <img src="image/catalog/logo_mastercard_2.png" alt="MasterCard" title="MasterCard">
+                           <img src="image/catalog/logo_american_2.png" alt="American" title="American">
+                          <img src="image/catalog/logo_discover_2.png" alt="Discover" title="Discover">
+                          <img src="image/catalog/logo_jcb_2.png" alt="Jcb" title="Jcb"> 
+                      </div>#}
+                      </div>
+                  </div>
+              </div>
+          </div>
+           <div class="share">
+              <div class="share_list_title">{{ text_share }}</div>
+              <div class="icons">
+                  <a href="#"><img src="image/catalog/footer_facebook.png" alt="Facebook" title="Facebook"></a>
+                  <a href="#"><img src="image/catalog/footer_twitter.png" alt="Twitter" title="Twitter"></a>
+                  <a href="#"><img src="image/catalog/footer_instagram.png" alt="Instagram" title="Instagram"></a>
+              </div> 
+          </div>
+        </div>
+
+
+      {% if products %}
+    <div class="related__products" id="slideshow_related">    
+      <h3>{{ text_related }}</h3>
+          <div class="swiper-viewport">
+            <div id="" class="row1 slideshow_related swiper-container">
+                <div class="swiper-wrapper">
+                  {% for product in products %}
+                    <div class="product-thumb transition swiper-slide">
+                      <div class="image">
+                        <a href="{{ product.href }}">
+                          <img data-src="{{ product.thumb }}" src="image/catalog/1x1.png" alt="{{ product.name }}" title="{{ product.name }}" class="swiper-lazy img-responsive" />
+                           {% if product.extra != '' %}
+                             <img class="product-img-extra img-responsive" alt="{{ product.name }}" title="{{ product.name }}" src= "{{ product.extra }}"/>
+                           {% endif %}
+                        </a>
+                      </div>
+                      <div class="caption">
+                        <h4><a href="{{ product.href }}">{{ product.name }}</a></h4>
+                          {% if product.price %}
+                          <p class="price"> {% if not product.special %}
+                            {{ product.price }}
+                            {% else %} <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span> {% endif %}
+                            {% if product.tax %} <span class="price-tax">{{ text_tax }} {{ product.tax }}</span> {% endif %} </p>
+                          {% endif %}
+                          {% if product.rating %}
+                          <div class="rating"> {% for j in 1..5 %}
+                            {% if product.rating < j %} <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span> {% else %} <span class="fa fa-stack"><i class="fa fa-star fa-stack-1x"></i><i class="fa fa-star-o fa-stack-1x"></i></span> {% endif %}
+                            {% endfor %} </div>
+                          {% endif %}
+                      </div>
+                    </div>
+                  {% endfor %} 
+                </div>
+              </div>
+              <div class="swiper-pagination slideshow_related"></div>
+            <div class="swiper-pager">
+                <div class="swiper-button-next swiper-button-black">{# <img src="image/catalog/slider_arrow_right.png"> #}</div>
+                <div class="swiper-button-prev swiper-button-black ">{# <img src="image/catalog/slider_arrow_left.png">#}</div>
+            </div>
+          </div>      
+    </div>    
+        {% endif %}
+        
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+<script type="text/javascript"><!--
+const Swiper_related = new Swiper ('.row1.slideshow_related', {
+//$('.row1.slideshow_related').swiper({
+  lazy: true,
+  mode: 'horizontal',
+  slidesPerView: 4,
+  pagination: {
+    el: '#slideshow_related .swiper-pagination',
+    clickable: true,
+  },
+  navigation:{
+    nextEl: '#slideshow_related .swiper-button-next',
+    prevEl: '#slideshow_related .swiper-button-prev',
+  },
+  spaceBetween: 20,
+  //autoplay: 2500,
+    autoplayDisableOnInteraction: true,
+  // loop: true,
+  breakpoints: { // условия для разных размеров окна браузера
+    320: { // при 320px и ниже
+     //direction: 'horizontal', // горизонтальная прокрутка
+     slidesPerView: 1,
+    },
+
+    520: { // при 768px и ниже
+      //direction: 'vertical', // вертикальная прокрутка
+       slidesPerView: 1,
+    },
+
+    767:{
+      slidesPerView: 2,
+    },
+    991:{
+         slidesPerView: 3,
+        spaceBetween: 18,
+    },
+    1200: { // при 768px и выше
+      //direction: 'vertical', // вертикальная прокрутка
+       slidesPerView: 4,
+    }
+  },
+});
+//--></script>
+<script type="text/javascript"><!--
+$('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
+	$.ajax({
+		url: 'index.php?route=product/product/getRecurringDescription',
+		type: 'post',
+		data: $('input[name=\'product_id\'], input[name=\'quantity\'], select[name=\'recurring_id\']'),
+		dataType: 'json',
+		beforeSend: function() {
+			$('#recurring-description').html('');
+		},
+		success: function(json) {
+			$('.alert-dismissible, .text-danger').remove();
+
+			if (json['success']) {
+				$('#recurring-description').html(json['success']);
+			}
+		}
+	});
+});
+//--></script> 
+<script type="text/javascript"><!--
+
+//--></script> 
+<script type="text/javascript"><!--
+$('.date').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+
+$('.datetime').datetimepicker({
+	language: '{{ datepicker }}',
+	pickDate: true,
+	pickTime: true
+});
+
+$('.time').datetimepicker({
+	language: '{{ datepicker }}',
+	pickDate: false
+});
+
+$('button[id^=\'button-upload\']').on('click', function() {
+	var node = this;
+
+	$('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=tool/upload',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$(node).button('loading');
+				},
+				complete: function() {
+					$(node).button('reset');
+				},
+				success: function(json) {
+					$('.text-danger').remove();
+
+					if (json['error']) {
+						$(node).parent().find('input').after('<div class="text-danger">' + json['error'] + '</div>');
+					}
+
+					if (json['success']) {
+						alert(json['success']);
+
+						$(node).parent().find('input').val(json['code']);
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+//--></script> 
+<script type="text/javascript"><!--
+$('#review').delegate('.pagination a', 'click', function(e) {
+    e.preventDefault();
+
+    $('#review').fadeOut('slow');
+
+    $('#review').load(this.href);
+
+    $('#review').fadeIn('slow');
+});
+
+$('#review').load('index.php?route=product/product/review&product_id={{ product_id }}');
+
+$('#button-review').on('click', function() {
+	$.ajax({
+		url: 'index.php?route=product/product/write&product_id={{ product_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: $("#form-review").serialize(),
+		beforeSend: function() {
+			$('#button-review').button('loading');
+		},
+		complete: function() {
+			$('#button-review').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#review').after('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+				$('#review').after('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('input[name=\'name\']').val('');
+				$('textarea[name=\'text\']').val('');
+				$('input[name=\'rating\']:checked').prop('checked', false);
+			}
+		}
+	});
+});
+
+ $(document).ready(function() {
+// 	$('.thumbnails').magnificPopup({
+// 		type:'image',
+// 		delegate: 'a',
+// 		gallery: {
+// 			enabled: true
+// 		}
+// 	});
+  Fancybox.bind('[data-fancybox="gallery"]', {
+  // Your custom options for a specific gallery
+    Thumbs: {
+      type: "classic",
+    }
+  });
+
+  //выбор первой опции при загрузке страницы 
+  $('div[id^=input-option]').each(function(){  // для цвета
+    $(this).find('.image-radio').first().find('input').prop('checked', true);
+    $(this).find('.image-radio').first().find('input').trigger('click');
+    $(this).find('.image-radio').first().find('input').change(); 
+
+    // $(this).find('li').first().find('input').prop('checked', true);  //для размеров
+    // $(this).find('li').first().find('input').trigger('click');
+    // $(this).find('li').first().find('input').change(); 
+  }); 
+
+ });
+//--></script> 
+{{ footer }} 

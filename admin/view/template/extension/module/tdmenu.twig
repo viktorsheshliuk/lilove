@@ -1,0 +1,589 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<button type="submit" form="form-tdmenu" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+			<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+			</div>
+		{% endif %}
+		{% if success %}
+			<div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+			</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="input-group">
+					<span class="input-group-addon" style="min-width: 150px"><i class="fa fa-pencil"></i> {{ text_editfor }}</span>
+					<select class="form-control" onchange="location = this.value;">
+						<option {{ store == 0 ? 'selected="selected"' : '' }} value="{{ module_url }}">Default</option>
+						{% for st in stores %}
+							<option {{ st.store_id == store ? 'selected="selected"' : '' }} value="{{ module_url ~ '&store=' ~ st.store_id }}">{{ st.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+
+			<div class="panel-body">
+				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-tdmenu" class="form-horizontal">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab-items" data-toggle="tab">{{ tab_items }}</a></li>
+						<li><a href="#tab-settings" data-toggle="tab">{{ tab_settings }}</a></li>
+					</ul>
+
+					<div class="tab-content">
+					<div class="tab-pane active in" id="tab-items">
+						<div class="table-responsive">
+							<table id="item" class="table table-striped table-bordered table-hover" style="display: none">
+								<thead>
+									<tr>
+										<td class="text-left">{{ entry_type }}</td>
+										<td style="width: 70%;" class="text-left">{{ entry_iset }}</td>
+										<td class="text-left">{{ entry_advanced }}</td>
+										<td></td>
+									</tr>
+								</thead>
+								{% set item_row = 0 %}
+								{% set libg = '#fcfcfc' %}
+								{% for item in items %}
+									{% set libg = libg  ==  '#fff' ? '#fcfcfc' : '#fff' %}
+									<tbody class="item-row" id="item-row{{ item_row }}">
+										<tr>
+											<td class="text-left" style="background: {{ libg }};">
+												<select class="item-type" id="item-type{{ item_row }}" name="tdmenu_item[{{ item_row }}][type]">
+													<option class="ocat" id="ocat{{ item_row }}" value="cat" {% if item.type  ==  'cat' %}selected="selected"{% endif %}>{{ type_cat }}</option>
+													<option class="oinfol" id="oinfol{{ item_row }}" value="infol" {% if item.type  ==  'infol' %}selected="selected"{% endif %}>{{ type_infol }}</option>
+													<option value="infod" {% if item.type  ==  'infod' %}selected="selected"{% endif %}>{{ type_infod }}</option>
+													<option class="ocustom" id="ocustom{{ item_row }}" value="custom" {% if item.type  ==  'custom' %}selected="selected"{% endif %}>{{ type_custom }}</option>
+													<option class="mand" id="mand{{ item_row }}" value="mand" {% if item.type == 'mand' %} selected="selected"{% endif %}>{{ type_mand }}</option>
+													<option class="more" id="more{{ item_row }}" value="more" {% if item.type == 'more' %}selected="selected"{% endif %}>{{ type_more }}</option>
+													<option class="moredoi" id="moredoi{{ item_row }}" value="more2" {% if item.type == 'more2' %} selected="selected"{% endif %}>{{ type_more2 }}</option>
+												</select>
+												<div class="viewsel viewsel{{ item_row }}"><b>{{ text_sview }} </b>
+													<select name="tdmenu_item[{{ item_row }}][view]" class="form-control">
+														<option value="0" {% if not item.view %}selected="selected"{% endif %}>{{ text_slist }}</option>
+														<option value="1" {% if item.view  ==  '1' %}selected="selected"{% endif %}>{{ text_sgrid }}</option>
+														<option value="f0" {% if item.view  ==  'f0' %}selected="selected"{% endif %}>{{ text_dflist }}</option>
+													</select>
+												</div>
+											</td>
+											<td class="text-left" style="background: {{ libg }};">
+												<div style="position: relative">
+													<div class="sorder">
+														{{ text_sorder }}
+														<input size="2" type="text" name="tdmenu_item[{{ item_row }}][sorder]" value="{{ item.sorder ? item.sorder : '' }}" />
+													</div>
+
+													<div id="cat-type{{ item_row }}" class="typediv cat-type">
+														<h3 class="menuh3">{{ entry_category }}</h3>
+														<input type="hidden" name="tdmenu_item[{{ item_row }}][category_id]" value="{{ categories[item.category_id]['name'] ? item.category_id : 0 }}" />
+														<input type="text" value="{{ categories[item.category_id]['name'] }}" placeholder="{{ entry_category }}" class="form-control category-autocomplete" />
+													</div>
+
+													<div id="info-type{{ item_row }}" class="typediv info-type">
+														<h3 class="menuh3">{{ entry_information }}</h3>
+														<select class="form-control" name="tdmenu_item[{{ item_row }}][information_id]">
+															{% for information in informations %}
+																{% if information.information_id  ==  item.information_id %}
+																	<option value="{{ information.information_id }}" selected="selected">{{ information.name }}</option>
+																{% else %}
+																	<option value="{{ information.information_id }}">{{ information.name }}</option>
+																{% endif %}
+															{% endfor %}
+														</select>
+													</div>
+
+													<div id="custom-type{{ item_row }}" class="typediv custom-type">
+														<h3 class="menuh3">{{ entry_custom }}</h3>
+														{% for language in languages %}
+															<div class="input-group long">
+																<span class="input-group-addon long"><img class="inline-img" src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ custom_name }}</span>
+																<input class="form-control" type="text" name="tdmenu_item[{{ item_row }}][customname][{{ language.language_id }}]" value="{{ item.customname[language.language_id] }}" />
+															</div>
+															<div class="input-group long">
+																<span class="input-group-addon long"><img class="inline-img" src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ custom_url }}</span>
+																<input class="form-control" type="text" name="tdmenu_item[{{ item_row }}][customurl][{{ language.language_id }}]" value="{{ item.customurl[language.language_id] }}" />
+															</div>
+															<br />
+														{% endfor %}
+													</div>
+
+													<h3 class="addmenuh3" id="hideadd-type{{ item_row }}">{{ entry_add }}</h3>
+													<div id="add-type{{ item_row }}" class="addtypediv">
+														{% for language in languages %}
+															<div class="addTypeInner">
+																<div class="input-group">
+																	<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+																	<input class="form-control" type="text" name="tdmenu_item[{{ item_row }}][addurl][{{ language.language_id }}]" value="{{ item.addurl[language.language_id] }}" placeholder="Banner Link URL" />
+																</div>
+																<div class="input-group">
+																	<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+																	<a href="" id="thumb-image_{{ item_row }}{{ language.language_id }}" data-toggle="image" class="img-thumbnail">
+																		<img style="max-width: 200px" src="{{ item.image[language.language_id]|length > 3 ? (http_catalog_url ~ 'image/' ~ item.image[language.language_id]) : no_image }}" alt="" title="" data-placeholder="{{ no_image }}" />
+																	</a>
+																	<input type="hidden" name="tdmenu_item[{{ item_row }}][image][{{ language.language_id }}]" value="{{ item.image[language.language_id] }}" id="input-image_{{ item_row }}{{ language.language_id }}" />
+																</div>
+															</div>
+														{% endfor %}
+													</div>
+												</div>
+											</td>
+											<td class="text-left" style="background: {{ libg }};">
+												<div class="advm{{ item_row }} advs">
+													<a class="expand btn btn-info"><i class="fa fa-cog" aria-hidden="true"></i></a>
+													<div class="advh">
+														<a class="closeadvm"><strong><span><i class="fa fa-times" area-hidden="true"></i></span></strong></a>
+														<table class="smenua">
+															<tr>
+																<td>{{ text_tlcolor }}</td>
+																<td><input type="text" name="tdmenu_item[{{ item_row }}][tlcolor]" class="sm-colors form-control" value="{{ item.tlcolor }}" size="7" /></td>
+																<td>{{ text_tlstyle }}</td>
+																<td><input type="text" name="tdmenu_item[{{ item_row }}][tlstyle]" value="{{ item.tlstyle }}" size="28" class="form-control" /></td>
+															</tr>
+															<tr>
+																<td>{{ text_subcatdisplay }}</td>
+																<td colspan="3">
+																	<select name="tdmenu_item[{{ item_row }}][subcatdisplay]" class="form-control">
+																		<option value="all" {% if item.subcatdisplay  ==  'all' %}selected="selected"{% endif %}>{{ text_subcatdisplay_all }}</option>
+																		<option value="level1" {% if item.subcatdisplay  ==  'level1' %}selected="selected"{% endif %}>{{ text_subcatdisplay_level1 }}</option>
+																		<option value="none" {% if item.subcatdisplay  ==  'none' %}selected="selected"{% endif %}>{{ text_subcatdisplay_none }}</option>
+																	</select>
+																</td>
+															</tr>
+															<tr>
+																<td>{{ text_dwidth }}</td>
+																<td><input size="3" type="text" name="tdmenu_item[{{ item_row }}][dwidth]" value="{{ item.dwidth }}" class="form-control" /></td>
+																<td> {{ text_iwidth }}</td>
+																<td><input size="3" type="text" name="tdmenu_item[{{ item_row }}][iwidth]" value="{{ item.iwidth }}" class="form-control" /></td>
+															</tr>
+															<tr>
+																<td colspan="2">{{ text_linknewtab }} <input type="checkbox" name="tdmenu_item[{{ item_row }}][tntab]" value="1" {{ item.tntab ? 'checked="checked"' : '' }} /></td>
+																<td colspan="2">{{ text_flyout_left }} <input type="checkbox" name="tdmenu_item[{{ item_row }}][mflyl]" value="1" {{ item.mflyl ? 'checked="checked"' : '' }} /></td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</td>
+											<td class="text-left" style="background: {{ libg }};">
+												<button type="button" onclick="$('#item-row{{ item_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
+											</td>
+										</tr>
+									</tbody>
+									{% set item_row = item_row + 1 %}
+								{% endfor %}
+								<tfoot>
+									<tr>
+										<td colspan="3"></td>
+										<td class="text-left">
+											<button type="button" onclick="additem();" data-toggle="tooltip" title="{{ button_add_item }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-settings">
+						<div class="row">
+							<div class="col-sm-5 col-xs-12" >
+								<h2 class="h2settings">{{ text_general }}</h2>
+								<div class="settings-row">
+									<div class="lefter">Menu Status</div>
+									<div class="btn-group selectbuts">
+										<button type="button" class="btn {{ tdmenu_showstatus ? 'btn-info' : 'btn-default' }}" data-toggle="tooltip" data-value="1" title="">{{ text_disabled }}</button>
+										<button type="button" class="btn {{ not tdmenu_showstatus ? 'btn-success' : 'btn-default' }}" data-toggle="tooltip" data-value="0" title="">{{ text_enabled }}</button>
+									</div>
+									<input type="hidden" name="tdmenu_showstatus" value="{{ tdmenu_showstatus }}" />
+								</div>
+								<div class="settings-row">
+									<div class="lefter">{{ text_settings_tophomelink }}</div>
+									<div class="btn-group selectbuts">
+										<button type="button" class="btn {{ tdmenu_tophomelink ==  'no' ? 'btn-info' : 'btn-default' }}" data-toggle="tooltip" data-value="no" title="">No</button>
+										<button type="button" class="btn {{ tdmenu_tophomelink ==  'yes' ? 'btn-info' : 'btn-default' }}" data-toggle="tooltip" data-value="yes" title="">Yes</button>
+									</div>
+									<input type="hidden" name="tdmenu_tophomelink" value="{{ tdmenu_tophomelink }}" />
+								</div>
+								<div class="settings-row">
+									<div class="lefter">{{ text_settings_tdmenucache }}</div>
+									<div class="btn-group selectbuts">
+										<button type="button" class="btn {{ tdmenu_cache ? 'btn-success' : 'btn-default' }}" data-toggle="tooltip" data-value="1" title="">{{ text_enabled }}</button>
+										<button type="button" class="btn {{ not tdmenu_cache ? 'btn-info' : 'btn-default' }}" data-toggle="tooltip" data-value="0" title="">{{ text_disabled }}</button>
+									</div>
+									<input type="hidden" name="tdmenu_cache" value="{{ tdmenu_cache }}" />
+								</div>
+								<div class="settings-row">
+									<div class="lefter">{{ entry_image_size }} </div>
+									<input type="text" name="tdmenu_image_width" value="{{ tdmenu_image_width }}" class="form-control small" size="3" />x
+									<input type="text" name="tdmenu_image_height" value="{{ tdmenu_image_height }}" class="form-control small" size="3" />px
+								</div>
+							</div>
+							<div class="col-sm-7 col-xs-12">
+								<div class="row">
+									<div class="col-sm-6 col-xs-12" >
+										<h3 class="h3settings">{{ text_more_dropdown }}</h3>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-featcat">Category</label>
+											<div class="col-sm-10">
+												<input type="text" name="featcat" value="" placeholder="Type category name" id="input-featcat" class="form-control" />
+												<div id="featured-featcat" class="well well-sm" style="height: 250px; overflow: auto;">
+													{% for featcat in featcats %}
+														<div id="featured-featcat{{ featcat.category_id }}"><i class="fa fa-minus-circle"></i> {{ featcat.name }}
+															<input type="hidden" name="tdmenu_more[]" value="{{ featcat.category_id }}" />
+														</div>
+													{% endfor %}
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-6 col-xs-12" >
+										<h3 class="h3settings">{{ text_more2_dropdown }}</h3>
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-feat2cat">Category</label>
+											<div class="col-sm-10">
+												<input type="text" name="feat2cat" value="" placeholder="Type category name" id="input-feat2cat" class="form-control" />
+												<div id="featured-feat2cat" class="well well-sm" style="height: 250px; overflow: auto;">
+													{% for feat2cat in feat2cats %}
+														<div id="featured-feat2cat{{ feat2cat.category_id }}"><i class="fa fa-minus-circle"></i> {{ feat2cat.name }}
+															<input type="hidden" name="tdmenu_more2[]" value="{{ feat2cat.category_id }}" />
+														</div>
+													{% endfor %}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-xs-12" >
+								<h2 class="h2settings">{{ text_languagerelated }}</h2>
+								<div class="settings-row">
+									{{ more_name }}
+									{% for language in languages %}
+										<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+											<input class="form-control" type="text" name="tdmenu_more_title[{{ language.language_id }}]" value="{{ tdmenu_more_title[language.language_id] }}" />
+										</div>
+									{% endfor %}
+								</div>
+
+								<div class="settings-row">
+									{{ more2_name }}
+									{% for language in languages %}
+										<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+											<input class="form-control" type="text" name="tdmenu_more2_title[{{ language.language_id }}]" value="{{ tdmenu_more2_title[language.language_id] }}" />
+										</div>
+									{% endfor %}
+								</div>
+
+								<div class="settings-row">
+									{{ text_settings_mobilemenuname }}
+									{% for language in languages %}
+										<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+											<input class="form-control" type="text" name="tdmenu_mobilemenuname[{{ language.language_id }}]" value="{{ tdmenu_mobilemenuname[language.language_id] }}" />
+										</div>
+									{% endfor %}
+								</div>
+
+								<div class="settings-row">
+									{{ text_settings_infodname }}
+									{% for language in languages %}
+										<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+											<input class="form-control" type="text" name="tdmenu_infodname[{{ language.language_id }}]" value="{{ tdmenu_infodname[language.language_id] }}" />
+										</div>
+									{% endfor %}
+								</div>
+
+								<div class="settings-row">
+									{{ text_settings_brandsdname }}
+									{% for language in languages %}
+										<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+											<input class="form-control" type="text" name="tdmenu_brandsdname[{{ language.language_id }}]" value="{{ tdmenu_brandsdname[language.language_id] }}" />
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="view/javascript/themedelights/jquery.minicolors.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="view/javascript/themedelights/jquery.minicolors.css" />
+	<script type="text/javascript">
+		function startColMan() {
+			$(".sm-colors").minicolors({
+				control: 'hue',
+				theme: 'bootstrap',
+				change: function(hex, rgb) {
+					$("#console").prepend('HEX: ' + hex + ' (RGB: ' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')<br />');
+				}
+			});
+		}
+		$(document).ready(startColMan);
+	</script>
+	<script type="text/javascript">
+	/* Category autocomplete */
+	function categoryAutocomplete(id, name) {
+		$('input[name=\''+id+'\']').autocomplete({
+			source: function(request, response) {
+				$.ajax({
+					url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+					dataType: 'json',
+					success: function(json) {
+						response($.map(json, function(item) {
+							return {
+								label: item['name'],
+								value: item['category_id']
+							}
+						}));
+					}
+				});
+			},
+			select: function(item) {
+				$('input[name=\''+id+'\']').val('');
+
+				$('#featured-'+id + item['value']).remove();
+
+				$('#featured-'+id).append('<div id="featured-' + id + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="'+name+'[]" value="' + item['value'] + '" /></div>');
+			}
+		});
+
+		$('#featured-'+id).delegate('.fa-minus-circle', 'click', function() {
+			$(this).parent().remove();
+		});
+	}
+	/* more categories */
+	categoryAutocomplete('featcat', 'tdmenu_more');
+	/* featured categories */
+	categoryAutocomplete('feat2cat', 'tdmenu_more2');
+
+	/* single category autocomplete */
+	function singleCatAutocomplete(obj) {
+		obj.autocomplete({
+			'source': function(request, response) {
+				$.ajax({
+					url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+					dataType: 'json',
+					success: function(json) {
+						json.unshift({
+							category_id: 0,
+							name: '{{ text_none }}'
+						});
+
+						response($.map(json, function(item) {
+							return {
+								label: item['name'],
+								value: item['category_id']
+							}
+						}));
+					}
+				});
+			},
+			'select': function(item) {
+				obj.val(item['label']);
+				obj.prev().val(item['value']);
+			}
+		});
+	}
+
+	$('.category-autocomplete').each(function() {
+		singleCatAutocomplete($(this));
+	});
+
+	$(document).on('click', '.selectbuts button',  function() {
+		$(this).parent().parent().find('input').val($(this).data('value')).trigger('change');
+		$(this).parent().find('button').attr("class", "btn btn-default");
+		$(this).addClass('btn-info');
+	});
+
+	/* row item add */
+	var item_row = "{{ item_row }}";
+
+	function additem() {
+		html  = '<tbody class="item-row" id="item-row' + item_row + '">';
+			html += '<tr>';
+				html += '<td class="text-left">';
+					html += '<select class="item-type" id="item-type' + item_row + '" name="tdmenu_item[' + item_row + '][type]">';
+						html += '<option class="ocat" id="ocat' + item_row + '" value="cat">{{ type_cat }}</option>';
+						html += '<option class="oinfol" id="oinfol' + item_row + '" value="infol">{{ type_infol }}</option>';
+						html += '<option value="infod">{{ type_infod }}</option>';
+						html += '<option class="ocustom" id="ocustom' + item_row + '" value="custom">{{ type_custom }}</option>';
+						html += '<option class="mand" id="mand' + item_row + '" value="mand">{{ type_mand }}</option>';
+						html += '<option class="more" id="more' + item_row + '" value="more">{{ type_more }}</option>';
+						html += '<option class="moredoi" id="moredoi' + item_row + '" value="more2">{{ type_more2 }}</option>';
+					html += '</select>';
+					html += '<div class="viewsel viewsel' + item_row + '"><b>{{ text_sview }} </b>';
+						html += '<select name="tdmenu_item[' + item_row + '][view]" class="form-control">';
+							html += '<option value="0" selected="selected">{{ text_slist }}</option>';
+							html += '<option value="1">{{ text_sgrid }}</option>';
+							html += '<option value="f0">{{ text_dflist }}</option>';
+						html += '</select>';
+					html += '</div>';
+				html += '</td>';
+
+				html += '<td class="text-left">';
+					html += '<div style="position: relative;">';
+						html += '<div class="sorder">';
+							html += '{{ text_sorder }}';
+							html += '<input size="2" type="text" name="tdmenu_item[' + item_row + '][sorder]" value="" />';
+						html += '</div>';
+
+						html += '<div id="cat-type' + item_row + '" class="typediv cat-type">';
+							html += '<h3 class="menuh3">{{ entry_category }}</h3>';
+							html += '<input type="hidden" name="tdmenu_item[' + item_row + '][category_id]" value="0" />';
+							html += '<input type="text" value="" placeholder="{{ entry_category }} - autocomplete" class="form-control category-autocomplete" id="autocompcat' + item_row +'" />';
+						html += '</div>';
+
+						html += '<div id="info-type' + item_row + '" class="typediv info-type">';
+							html += '<h3 class="menuh3">{{ entry_information }}</h3>';
+							html += '<select class="form-control" name="tdmenu_item[' + item_row + '][information_id]">';
+								{% for information in informations %}
+									html += '<option value="{{ information.information_id }}">{{ information.name|replace({"'" : ""}) }}</option>';
+								{% endfor %}
+							html += '</select>';
+						html += '</div>';
+
+						html += '<div id="custom-type' + item_row + '" class="typediv custom-type">';
+							html += '<h3 class="menuh3">{{ entry_custom }}</h3>';
+							{% for language in languages %}
+								html += '<div class="input-group long">';
+									html += '<span class="input-group-addon long"><img class="inline-img" src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ custom_name }}</span>';
+									html += '<input class="form-control" type="text" name="tdmenu_item[' + item_row + '][customname][{{ language.language_id }}]" value="" />';
+								html += '</div>';
+								html += '<div class="input-group long">';
+									html += '<span class="input-group-addon long"><img class="inline-img" src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ custom_url }}</span>';
+									html += '<input class="form-control" type="text" name="tdmenu_item[' + item_row + '][customurl][{{ language.language_id }}]" value="" />';
+								html += '</div>';
+								html += '<br />';
+							{% endfor %}
+						html += '</div>';
+
+						html += '<h3 class="addmenuh3" id="hideadd-type' + item_row + '">{{ entry_add }}</h3>';
+						html += '<div id="add-type' + item_row + '" class="addtypediv">';
+							{% for language in languages %}
+								html +=	'<div class="addTypeInner">';
+									html += '<div class="input-group">';
+										html += '<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>';
+										html += '<input class="form-control" type="text" name="tdmenu_item[' + item_row + '][addurl][{{ language.language_id }}]" value="" placeholder="Banner Link Url" />';
+									html += '</div>';
+									html +=	'<div class="input-group">';
+										html += '<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>';
+										html += '<a href="" id="thumb-image_' + item_row + '{{ language.language_id }}" data-toggle="image" class="img-thumbnail">';
+											html += '<img style="max-width: 200px" src="{{ no_image }}" alt="" title="" data-placeholder="{{ no_image }}" />';
+										html += '</a>';
+										html += '<input type="hidden" name="tdmenu_item[' + item_row + '][image][{{ language.language_id }}]" value="" id="input-image_' + item_row + '{{ language.language_id }}" />';
+									html += '</div>';
+								html += '</div>';
+							{% endfor %}
+						html += '</div>';
+					html += '</div>';
+				html += '</td> ';
+
+				html += '<td class="text-left">';
+					html += '<style type="text/css"> .advm' + item_row + ' .advh { display: none; } </style>';
+					html += '<div class="advm' + item_row + ' advs">';
+						html += '<a class="expand btn btn-info"><i class="fa fa-cog" aria-hidden="true"></i></a>';
+						html += '<div class="advh">';
+							html += '<a class="closeadvm"><strong><span><i class="fa fa-times" area-hidden="true"></i></span></strong></a>';
+							html += '<table class="smenua">';
+								html += '<tr>';
+									html += '<td>{{ text_tlcolor }}</td>';
+									html += '<td><input type="text" name="tdmenu_item[' + item_row + '][tlcolor]" class="sm-colors form-control" value="" size="7" /></td>';
+									html += '<td>{{ text_tlstyle }}</td>';
+									html += '<td><input type="text" name="tdmenu_item[' + item_row + '][tlstyle]" value="" size="28" class="form-control" /></td>';
+								html += '</tr>';
+								html += '<tr>';
+									html += '<td>{{ text_subcatdisplay }}</td>';
+									html += '<td colspan="3">';
+										html += '<select name="tdmenu_item[' + item_row + '][subcatdisplay]" class="form-control">';
+											html += '<option value="all">{{ text_subcatdisplay_all }}</option>';
+											html += '<option value="level1">{{ text_subcatdisplay_level1 }}</option>';
+											html += '<option value="none">{{ text_subcatdisplay_none }}</option>';
+										html += '</select>';
+									html += '</td>';
+								html += '</tr>';
+								html += '<tr>';
+									html += '<td>{{ text_dwidth }}</td>';
+									html += '<td><input size="3" type="text" name="tdmenu_item[' + item_row + '][dwidth]" value="" class="form-control" /></td>';
+									html += '<td>{{ text_iwidth }}</td>';
+									html += '<td><input size="3" type="text" name="tdmenu_item[' + item_row + '][iwidth]" value="" class="form-control" /></td>';
+								html += '</tr>';
+								html += '<tr>';
+									html += '<td colspan="2">{{ text_linknewtab }} <input type="checkbox" name="tdmenu_item[{{ item_row }}][tntab]" value="1" /></td>';
+									html += '<td colspan="2">{{ text_flyout_left }} <input type="checkbox" name="tdmenu_item[{{ item_row }}][mflyl]" value="1" /></td>';
+								html += '</tr>';
+							html += '</table>';
+						html += '</div>';
+					html += '</div>';
+				html += '</td>';
+
+				html += '<td class="text-left">';
+					html += '<button type="button" onclick="$(\'#item-row' + item_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>';
+				html += '</td>';
+			html += '</tr>';
+		html += '</tbody>';
+		$('#item tfoot').before(html);
+		$("#item-row" + item_row + " .item-type").change();
+		singleCatAutocomplete($('#autocompcat'+item_row));
+		item_row++;
+		startColMan();
+	}
+
+	/* activate first lang tab */
+	$('#language a:first').tab('show');
+
+	/* trigger change on item type */
+	$( document ).ready(function() {
+		$(".item-row .item-type").change();
+	});
+
+	$(document).on('change','.item-row .item-type',function(){
+		var parent = $(this).parent().parent();
+		parent.find('.typediv').hide();
+		if ($(this).find('.ocat').is(":selected")) {
+			parent.find('.cat-type').fadeIn('fast');
+			parent.find('.viewsel').fadeIn('fast');
+		} else if ($(this).find('.oinfol').is(":selected")) {
+			parent.find('.info-type').fadeIn('fast');
+		} else if ($(this).find('.ocustom').is(":selected")) {
+			parent.find('.custom-type').fadeIn('fast');
+		} else if ($(this).find('.mand').is(":selected") || $(this).find('.more').is(":selected") || $(this).find('.moredoi').is(":selected")) {
+			parent.find('.viewsel').fadeIn('fast');
+		}
+	});
+
+	/* dropdown banner show */
+	$(document).on('click', '.addmenuh3', function() {
+		$(this).next(".addtypediv").slideToggle('fast');
+		$(this).toggleClass('active');
+	});
+
+	/* advanced settings show */
+	$(document).on('click', '.advs .expand', function() {
+		$(this).parent().find('.advh').slideToggle('fast');
+	});
+	$(document).on('click', '.advs .advh .closeadvm', function() {
+		$(this).parent().slideUp('fast');
+	});
+	</script>
+
+	<style type="text/css">
+	.addtypediv,.typediv,h3.addmenuh3{margin-right:70px}.advs a.closeadvm,.advs a.expand,a,h3.addmenuh3{cursor:pointer}select{border:2px solid #DDD;padding:5px;-webkit-border-radius:3px;-moz-border-radius:3px;-khtml-border-radius:3px;border-radius:3px}h3.addmenuh3,h3.menuh3{margin-top:5px;margin-bottom:5px;border-bottom:1px solid #ddd;padding-bottom:3px;color:#FF7200;font-size:15px}.list a.button,a.button{background:#4094D8;color:#fff;padding:6px;font-weight:700;border:1px solid #4FB0FA;border-right:1px solid #3E83B7;border-bottom:1px solid #3E83B7;-webkit-border-radius:3px;-moz-border-radius:3px;-khtml-border-radius:3px;border-radius:3px}.list a.button:hover,a.button:hover{background:#333;border:1px solid #444;border-right:1px solid #222;border-bottom:1px solid #222}.viewsel{padding:5px;background:#ddd;border-radius:3px;width:200px;margin-top:8px}.advs{overflow:visible;width:100%;height:58px;position:relative;text-align:center}.advs .advh,.sorder{position:absolute;right:0}.advs a.closeadvm{float:right;margin-top:-20px}.advs .advh{z-index:99;width:700px;background:#fff;border:3px solid #eee;padding:20px;text-align:left;-webkit-border-radius:7px;-moz-border-radius:7px;-khtml-border-radius:7px;border-radius:7px;-webkit-box-shadow:0 0 30px #999;-moz-box-shadow:0 0 30px #999;box-shadow:0 0 30px #999}.sorder,.sorder input{text-align:center;font-weight:700}table.smenua{width:100%;background:0 0}table.smenua td{background:#fff!important}.addtypediv{display:none}.image,.settings-row{display:block}.sorder{top:0;width:50px;color:#fff;background:#6d6d6d;padding:5px;box-radius:5px;box-shadow:0 0 2px #333}.sorder input{font-size:15px;color:#333;width:30px}select.item-type{width:200px}.advs .advh{display:none}table.smenua{border:none;border-collapse:collapse}table.smenua td{border:1px solid #ddd;padding:4px}.sorder input{padding:0!important}.settings-row{padding:7px;border-bottom:1px solid #eee;border-top:1px solid #eee;margin-bottom:3px}*{white-space:normal!important}#item{display:table!important}.addTypeInner{padding:3px;background:#eee;border:1px solid #ddd;margin-bottom:2px;text-align:left;font-weight:700}.settings-row .lefter{display:inline-block;width:240px;vertical-align:top}.form-control.small{width:100px;display:inline-block}.form-control.medium{width:250px;display:inline-block}.h2settings{margin-top:15px;margin-bottom:15px}.addTypeInner a.img-thumbnail{width:100%;text-align:center}.input-group-addon.long{width:30%}.inline-img{display:inline-block!important}.input-group.long{width:100%}.table tbody>tr>td,.table thead>tr>td{vertical-align:top}
+		span.help{font-size: 11px;color: #888;}span.help.inred{color: #f00;}
+	</style>
+</div>
+{{ footer }}

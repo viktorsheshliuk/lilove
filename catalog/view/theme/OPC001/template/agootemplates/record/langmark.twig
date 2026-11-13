@@ -1,0 +1,25 @@
+{% if languages|length > 1 %}
+ 
+<div id="language_selector">
+ <div id="form-language">
+ 
+<div class="language-selector">
+ <span class="title">{{ text_language }}: </span>
+ <ul>
+ {% for language in languages %}
+ <li {% if language.current %} class="current-active" {% endif %}>
+ <button class="btn btn-link btn-block language-select" onclick="window.location = '{{ language.url }}'">
+ <img src="catalog/language/{{ language.code }}/{{ language.code }}.png" alt="{{ language.name }}" title="{{ language.name }}" />
+ {{ language.name }}
+ </button>
+ </li>
+ {% endfor %}
+ </ul>
+ </div>
+
+ 
+ 
+ </div>
+ </div>
+
+{% endif %}

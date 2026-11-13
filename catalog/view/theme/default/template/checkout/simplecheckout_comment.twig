@@ -1,0 +1,27 @@
+<div class="simplecheckout-block" id="simplecheckout_comment">
+    {% if display_header %}
+      <div class="checkout-heading panel-heading comment">{{ label }}</div>
+    {% endif %}
+    <div class="simplecheckout-block-content">
+      <textarea class="form-control" name="comment" id="comment" placeholder="{{ placeholder }}" data-reload-payment-form="true">{{ comment }}</textarea>
+    </div>
+    {# <div class="callback__box">
+      <label class="checkbox-inline container_black_checkbox">
+                          <input  id="callback" type="checkbox">
+               <span class="checkmark"></span>
+                          <span id="callback__label"></span>
+      </label>
+    </div> #}
+</div>
+{# <script>
+$(document).ready(function() {
+  $('#callback__label').html($('label[for=customer_callback]').text() );
+  $('#callback').click(function() {
+        if ($(this).prop('checked')) {
+          $('#customer_callback').prop('checked', true);
+        } else {
+          $('#customer_callback').prop('checked', false);
+        }
+      });
+});
+</script> #}

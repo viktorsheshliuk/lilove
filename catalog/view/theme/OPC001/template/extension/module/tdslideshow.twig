@@ -1,0 +1,33 @@
+<div id="tdimageslider">
+    <div class="td-nivoslider">
+    	<div id="td-inivoslider-{{ module }}" class="nivoSlider">
+            {% set config = slide_setting[0] %}
+            {% for s in tdslideshows %}
+    			<a href="{{ s['link'] }}">
+    			{#<img data-src="{{ s['image'] }}" alt="{{ s['title'] }}" title="{{ s['title'] }}"  />#}
+    			<img src="{{ s['image'] }}" alt="{{ s['title'] }}" title="{{ s['title'] }}" loading="lazy" />
+                </a>
+            {% endfor %}
+    	</div>
+    	<script type="text/javascript">
+            $(window).load(function() {
+                $('#td-inivoslider-{{ module }}').nivoSlider({
+                    effect:  {% if config['effect'] %}  "{{ config['effect'] | trim }}" {% else %}   'random'  {% endif %} ,
+                    slices: 15,
+                    boxCols: 8,
+                    boxRows: 4,
+                    manualAdvance: {% if config['auto'] and config['auto'] == 1 %} false {% else %}   true  {% endif %} ,
+                    animSpeed: 1000,
+                    pauseTime: {% if config['delay'] %}  {{ config['delay'] }} {% else %}   3000  {% endif %} ,
+                    startSlide: 0,
+                    controlNav:  {% if config['contrl'] and config['contrl'] == 1 %} true {% else %}   false  {% endif %} ,
+                    directionNav:  {% if config['nextback'] and config['nextback'] == 1 %} true {% else %}   false  {% endif %} ,
+                    controlNavThumbs: false,
+                    pauseOnHover:  {% if config['hover'] and config['hover'] == 1 %} true {% else %}   false  {% endif %} ,
+                    prevText: '<i class="ti-angle-left"></i>',
+    				nextText: '<i class="ti-angle-right"></i>',
+                });
+            });
+    	</script>
+    </div>
+</div>

@@ -1,0 +1,144 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <button onclick="$('#content form #saveandstay').attr('value', '1'); $('#' + $('#content form').attr('id')).submit();" data-toggle="tooltip" title="{{ button_savestay }}" class="btn btn-warning"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default custom-panel">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label" for="input-status">{{ entry_status }}</label>
+            <div class="control-group">
+             <div class="switch-field">
+              <input type="radio" name="module_tdinstagram_status" id="status_on" value="1" {% if module_tdinstagram_status == 1 %} checked="checked" {% endif %}/>
+              <label for="status_on">{{ text_enabled }}</label>
+              <input type="radio" name="module_tdinstagram_status" id="status_off" value="0" {% if module_tdinstagram_status == 0 %} checked="checked" {% endif %}/>
+              <label for="status_off">{{ text_disabled }}</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-noofimg">{{ entry_username }}</label>
+            <div class="control-group">
+              <input type="text" name="module_tdinstagram_username" value="{{ module_tdinstagram_username }}" placeholder="{{ entry_username }}" id="input-limit" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group required">
+            <label class="control-label" for="input-limit">{{ entry_uid }}</label>
+            <div class="control-group">
+              <input type="text" name="module_tdinstagram_userid" value="{{ module_tdinstagram_userid }}" placeholder="{{ entry_uid }}" id="input-limit" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-token">{{ entry_token }}</label>
+            <div class="control-group">
+              <input type="text" name="module_tdinstagram_usertoken" value="{{ module_tdinstagram_usertoken }}" placeholder="{{ entry_token }}" id="input-limit" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-hashtag">{{ entry_hashtag }}</label>
+            <div class="control-group">
+              <input type="text" name="module_tdinstagram_hashtag" value="{{ module_tdinstagram_hashtag }}" placeholder="{{ entry_hashtag }}" id="input-limit" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-display-sort">{{ entry_sort }}</label>
+            <div class="control-group">
+              <select name="module_tdinstagram_sort" id="input-display-sort" class="form-control">
+                <option value="none" {% if module_tdinstagram_sort == 'none' %} selected="selected"{% endif %}>{{ entry_none }}</option>
+                <option value="most-recent" {% if module_tdinstagram_sort == 'most-recent' %} selected="selected"{% endif %}>{{ entry_mostrecent }}</option>
+                <option value="least-recent" {% if module_tdinstagram_sort == 'least-recent' %} selected="selected"{% endif %}>{{ entry_leastrecent }}</option>
+                <option value="most-liked" {% if module_tdinstagram_sort == 'most-liked' %} selected="selected"{% endif %}>{{ entry_mostliked }}</option>
+                <option value="least-liked" {% if module_tdinstagram_sort == 'least-liked' %} selected="selected"{% endif %}>{{ entry_leastliked }}</option>
+                <option value="most-commented" {% if module_tdinstagram_sort == 'most-commented' %} selected="selected"{% endif %}>{{ entry_mostcommented }}</option>
+                <option value="least-commented" {% if module_tdinstagram_sort == 'least-commented' %} selected="selected"{% endif %}>{{ entry_leastcommented }}</option>
+                <option value="random" {% if module_tdinstagram_sort == 'random' %} selected="selected"{% endif %}>{{ entry_random }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-display-size">{{ entry_imagesize }}</label>
+            <div class="control-group">
+              <select name="module_tdinstagram_size" id="input-display-size" class="form-control">
+                <option value="thumbnail" {% if module_tdinstagram_size == 'thumbnail' %} selected="selected"{% endif %}>{{ entry_thumbnail }}</option>
+                <option value="low_resolution" {% if module_tdinstagram_size == 'low_resolution' %} selected="selected"{% endif %}>{{ entry_lowres }}</option>
+                <option value="standard_resolution" {% if module_tdinstagram_size == 'standard_resolution' %} selected="selected"{% endif %}>{{ entry_stdres }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-noofimg">{{ entry_noofdisplayimg }}</label>
+            <div class="control-group">
+              <input type="text" name="module_tdinstagram_noofdisplayimg" value="{{ module_tdinstagram_noofdisplayimg }}" placeholder="{{ entry_noofdisplayimg }}" id="input-limit" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-image-like">{{ entry_imglikes }}</label>
+            <div class="control-group">
+             <div class="switch-field">
+              <input type="radio" name="module_tdinstagram_imglikes" id="imglikes_on" value="1" {% if module_tdinstagram_imglikes == 1 %} checked="checked" {% endif %}/>
+              <label for="imglikes_on">{{ text_enabled }}</label>
+              <input type="radio" name="module_tdinstagram_imglikes" id="imglikes_off" value="0" {% if module_tdinstagram_imglikes == 0 %} checked="checked" {% endif %}/>
+              <label for="imglikes_off">{{ text_disabled }}</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-img-comment">{{ entry_imgcomments }}</label>
+            <div class="control-group">
+             <div class="switch-field">
+              <input type="radio" name="module_tdinstagram_imgcomments" id="imgcomments_on" value="1" {% if module_tdinstagram_imgcomments == 1 %} checked="checked" {% endif %}/>
+              <label for="imgcomments_on">{{ text_enabled }}</label>
+              <input type="radio" name="module_tdinstagram_imgcomments" id="imgcomments_off" value="0" {% if module_tdinstagram_imgcomments == 0 %} checked="checked" {% endif %}/>
+              <label for="imgcomments_off">{{ text_disabled }}</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="input-img-captions">{{ entry_imgcaptions }}</label>
+            <div class="control-group">
+             <div class="switch-field">
+              <input type="radio" name="module_tdinstagram_imgcaptions" id="imgcaptions_on" value="1" {% if module_tdinstagram_imgcaptions == 1 %} checked="checked" {% endif %}/>
+              <label for="imgcaptions_on">{{ text_enabled }}</label>
+              <input type="radio" name="module_tdinstagram_imgcaptions" id="imgcaptions_off" value="0" {% if module_tdinstagram_imgcaptions == 0 %} checked="checked" {% endif %}/>
+              <label for="imgcaptions_off">{{ text_disabled }}</label>
+              </div>
+            </div>
+          </div>
+         <input type="hidden" name="saveandstay" id="saveandstay" value="0">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

@@ -1,0 +1,597 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+      <div class="container-fluid">
+        <div class="pull-right">
+          <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+          <button onclick="$('#content form #saveandstay').attr('value', '1'); $('#' + $('#content form').attr('id')).submit();" data-toggle="tooltip" title="{{ button_savestay }}" class="btn btn-warning"><i class="fa fa-save"></i></button>
+          <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+        </div>
+        <h1>{{ heading_title }}</h1>
+        <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default custom-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+        </div>
+        <div class="panel-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+
+            {# Module Name #}
+            <div class="form-group">
+              <label class="control-label" for="input-name">{{ entry_name }}</label>
+              <div class="control-group">
+                <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+                {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Module Status #}
+            <div class="form-group">
+              <label class="control-label" for="input-status">{{ entry_status }}</label>
+              <div class="control-group">
+                <div class="switch-field">
+                  <input type="radio" name="status" id="status_on" value="1" {% if status == 1 %} checked="checked" {% endif %}/>
+                  <label for="status_on">{{ text_enabled }}</label>
+                  <input type="radio" name="status" id="status_off" value="0" {% if status == 0 %} checked="checked" {% endif %}/>
+                  <label for="status_off">{{ text_disabled }}</label>
+                </div>
+              </div>
+            </div>
+
+            {# Heading Title #}
+            <div class="form-group">
+              <label class="control-label" for="input-title">{{ entry_title }}</label>
+              <div class="control-group">
+                {% for language in languages %}
+                <div class="input-group">
+                  <span class="input-group-addon"><img src="language/{{language['code']}}/{{language['code']}}.png" title="{{language['name']}}" /></span>
+                  <input type="text" name="title[{{ language.code }}][title]" value="{{ title[language.code]['title'] is defined ? title[language.code]['title'] : '' }}" placeholder="" id="input-title{{ language.language_id }}" class="form-control" />
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            {# Heading Title #}
+            <div class="form-group">
+              <label class="control-label" for="input-subtitle">{{ entry_subtitle }}</label>
+              <div class="control-group">
+                {% for language in languages %}
+                <div class="input-group">
+                  <span class="input-group-addon"><img src="language/{{language['code']}}/{{language['code']}}.png" title="{{language['name']}}" /></span>
+                  <input type="text" name="subtitle[{{ language.code }}][subtitle]" value="{{ subtitle[language.code]['subtitle'] is defined ? subtitle[language.code]['subtitle'] : '' }}" placeholder="" id="input-subtitle{{ language.language_id }}" class="form-control" />
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            {# Product Limit #}
+            <div class="form-group">
+              <label class="control-label" for="input-limit">{{ entry_limit }}</label>
+              <div class="control-group">
+                <input type="text" name="limit" value="{{ limit }}" placeholder="{{ entry_limit }}" id="input-limit" class="form-control" />
+              </div>
+            </div>
+
+            {# Product WxH #}
+            <div class="form-group">
+              <label class="control-label" for="input-width">{{ entry_image_size }}</label>
+              <div class="control-group">
+                <input type="text" name="width" value="{{ width }}" placeholder="{{ entry_width }}" id="input-width" class="td-number-field form-control" />
+                {% if error_width %}
+                <div class="text-danger">{{ error_width }}</div>
+                {% endif %}
+                x
+                <input type="text" name="height" value="{{ height }}" placeholder="{{ entry_height }}" id="input-height" class="td-number-field form-control" />
+                {% if error_height %}
+                <div class="text-danger">{{ error_height }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Display Type #}
+            <div class="form-group parent-form">
+              <label class="control-label" for="input-display-type">{{ entry_display_type }}</label>
+              <div class="control-group">
+                <div class="switch-field">
+                  <input type="radio" name="display_type" id="type_grid" onclick="GetOptionsSelect();" value="0" {% if display_type == 0 %} checked="checked" {% endif %}/>
+                  <label for="type_grid">{{ entry_grid }}</label>
+                  <input type="radio" name="display_type" id="type_slider" onclick="GetOptionsSelect();" value="1" {% if display_type == 1 %} checked="checked" {% endif %}/>
+                  <label for="type_slider">{{ entry_slider }}</label>
+                </div>
+              </div>
+            </div>
+
+            {# Responsive #}
+            <div class="form-group">
+              <label class="control-label">{{ entry_responsive }}</label>
+              <div class="control-group">
+                <div class="form-content">
+                  <label class="control-label" for="input-xxldevice"><i class="fa fa-desktop"></i> {{ entry_xxldevice }}</label>
+                  <select name="xxldevice" id="input-xxldevice" class="form-control">
+                    <option value="1" {% if xxldevice == 1 %} selected="selected"{% endif %}>1</option>
+                    <option value="2" {% if xxldevice == 2 %} selected="selected"{% endif %}>2</option>
+                    <option value="3" {% if xxldevice == 3 %} selected="selected"{% endif %}>3</option>
+                    <option value="4" {% if xxldevice == 4 %} selected="selected"{% endif %}>4</option>
+                    <option value="5" {% if xxldevice == 5 %} selected="selected"{% endif %}>5</option>
+                    <option value="6" {% if xxldevice == 6 %} selected="selected"{% endif %}>6</option>
+                  </select>
+                </div>
+                <div class="form-content">
+                  <label class="control-label" for="input-xldevice"><i class="fa fa-desktop"></i> {{ entry_xldevice }}</label>
+                  <select name="xldevice" id="input-xldevice" class="form-control">
+                    <option value="1" {% if xldevice == 1 %} selected="selected"{% endif %}>1</option>
+                    <option value="2" {% if xldevice == 2 %} selected="selected"{% endif %}>2</option>
+                    <option value="3" {% if xldevice == 3 %} selected="selected"{% endif %}>3</option>
+                    <option value="4" {% if xldevice == 4 %} selected="selected"{% endif %}>4</option>
+                    <option value="5" {% if xldevice == 5 %} selected="selected"{% endif %}>5</option>
+                    <option value="6" {% if xldevice == 6 %} selected="selected"{% endif %}>6</option>
+                  </select>
+                </div>
+                <div class="form-content">
+                  <label class="control-label" for="input-lgdevice"><i class="fa fa-laptop"></i> {{ entry_lgdevice }}</label>
+                  <select name="lgdevice" id="input-lgdevice" class="form-control">
+                    <option value="1" {% if lgdevice == 1 %} selected="selected"{% endif %}>1</option>
+                    <option value="2" {% if lgdevice == 2 %} selected="selected"{% endif %}>2</option>
+                    <option value="3" {% if lgdevice == 3 %} selected="selected"{% endif %}>3</option>
+                    <option value="4" {% if lgdevice == 4 %} selected="selected"{% endif %}>4</option>
+                    <option value="5" {% if lgdevice == 5 %} selected="selected"{% endif %}>5</option>
+                  </select>
+                </div>
+                <div class="form-content">
+                  <label class="control-label" for="input-mddevice"><i class="fa fa-tablet fa-rotate-270"></i> {{ entry_mddevice }}</label>
+                  <select name="mddevice" id="input-mddevice" class="form-control">
+                    <option value="1" {% if mddevice == 1 %} selected="selected"{% endif %}>1</option>
+                    <option value="2" {% if mddevice == 2 %} selected="selected"{% endif %}>2</option>
+                    <option value="3" {% if mddevice == 3 %} selected="selected"{% endif %}>3</option>
+                    <option value="4" {% if mddevice == 4 %} selected="selected"{% endif %}>4</option>
+                  </select>
+                </div>
+                <div class="form-content">
+                  <label class="control-label" for="input-smdevice"><i class="fa fa-tablet"></i> {{ entry_smdevice }}</label>
+                  <select name="smdevice" id="input-smdevice" class="form-control">
+                    <option value="1" {% if smdevice == 1 %} selected="selected"{% endif %}>1</option>
+                    <option value="2" {% if smdevice == 2 %} selected="selected"{% endif %}>2</option>
+                    <option value="3" {% if smdevice == 3 %} selected="selected"{% endif %}>3</option>
+                  </select>
+                </div>
+                <div class="form-content">
+                  <label class="control-label" for="input-xsdevice"><i class="fa fa-mobile"></i> {{ entry_xsdevice }}</label>
+                  <select name="xsdevice" id="input-xsdevice" class="form-control">
+                    <option value="1" {% if xsdevice == 1 %} selected="selected"{% endif %}>1</option>
+                    <option value="2" {% if xsdevice == 2 %} selected="selected"{% endif %}>2</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {# Slider Options #}
+            <div class="type_slider_selected select-options">
+              <div class="form-group">
+                <label class="control-label" for="input-rows">{{ entry_rows }}</label>
+                <div class="control-group">
+                  <input type="text" name="rows" value="{{ rows }}" placeholder="{{ entry_rows }}" id="input-rows" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-navigation">{{ entry_navigation }}</label>
+                <div class="control-group">
+                  <div class="switch-field">
+                    <input type="radio" name="navigation" id="navigation_on" value="1" {% if navigation == 1 %} checked="checked" {% endif %}/>
+                    <label for="navigation_on">{{ text_enabled }}</label>
+                    <input type="radio" name="navigation" id="navigation_off" value="0" {% if navigation == 0 %} checked="checked" {% endif %}/>
+                    <label for="navigation_off">{{ text_disabled }}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-pagination">{{ entry_pagination }}</label>
+                <div class="control-group">
+                  <div class="switch-field">
+                    <input type="radio" name="pagination" id="pagination_on" value="1" {% if pagination == 1 %} checked="checked" {% endif %}/>
+                    <label for="pagination_on">{{ text_enabled }}</label>
+                    <input type="radio" name="pagination" id="pagination_off" value="0" {% if pagination == 0 %} checked="checked" {% endif %}/>
+                    <label for="pagination_off">{{ text_disabled }}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-autoplay">{{ entry_autoplay }}</label>
+                <div class="control-group">
+                  <div class="switch-field">
+                    <input type="radio" name="autoplay" id="autoplay_on" value="1" {% if autoplay == 1 %} checked="checked" {% endif %}/>
+                    <label for="autoplay_on">{{ text_enabled }}</label>
+                    <input type="radio" name="autoplay" id="autoplay_off" value="0" {% if autoplay == 0 %} checked="checked" {% endif %}/>
+                    <label for="autoplay_off">{{ text_disabled }}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-apdelay">{{ entry_apdelay }}</label>
+                <div class="control-group">
+                  <input type="text" name="apdelay" value="{{ apdelay }}" placeholder="{{ entry_apdelay }}" id="input-apdelay" class="form-control" />
+                </div>
+              </div>
+            </div>
+
+            <div class="tabs-container">
+              {% set tabId = 0 %}
+              {% for tdtab in tdtabs %}
+              <div class="tab-container">
+                <div class="tab-heading">Tab-{{ tabId }}<span class="delete_tab"><i class="fa fa-times"></i>{{ entry_deletetab }}</span></div>
+                <div class="tab-content">
+                  {# Tab Title #}
+                  <div class="form-group">
+                    <label class="control-label" for="input-row">{{ entry_overwritetitle }}</label>
+                    <div class="control-group">
+                      {% for language in languages %}
+                      <div class="input-group">
+                        <span class="input-group-addon"><img src="language/{{language['code']}}/{{language['code']}}.png" title="{{language['name']}}"/></span>
+                        <input type="text" name="tdtab[{{ tabId }}][tab_name][{{ language.code }}][title]" value="{{ tdtab.tab_name[language.code].title ? tdtab.tab_name[language.code].title }}" placeholder="" id="input-title{{ language.language_id }}-{{ tabId }}" class="form-control" />
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {# Product Type #}
+                  <div class="form-group parent-form">
+                    <label class="control-label" for="input-product-type">{{ entry_type }}</label>
+                    <div class="control-group">
+                      <div class="switch-field">
+                        <input type="radio" name="tdtab[{{ tabId }}][prd_type]" class="switch-input" id="all_prd_{{ tabId }}" value="0" onClick="GetOptionsSelect();" {% if tdtab.prd_type == 0 %}checked="checked"{% endif %}/>
+                        <label for="all_prd_{{ tabId }}" class="switch-label switch-label-1">{{ entry_type_all }}</label>
+                        <input type="radio" name="tdtab[{{ tabId }}][prd_type]" class="switch-input" id="category_prd_{{ tabId }}" value="1" onClick="GetOptionsSelect();" {% if tdtab.prd_type == 1 %}checked="checked"{% endif %} />
+                        <label for="category_prd_{{ tabId }}" class="switch-label switch-label-2">{{ entry_type_category }}</label>
+                        <input type="radio" name="tdtab[{{ tabId }}][prd_type]" class="switch-input" id="specific_prd_{{ tabId }}" value="2" onClick="GetOptionsSelect();" {% if tdtab.prd_type == 2 %}checked="checked"{% endif %}/>
+                        <label for="specific_prd_{{ tabId }}">{{ entry_type_specific }}</label>
+                        <span class="switch-selection"></span>
+                      </div>
+                    </div>
+                  </div>
+                  {# Selected Product #}
+                  <div class="all_prd_{{ tabId }}_selected select-options">
+                    <div class="form-group">
+                      <label class="control-label" for="input-product-{{ tabId }}">{{ entry_product }}</label>
+                      <div class="control-group">
+                        <input type="text" name="tdtab[{{ tabId }}][product]" value="" placeholder="{{ entry_product }}" id="input-product-{{ tabId }}" class="form-control" />
+                        <div id="featured-product-{{ tabId }}" class="well well-sm" style="height: 150px; overflow: auto;">
+                          {% for product in tdtab.products %}
+                          <div id="featured-product-{{ product.product_id }}" class="td-product">
+                            <i class="fa fa-minus-circle"></i>
+                            <img src="{{ product.image }}" alt="" />
+                            {{ product.name }}
+                            <input type="hidden" name="tdtab[{{ tabId }}][product][]" value="{{ product.product_id }}" />
+                          </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {# Category Product #}
+                  <div class="category_prd_{{ tabId }}_selected select-options">
+                    {# Category Selection #}
+                    <div class="form-group">
+                      <label class="control-label" for="input-cate_id-{{ tabId }}">{{ entry_cate_select }}</label>
+                      <div class="control-group">
+                        <input type="text" name="tdtab[{{ tabId }}][category_name]" value="{{ tdtab.category_name }}" placeholder="{{ entry_cate_search }}" id="input-category_name-{{ tabId }}" class="input-category_name form-control" /><i class="fa fa-times"></i>
+                        <input type="hidden" name="tdtab[{{ tabId }}][category_id]" value="{{ tdtab.category_id }}" id="input-category_id-{{ tabId }}" />
+                      </div>
+                    </div>
+                    <div class="form-group parent-form">
+                      <label class="control-label" for="input-productfrom-{{ tabId }}">{{ entry_product_from }}</label>
+                      <div class="control-group">
+                        <div class="switch-field">
+                          <input type="radio" name="tdtab[{{ tabId }}][productfrom]" class="switch-input" id="productfrom_all_{{ tabId }}" value="0" onClick="GetOptionsSelect();" {% if tdtab.productfrom == 0 %}checked="checked"{% endif %}/>
+                          <label for="productfrom_all_{{ tabId }}" class="switch-label switch-label-1">{{ entry_all_product }}</label>
+                          <input type="radio" name="tdtab[{{ tabId }}][productfrom]" class="switch-input" id="productfrom_select_{{ tabId }}" value="1" onClick="GetOptionsSelect();" {% if tdtab.productfrom == 1 %}checked="checked"{% endif %}/>
+                          <label for="productfrom_select_{{ tabId }}" class="switch-label switch-label-2">{{ entry_select_product }}</label>
+                          <input type="radio" name="tdtab[{{ tabId }}][productfrom]" class="switch-input" id="specific_product_{{ tabId }}" value="2" onClick="GetOptionsSelect();" {% if tdtab.productfrom == 2 %}checked="checked"{% endif %}/>
+                          <label for="specific_product_{{ tabId }}" class="switch-label switch-label-3">{{ entry_type_specific }}</label>
+                          <span class="switch-selection"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="productfrom_all_{{ tabId }}_selected select-options">
+                    </div>
+                    <div class="productfrom_select_{{ tabId }}_selected select-options">
+                      <div class="form-group">
+                        <label class="control-label" for="input-rows-{{ tabId }}">{{ entry_product }}</label>
+                        <div class="control-group">
+                          <input type="text" name="tdtab[{{ tabId }}][productcate]" value="" placeholder="{{ entry_product }}" id="input-productcate-{{ tabId }}" class="form-control" />
+                          <div id="category-product-{{ tabId }}" class="well well-sm" style="height: 150px; overflow: auto;">
+                            {% for productcate in tdtab.productcates %}
+                            <div id="category-product{{ productcate.product_id }}" class="td-product">
+                              <i class="fa fa-minus-circle"></i>
+                              <img src="{{ productcate.image }}" alt="" />
+                              {{ productcate.name }}
+                              <input type="hidden" name="tdtab[{{ tabId }}][productcate][]" value="{{ productcate.product_id }}" />
+                            </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="specific_product_{{ tabId }}_selected select-options">
+                      <div class="form-group">
+                        <label class="control-label" for="input-specific-product-{{ tabId }}">{{ entry_product }}</label>
+                        <div class="control-group">
+                          <select name="tdtab[{{ tabId }}][specific_product]" id="input-specific-product-{{ tabId }}" class="form-control">
+                            <option value="0" {% if tdtab.specific_product == 0 %} selected="selected"{% endif %}>{{ entry_newproduct }}</option>
+                            <option value="1" {% if tdtab.specific_product == 1 %} selected="selected"{% endif %}>{{ entry_saleproduct }}</option>
+                            <option value="2" {% if tdtab.specific_product == 2 %} selected="selected"{% endif %}>{{ entry_bestsellerproduct }}</option>
+                            <option value="3" {% if tdtab.specific_product == 3 %} selected="selected"{% endif %}>{{ entry_mostviewproduct }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {# Specific Product #}
+                  <div class="specific_prd_{{ tabId }}_selected select-options">
+                    <div class="form-group">
+                      <label class="control-label" for="input-autoproduct-{{ tabId }}">{{ entry_product }}</label>
+                      <div class="control-group">
+                        <select name="tdtab[{{ tabId }}][autoproduct]" id="input-autoproduct-{{ tabId }}" class="form-control">
+                          <option value="0" {% if tdtab.autoproduct == 0 %} selected="selected"{% endif %}>{{ entry_newproduct }}</option>
+                          <option value="1" {% if tdtab.autoproduct == 1 %} selected="selected"{% endif %}>{{ entry_saleproduct }}</option>
+                          <option value="2" {% if tdtab.autoproduct == 2 %} selected="selected"{% endif %}>{{ entry_bestsellerproduct }}</option>
+                          <option value="3" {% if tdtab.autoproduct == 3 %} selected="selected"{% endif %}>{{ entry_mostviewproduct }}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% set tabId = tabId + 1 %}
+              {% endfor %}
+            </div>
+            <button class="button-addnew btn btn-primary" type="button" onClick="addTabs();">{{ entry_addnewtab }}</button>
+            <input type="hidden" name="saveandstay" id="saveandstay" value="0">
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+{{ footer }}
+<script type="text/javascript">
+  var category_id;
+  var tabId = "{{ tabId }}";
+  /*All Products*/
+  function loadAutocomplete(i) {
+    $("input[name=\'tdtab["+i+"][product]\']").autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: 'index.php?route=extension/module/tdproducts/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+          dataType: 'json',
+          success: function(json) {
+            response($.map(json, function(item) {
+              return {
+                image: item['image'],
+                label: item['name'],
+                value: item['product_id']
+              }
+            }));
+          }
+        });
+      },
+      select: function(item) {
+        $("input[name=\'tdtab["+i+"][product]\']").val('');
+
+        $('#featured-product-'+ i+ + item['value']).remove();
+        $('#featured-product-'+ i).append('<div id="featured-product-'+i + item['value'] + '" class="td-product"><i class="fa fa-minus-circle"></i> ' + '<img src="' +item['image']+ '" alt=""/>' + item['label'] + '<input type="hidden" name="tdtab['+i+'][product][]" value="' + item['value'] + '" /></div>');
+
+        $('#featured-product-'+i).scrollTop(1000);
+      }
+    });
+    $('#featured-product-'+i).delegate('.fa-minus-circle', 'click', function() {
+      $(this).parent().remove();
+    });
+
+    /*Search category*/
+    $("input[name=\'tdtab["+i+"][category_name]\']").autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: 'index.php?route=extension/module/tdproducts/autocompleteCategory&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+          dataType: 'json',
+          success: function(json) {
+            response($.map(json, function(item) {
+              return {
+                label: item['name'],
+                value: item['category_id']
+              }
+            }));
+          }
+        });
+      },
+      select: function(item) {
+        document.getElementById("input-category_name-"+i).value= item['label'];
+        document.getElementById("input-category_id-"+i).value= item['value'];
+        $('#category-product-'+i).children().remove();
+      }
+    });
+    $('#input-category_name-'+i).parent().delegate('.fa-times', 'click', function() {
+      document.getElementById("input-category_name-"+i).value= '';
+      document.getElementById("input-category_id-"+i).value= '';
+      $('#category-product-'+i).children().remove();
+    });
+
+    /*Category Products*/
+    $("input[name=\'tdtab["+i+"][productcate]\']").autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: 'index.php?route=extension/module/tdproducts/getProductCategory&user_token={{ user_token }}&category_id=' + $("#input-category_id-"+i).val()+ '&filter_name=' +  encodeURIComponent(request),
+          dataType: 'json',
+          data: {
+          },
+          success: function(json) {
+            response($.map(json, function(item) {
+              return {
+                image: item['image'],
+                label: item['name'],
+                value: item['product_id']
+              }
+            }));
+          }
+        });
+      },
+      select: function(item) {
+        $('input[name=\'productcate\']').val('');
+
+        $('#category-product-'+ i + item['value']).remove();
+
+        $('#category-product-' +i).append('<div id="category-product-' + i + item['value'] + '" class="td-product"><i class="fa fa-minus-circle"></i> ' + '<img src="' +item['image']+ '" alt=""/>' + item['label'] + '<input type="hidden" name="tdtab['+i+'][productcate][]" value="' + item['value'] + '" /></div>');
+
+        $('#category-product'+i).scrollTop(1000);
+      }
+    });
+    $('#category-product-'+i).delegate('.fa-minus-circle', 'click', function() {
+      $(this).parent().remove();
+    });
+  }
+  function GetOptionsSelect() {
+    $('.select-options').hide();
+    var parentForms = document.getElementsByClassName('parent-form');
+    for (var j = 0; j < parentForms.length; j++) {
+      var inputChilds = parentForms[j].getElementsByTagName('input');
+      for (var i = 0; i < inputChilds.length; i++) {
+        if (inputChilds[i].checked) {
+          var id = inputChilds[i].id;
+          var showSelected = $('.'+id+'_selected');
+          $(showSelected).show();
+        }
+      }
+    };
+  }
+  $(document).ready(function(){
+    GetOptionsSelect();
+    afterAdd();
+    $('.list-selection label').on('click',function(){
+      $(this).parent().find('.active').removeClass('active');
+      $(this).addClass('active');
+    });
+    for(i=0; i <= tabId; i++){
+      loadAutocomplete(i);
+    }
+    $('.tab-content').hide();
+  })
+  {% for language in languages %}
+  $('#language{{ language.language_id }} .html-content').hide();
+  $('#language{{ language.language_id }} a').click(function(){
+    $('#language{{ language.language_id }} .html-content').slideToggle();
+  });
+  {% endfor %}
+  function afterAdd(){
+    $('.tab-heading').on('click', function(){
+      $(this).next('.tab-content').slideToggle();
+      event.stoppropagation();
+    })
+    $('.delete_tab').click(function(){
+      $(this).parent().parent().remove();
+    })
+  }
+  function addTabs() {
+    html  = '<div class="tab-container"><div class="tab-heading">Tab-'+tabId+'<span class="delete_tab"><i class="fa fa-times"></i>{{ entry_deletetab }}</span></div><div class="tab-content">';
+    html += '<div class="form-group">';
+    html += '<label class="control-label" for="input-row">{{entry_overwritetitle}}</label>';
+    html += '<div class="control-group">';
+    {% for language in languages %}
+    html += '<div class="input-group">';
+    html += '<span class="input-group-addon"><img src="language/{{language['code']}}/{{language['code']}}.png" title="{{language['name']}}"/></span>';
+    html += '<input type="text" name="tdtab[' + tabId + '][tab_name][{{ language.code }}][title]" value="" placeholder="" id="input-title{{ language.language_id }}-'+ tabId +'" class="form-control" />';
+    html += '</div>';
+    {% endfor %}
+    html += '</div></div>';
+    html += '<div class="form-group parent-form">';
+    html += '<label class="control-label" for="input-product-type">{{ entry_type }}</label>';
+    html += '<div class="control-group"><div class="switch-field">';
+    html += '<input type="radio" name="tdtab[' + tabId + '][prd_type]" class="switch-input" id="all_prd_' + tabId + '" onClick="GetOptionsSelect();" value="0" checked="checked"/>';
+    html += '<label for="all_prd_' + tabId + '" class="switch-label switch-label-1">{{ entry_type_all }}</label>';
+    html += '<input type="radio" name="tdtab[' + tabId + '][prd_type]" class="switch-input" value="1" onClick="GetOptionsSelect();" id="category_prd_' + tabId + '" />';
+    html += '<label for="category_prd_' + tabId + '" class="switch-label switch-label-2">{{ entry_type_category }}</label>';
+    html += '<input type="radio" name="tdtab[' + tabId + '][prd_type]" class="switch-input" id="specific_prd_' + tabId + '" value="2" onClick="GetOptionsSelect();"/>';
+    html += '<label for="specific_prd_' + tabId + '" class="switch-label switch-label-3">{{ entry_type_specific }}</label>';
+    html += '<span class="switch-selection"></span>';
+    html += '</div></div>';
+    html += '</div>';
+
+    html += '<div class="all_prd_' + tabId + '_selected select-options">';
+    html += '<div class="form-group">';
+    html += '<label class="control-label" for="input-product-' + tabId + '">{{ entry_product }}</label>';
+    html += '<div class="control-group">';
+    html += '<input type="text" name="tdtab[' + tabId + '][product]" value="" placeholder="{{ entry_product }}" id="input-product-' + tabId + '" class="form-control" />';
+    html += '<div id="featured-product-' + tabId + '" class="well well-sm" style="height: 150px; overflow: auto;">';
+    html += '</div></div></div></div>';
+
+    html += '<div class="category_prd_' + tabId + '_selected select-options">';
+    html += '<div class="form-group">';
+    html += '<label class="control-label" for="input-cate_id-{{ tabId }}">{{ entry_cate_select }}</label>';
+    html += '<div class="control-group">';
+    html += '<input type="text" name="tdtab[' + tabId + '][category_name]" value="" placeholder="{{ entry_cate_search }}" id="input-category_name-' + tabId + '" class="input-category_name form-control " /><i class="fa fa-times"></i>';
+    html += '<input type="hidden" name="tdtab[' + tabId + '][category_id]" value="" id="input-category_id-' + tabId + '" />';
+    html += '</div></div>';
+
+    html += '<div class="form-group parent-form">';
+    html += '<label class="control-label" for="input-productfrom">{{ entry_product_from }}</label>';
+    html += '<div class="control-group">';
+    html += '<div class="switch-field">';
+    html += '<input type="radio" name="tdtab[' + tabId + '][productfrom]" class="switch-input" id="productfrom_all_' + tabId + '" value="0" onClick="GetOptionsSelect();" checked="checked"/>';
+    html += '<label for="productfrom_all_' + tabId + '" class="switch-label switch-label-1">{{ entry_all_product }}</label>';
+    html += '<input type="radio" name="tdtab[' + tabId + '][productfrom]" class="switch-input" id="productfrom_select_' + tabId + '" value="1" onClick="GetOptionsSelect();"/>';
+    html += '<label for="productfrom_select_' + tabId + '" class="switch-label switch-label-2">{{ entry_select_product }}</label>';
+    html += '<input type="radio" name="tdtab[' + tabId + '][productfrom]" class="switch-input" id="specific_product_' + tabId + '" value="2" onClick="GetOptionsSelect();"/>';
+    html += '<label for="specific_product_' + tabId + '" class="switch-label switch-label-3">{{ entry_type_specific }}</label>';
+    html += '<span class="switch-selection"></span>';
+    html += '</div></div></div>';
+
+    html += '<div class="productfrom_all_' + tabId + '_selected select-options"></div>';
+
+    html += '<div class="productfrom_select_' + tabId + '_selected select-options">';
+    html += '<div class="form-group">';
+    html += '<label class="control-label" for="input-rows-' + tabId + '">{{ entry_product }}</label>';
+    html += '<div class="control-group">';
+    html += '<input type="text" name="tdtab[' + tabId + '][productcate]" value="" placeholder="{{ entry_product }}" id="input-productcate-' + tabId + '" class="form-control" />';
+    html += '<div id="category-product-' + tabId + '" class="well well-sm" style="height: 150px; overflow: auto;">';
+    html += '</div></div></div></div>';
+
+    html += '<div class="specific_product_' + tabId + '_selected select-options">';
+    html += '<div class="form-group">';
+    html += '<label class="control-label" for="input-specific-product-' + tabId + '">{{ entry_type_specific }}</label>';
+    html += '<div class="control-group">';
+    html += '<select name="tdtab[' + tabId + '][specific_product]" id="input-specific-product-' + tabId + '" class="form-control">';
+    html += '<option value="0">{{ entry_newproduct }}</option>';
+    html += '<option value="1">{{ entry_saleproduct }}</option>';
+    html += '<option value="2">{{ entry_bestsellerproduct }}</option>';
+    html += '<option value="3">{{ entry_mostviewproduct }}</option>';
+    html += '</select></div></div></div></div>';
+
+    html += '<div class="specific_prd_' + tabId + '_selected select-options">';
+    html += '<div class="form-group">';
+    html += '<label class="control-label" for="input-autoproduct-' + tabId + '">{{ entry_product }}</label>';
+    html += '<div class="control-group">';
+    html += '<select name="tdtab[' + tabId + '][autoproduct]" id="input-autoproduct-' + tabId + '" class="form-control">';
+    html += '<option value="0">{{ entry_newproduct }}</option>';
+    html += '<option value="1">{{ entry_saleproduct }}</option>';
+    html += '<option value="2">{{ entry_bestsellerproduct }}</option>';
+    html += '<option value="3">{{ entry_mostviewproduct }}</option>';
+    html += '</select></div></div></div>';
+    html += '</div></div>';
+
+    $('.tabs-container').append(html);
+    GetOptionsSelect();
+    afterAdd();
+    loadAutocomplete(tabId);
+    tabId++;
+    $('body').scrollTop(10000);
+  }
+</script>

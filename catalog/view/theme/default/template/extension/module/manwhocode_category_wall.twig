@@ -1,0 +1,140 @@
+<div class="category-wall mb-5 {{class}}">
+	<div class="container">
+		<div class="heading">{{ heading_title }}</div>
+	</div>
+	<div class="container">
+		<ul class="list-unstyled category-wall__list">
+			{% for category in categories %}
+				<li>
+					<a href="{{ category.href }}">
+						<span class="category-wall__image">
+							<img src="{{ category.image }}" alt="{{ category.name }}">
+						</span>	
+						<span class="category-wall__title">{{ category.name }}</span>	
+					</a>
+				</li>
+			{% endfor %}	
+		</ul>
+	</div>	
+	{# <div class="category-wall__grid">
+		{% for category in categories %}
+		<div class="category-wall__item">
+			<div class="category-wall__image">
+				<img src="{{ category.image }}" {% if retina_image %}srcset="{{ category.image }} 1x, {{ category.image_2x }} 2x, {{ category.image_3x }} 3x, {{ category.image_4x }} 4x"{% endif %} alt="{{ category.name }}">
+			</div>
+			<p class="h6 text-center">{{ category.name }}</p>
+				<div class="category-wall__subcategory">
+					<span class="category-wall__close"><i class="fa fa-times" aria-hidden="true"></i></span>
+					<ul class="category-wall__subcategory-list">
+					{% for children in category.children %}
+						<li class="{{ class_font }}"><a href="{{ children.href }}">{{ children.name }}</a></li>
+					{% endfor %}
+					{% if category.children|length > 1 %}
+						<hr>
+					{% endif %}
+						<li class="h5"><a href="{{ category.href }}">Смореть все</a></li>
+					</ul>
+				</div>
+			
+		</div>
+		{% endfor %}
+	</div> #}
+</div>
+<style>
+.category-wall__list{display: flex;flex-wrap: wrap;-webkit-box-pack: justify;-ms-flex-pack: justify;justify-content: space-between;margin: 0 -10px 20px -10px;overflow: hidden;}
+.category-wall__list li {width: 25%; padding: 0 10px 20px 10px}
+.category-wall__list li a{display: block;position: relative;}
+.category-wall__list li a:before{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: -webkit-gradient(linear, left bottom, left top, from(rgba(17, 16, 16, .25)), to(rgba(17, 16, 16, .25)));
+    background: linear-gradient(0deg, rgba(17, 16, 16, .25), rgba(17, 16, 16, .25));
+    opacity: 0;
+    -webkit-transition: opacity .25s ease-in-out;
+    transition: opacity .25s ease-in-out;
+}
+.category-wall__list li a:hover:before {
+    opacity: 1;
+}
+.category-wall__list li a .category-wall__title {
+/*	font-family: Jost;*/
+    position: absolute;
+    left: 15px;
+  	width: calc(100% - 30px);
+/*    right: 0;*/
+    bottom: 30px;
+    padding: 0 10px;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 36px;
+    color: #141414;
+    background-color: rgb(255, 255, 255, 0.5);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-transition: opacity .25s ease-in-out, bottom .25s ease-in-out;
+    transition: opacity .25s ease-in-out, bottom .25s ease-in-out;
+}
+.category-wall__list li a:hover .category-wall__title {
+    opacity: 1;
+    bottom: 75px;
+}
+.category-wall__list li a img{max-width: 100%; height: auto;}
+@media only screen and (max-width: 991px){
+	.category-wall__list li a .category-wall__title{font-size: 18px}
+}
+@media only screen and (max-width: 767px){
+	.category-wall__list{margin: 0 0 20px 0}
+	.category-wall__list li a .category-wall__title{font-size: 16px}
+}
+@media only screen and (max-width: 575px){
+	.category-wall__list li {width: 50%}
+/*	.category-wall__list li a .category-wall__title{left: 30px}*/
+}
+
+.category-wall{cursor:pointer}
+/*.category-wall__item{position:relative}
+.category-wall__item:hover p{color:#dc3545}
+.category-wall__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax({{ item_width }},1fr));grid-gap:{{ item_gap }}}
+.category-wall__image img{display:block;margin:0 auto}
+.category-wall__item{overflow:hidden;border:1px solid #e5e5e5;border-radius:.25rem}
+.category-wall__subcategory{width:100%;height:100%;position:absolute;top:0;left:-100%;background:#f7f7f7;opacity:.9}
+.category-wall__subcategory-list{position:relative;padding:0;list-style:none;padding:1rem .5rem .5rem 1.3rem;margin-right:30px;overflow:auto;max-height:100%}
+.category-wall__subcategory-list li a{padding:.3rem 0;display:block}
+.category-wall__close{position:absolute;right:0;top:0;font-size:18px;padding:10px}
+.category-wall__close:hover{color:#dc3545}
+.category-wall__image img {max-width: 100%;}*/
+</style>
+
+{# <script>
+	$('.category-wall__item').on('click', function(){
+		$(this).find($('.category-wall__subcategory')).animate({
+			left: 0
+		}, 800);});
+	$('.category-wall__close:not(.category-wall__item)').on('click', function(){
+		$(this).parent().animate({
+			left: '-100%'
+		}, 800);
+		return false;
+	});
+</script>
+ #}
+
+
+
+
+
+
+
+
+
+
+

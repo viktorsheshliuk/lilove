@@ -1,0 +1,43 @@
+<div class="product-thumb style2">
+  <div class="image">
+    <a href="{{ product.href }}" class="product-thumbnail">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src ="{{ product.thumb }}" title="{{ product.name }}" alt="{{ product.name }}" class="lazy img-responsive" data-lazyloading="0" width="{{ product.width }}" height="{{ product.height }}" />
+    {% if (product.thumb_swap) %}
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ product.thumb_swap }}" title="{{ product.name }}" alt="{{ product.name }}" class="img-responsive img_1 lazy" width="{{ product.width }}" height="{{ product.height }}"/>
+        {% endif %}
+    </a>
+  </div>
+  <div class="caption">
+    <div class="product-title"><a href="{{ product.href }}">{{ product.name }}</a></div>
+    {% if product.rating %}
+    <div class="rating">
+      {% for i in 1..5 %}
+      {% if product.rating < i %}
+      <span class="fa fa-stack">
+        <i class="fa fa-star-o fa-stack-2x"></i>
+      </span>
+      {% else %}
+      <span class="fa fa-stack">
+        <i class="fa fa-star fa-stack-2x"></i>
+        <i class="fa fa-star-o fa-stack-2x"></i>
+      </span>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if product.price %}
+    <div class="price">
+      {% if not product.special %}
+      {{ product.price }}
+      {% else %}
+      <span class="price-new">{{ product.special }}</span>
+      <span class="price-old">{{ product.price }}</span>
+      {% endif %}
+      {% if product.tax %}
+      <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+    <p class="hidden-xs-up">{{ product.description }}</p>
+  </div>
+</div>

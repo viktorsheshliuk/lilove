@@ -1,0 +1,172 @@
+<?php
+class ControllerExtensionModuleTdinstagram extends Controller {
+	private $error = array();
+
+	public function install() {
+
+        $config = array(
+            'module_tdinstagram_status' => 1,
+       );
+        $this->load->model('setting/setting');
+        $this->model_setting_setting->editSetting('module_tdinstagram', $config);
+
+    }
+
+	public function index() {
+		$this->load->language('extension/module/tdinstagram');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('setting/setting');
+
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+            $post_data = $this->request->post;
+
+            $this->model_setting_setting->editSetting('module_tdinstagram', $post_data);
+
+            $this->session->data['success'] = $this->language->get('text_success');
+
+            /* Custom Code for Save & Stay */
+            if (isset($this->request->post['saveandstay'])) {
+                $get = explode("/", $this->request->get['route']);
+                $folder = $get[0];
+                $file = $get[1];
+
+                if ($file == 'user_permission') {
+                    $table = 'user_group';
+                } else {
+                    $table = $file;
+                }
+
+                $this->load->model('tdmodules/product');
+                $last_id = $this->model_tdmodules_product->getLastInsertID($table);
+
+                $editroute = $folder.'/'.$file.'/tdinstagram';
+
+                if (!isset($url)) {
+                    $url = "";
+                }
+
+                if ((isset($this->request->get[$table.'_id']) || $last_id)) {
+                    $url .= '&'.$table.'_id='.(isset($this->request->get[$table.'_id']) ? $this->request->get[$table.'_id'] : $last_id);
+                }
+
+                if ($this->request->post['saveandstay']) {
+                    $this->response->redirect($this->url->link($editroute, 'user_token='.$this->session->data['user_token'].$url, 'SSL'));
+                }
+            }
+            /* Custom Code for Save & Stay */
+
+            $this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true));
+        }
+
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('heading_title'),
+			'href' => $this->url->link('extension/module/tdinstagram', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['action'] = $this->url->link('extension/module/tdinstagram', 'user_token=' . $this->session->data['user_token'], true);
+
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
+
+
+		if (isset($this->request->post['module_tdinstagram_status'])) {
+			$data['module_tdinstagram_status'] = $this->request->post['module_tdinstagram_status'];
+		} else {
+			$data['module_tdinstagram_status'] = $this->config->get('module_tdinstagram_status');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_userid'])) {
+			$data['module_tdinstagram_userid'] = $this->request->post['module_tdinstagram_userid'];
+		} else {
+			$data['module_tdinstagram_userid'] = $this->config->get('module_tdinstagram_userid');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_username'])) {
+			$data['module_tdinstagram_username'] = $this->request->post['module_tdinstagram_username'];
+		} else {
+			$data['module_tdinstagram_username'] = $this->config->get('module_tdinstagram_username');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_usertoken'])) {
+			$data['module_tdinstagram_usertoken'] = $this->request->post['module_tdinstagram_usertoken'];
+		} else {
+			$data['module_tdinstagram_usertoken'] = $this->config->get('module_tdinstagram_usertoken');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_hashtag'])) {
+			$data['module_tdinstagram_hashtag'] = $this->request->post['module_tdinstagram_hashtag'];
+		} else {
+			$data['module_tdinstagram_hashtag'] = $this->config->get('module_tdinstagram_hashtag');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_sort'])) {
+			$data['module_tdinstagram_sort'] = $this->request->post['module_tdinstagram_sort'];
+		} else {
+			$data['module_tdinstagram_sort'] = $this->config->get('module_tdinstagram_sort');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_size'])) {
+			$data['module_tdinstagram_size'] = $this->request->post['module_tdinstagram_size'];
+		} else {
+			$data['module_tdinstagram_size'] = $this->config->get('module_tdinstagram_size');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_noofdisplayimg'])) {
+			$data['module_tdinstagram_noofdisplayimg'] = $this->request->post['module_tdinstagram_noofdisplayimg'];
+		} else {
+			$data['module_tdinstagram_noofdisplayimg'] = $this->config->get('module_tdinstagram_noofdisplayimg');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_imglikes'])) {
+			$data['module_tdinstagram_imglikes'] = $this->request->post['module_tdinstagram_imglikes'];
+		} else {
+			$data['module_tdinstagram_imglikes'] = $this->config->get('module_tdinstagram_imglikes');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_imgcomments'])) {
+			$data['module_tdinstagram_imgcomments'] = $this->request->post['module_tdinstagram_imgcomments'];
+		} else {
+			$data['module_tdinstagram_imgcomments'] = $this->config->get('module_tdinstagram_imgcomments');
+		}
+
+		if (isset($this->request->post['module_tdinstagram_imgcaptions'])) {
+			$data['module_tdinstagram_imgcaptions'] = $this->request->post['module_tdinstagram_imgcaptions'];
+		} else {
+			$data['module_tdinstagram_imgcaptions'] = $this->config->get('module_tdinstagram_imgcaptions');
+		}
+
+    	$this->document->addStyle('view/stylesheet/admin-styles.css');
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdinstagram', $data));
+	}
+
+	protected function validate() {
+		if (!$this->user->hasPermission('modify', 'extension/module/tdinstagram')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		return !$this->error;
+	}
+}

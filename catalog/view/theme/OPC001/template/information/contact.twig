@@ -1,0 +1,215 @@
+{{ header }}
+<div class="tdbreadcrumb">
+  <div class="breadcrumb container">
+    <h1 class="breadcrumb-title">{{ heading_title }}</h1>
+    <ol>
+      {% for breadcrumb in breadcrumbs %}
+      <li>
+        <a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</div>
+<div id="information-contact" class="container">
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xl-9' %}
+    {% else %}
+    {% set class = 'col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12' %}
+    {% endif %}
+    <div id="content" class="page-content {{ class }}">{{ content_top }}
+         <span style="font-size: 1.375rem;" class="information">{{ heading_title }}</span>
+        <div class="row">
+          <div class="contact-detail-info">
+            <div class="cotact-left col-xl-5 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+              <h3>{{ text_location }}</h3>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <tbody>
+                    <tr>
+                      <th class="text-xs-center str-img">
+                        <i class="fa fa-image"></i>
+                      </th>
+                      <td class="info-table-content">
+                        {% if image %}
+                          <img src="{{ image }}" alt="{{ store }}" title="{{ store }}" class="img-responsive" />
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-xs-center">
+                        <i class="fa fa-map-marker"></i>
+                      </th>
+                      <td class="info-table-content">
+                        {{ address }}
+                        {% if geocode %}
+                          <a href="https://maps.google.com/maps?q={{ geocode|url_encode }}&hl={{ geocode_hl }}&t=m&z=15" target="_blank" class="btn-link"><i class="fa fa-map-marker"></i> {{ button_map }}</a>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-xs-center">
+                        <i class="fa fa-phone"></i>
+                      </th>
+                      <td class="info-table-content">
+                        {{ telephone }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-xs-center">
+                        <i class="fa fa-fax"></i>
+                      </th>
+                      <td class="info-table-content">
+                        {% if fax %}
+                          {{ fax }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-xs-center">
+                        <i class="fa fa-clock-o"></i>
+                      </th>
+                      <td class="info-table-content">
+                        {% if open %}
+                          {{ open }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-xs-center">
+                        <i class="fa fa-commenting-o"></i>
+                      </th>
+                      <td class="info-table-content">
+                        {% if comment %}
+                          {{ comment }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="contact-location col-xl-7 col-lg-6 col-md-6 col-sm-12 col-xs-12 text-md-right">
+              <div class="map">
+               <script type="text/javascript" src="http://www.webestools.com/google_map_gen.js?lati=21.206297&long=72.837004&zoom=4&width=700&height=350&mapType=normal&map_btn_normal=yes&map_btn_satelite=yes&map_btn_mixte=yes&map_small=yes&marqueur=yes&info_bulle="></script>
+             </div>
+            </div>
+          </div>
+        </div>
+      {% if locations %}
+      <h3 class="store-title">{{ text_store }}</h3>
+      <div class="panel-group" id="accordion">
+        {% for location in locations %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title"><a href="#collapse-location{{ location.location_id }}" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">{{ location.name }} <i class="fa fa-caret-down"></i></a></h4>
+          </div>
+          <div class="panel-collapse collapse" id="collapse-location{{ location.location_id }}">
+            <div class="panel-body">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <td class="text-xs-center"><strong>{{ text_image }}</strong></td>
+                      <td class="text-xs-left"><strong>{{ location.name }}</strong></td>
+                      <td class="text-xs-left"><strong>{{ text_telephone }}</strong></td>
+                      <td class="text-xs-right"><strong>{{ text_fax }}</strong></td>
+                      <td class="text-xs-right"><strong>{{ text_open }}</strong></td>
+                      <td class="text-xs-right"><strong>{{ text_comment }}</strong></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-xs-center">
+                        {% if location.image %}
+                          <img src="{{ location.image }}" alt="{{ location.name }}" title="{{ location.name }}" class="img-responsive"/>
+                        {% endif %}
+                      </td>
+                      <td class="text-xs-left contact-add">
+                        <address>
+                          {{ location.address }}
+                        </address>
+                        {% if location.geocode %}
+                          <a href="https://maps.google.com/maps?q={{ location.geocode|url_encode }}&hl={{ geocode_hl }}&t=m&z=15" target="_blank" class="btn-link "><i class="fa fa-map-marker"></i> {{ button_map }}</a>
+                        {% endif %}
+                      </td>
+                      <td class="text-xs-left">
+                        {{ location.telephone }}
+                      </td>
+                      <td class="text-xs-right">
+                        {% if location.fax %}
+                        {{ location.fax }}
+                        {% endif %}
+                      </td>
+                      <td class="text-xs-right">
+                        {% if location.open %}
+                        {{ location.open }}
+                        {% endif %}
+                      </td>
+                      <td class="text-xs-right">
+                        {% if location.comment %}
+                        {{ location.comment }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <fieldset>
+          <legend>{{ text_contact }}</legend>
+          <div class="form-group required">
+            <div class="row">
+              <label class="col-md-2 control-label" for="input-name">{{ entry_name }}</label>
+              <div class="col-md-10">
+                <input type="text" name="name" value="{{ name }}" id="input-name" class="form-control" />
+                {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="form-group required">
+            <div class="row">
+              <label class="col-md-2 control-label" for="input-email">{{ entry_email }}</label>
+              <div class="col-md-10">
+                <input type="text" name="email" value="{{ email }}" id="input-email" class="form-control" />
+                {% if error_email %}
+                <div class="text-danger">{{ error_email }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="form-group required">
+            <div class="row">
+              <label class="col-md-2 control-label" for="input-enquiry">{{ entry_enquiry }}</label>
+              <div class="col-md-10">
+                <textarea name="enquiry" rows="10" id="input-enquiry" class="form-control">{{ enquiry }}</textarea>
+                {% if error_enquiry %}
+                <div class="text-danger">{{ error_enquiry }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {{ captcha }}
+        </fieldset>
+        <div class="buttons">
+          <div class="pull-right">
+            <input class="btn btn-primary" type="submit" value="{{ button_submit }}" />
+          </div>
+        </div>
+      </form>
+       {{ content_bottom }}</div>
+     {{ column_right }}
+  </div>
+</div>
+{{ footer }}

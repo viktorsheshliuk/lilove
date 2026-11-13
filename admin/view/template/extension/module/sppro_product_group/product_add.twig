@@ -1,0 +1,312 @@
+<div class="sppro-product-group-add">
+    <input type="hidden" name="product_group_current_product_id" value="{{ product_id }}">
+    <div class="sp_in_block">
+        <div class="sppg_title">{{ txt_mass_search_product }}</div>
+
+        <div class="sp_animated_input_group with_button">
+            <div style="display:inline-block;width: calc(100% - 105px);">
+                <input id="input-sp_name_or_model" type="text" name="product_group_search" placeholder="{{ txt_enter_name_or_model }}" class="profile-form-input">
+                <label for="input-sp_name_or_model" class="label">{{ txt_enter_name_or_model }}</label>
+                <span class="bar"></span>
+            </div>
+            <button type="button" class="sp_animated_button_group btn_search_mass">{{ txt_btn_search }}</button>
+        </div>
+
+        <div class="sp_search_results"></div>
+    </div>
+
+    <div class="sp_in_block">
+        <div class="sp_search_by_name_or_model row">
+            <div class="col-sm-6">
+                <div class="sppg_title">{{ txt_search_by_model }}</div>
+                <div class="sp_animated_input_group">
+                    <input id="input-product_group_search_by_model" type="text" name="product_group_search_by_model" value="" placeholder="{{ txt_enter_model }}" class="profile-form-input">
+                    <label for="input-product_group_search_by_model" class="label">{{ txt_enter_model }}</label>
+                    <span class="bar"></span>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="sppg_title">{{ txt_search_by_name }}</div>
+                <div class="sp_animated_input_group">
+                    <input id="input-product_group_search_by_name" type="text" name="product_group_search_by_name" value="" placeholder="{{ txt_enter_name }}" class="profile-form-input">
+                    <label for="input-product_group_search_by_name" class="label">{{ txt_enter_name }}</label>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-results">
+        {{ product_list }}
+    </div>
+
+</div>
+
+<script>
+    function searchProducts() {
+        $('.sppro-product-group-add .sp_search_results').html('');
+        if ($('.sppro-product-group-add .sp_animated_input_group.with_button input').val()) {
+            $('.sppro-product-group-add .sp_search_results').html('<div class="search-progress"><i class="fa fa-refresh"></i> {{ pg_btn_search }}...</div>');
+            $.ajax({
+                url: 'index.php?route=extension/module/sppro_product_group/searchProduct&user_token={{ user_token }}',
+                type: 'post',
+                data: getProductAddFormData(),
+                dataType: 'json',
+                success: function(json) {
+                    if (json['products']) {
+                        $('.sppro-product-group-add .sp_search_results').html('');
+                        products_html = '';
+                        for(i = 0; i < json['products'].length; i++) {
+                            if (json['products'][i]['active']) {
+                                checked = ' checked="checked"';
+                            } else {
+                                checked = '';
+                            }
+                            products_html += '<label class="sp_product_container">';
+                            products_html += '    <input type="checkbox" name="product_group_add_products[]" value="' + json['products'][i]['product_id'] + '" class="sp_checkbox_product_list_input" id="product-group-add-product-' + json['products'][i]['product_id'] + '"' + checked + '>';
+                            products_html += '    <div class="sp_mass_product_list_product_info">';
+                            products_html += '        <img src="' + json['products'][i]['image'] + '" alt="Product Image" class="sp_product_container_image">';
+                            products_html += '        <span class="sp_product_container_name">' + json['products'][i]['name'] + '<br><span class="sp_product_container_model">{{ txt_model }}:&nbsp;' + json['products'][i]['model'] + '</span></span>';
+                            products_html += '    </div>';
+                            products_html += '    <div class="sp_custom_checkbox">';
+                            products_html += '        <svg class="sp_checkout_icon"><use xlink:href="#checkout"></use></svg>';
+                            products_html += '        <svg class="sp_checkin_icon"><use xlink:href="#checkin"></use></svg>';
+                            products_html += '    </div>';
+                            products_html += '</label>';
+                        }
+                        if (products_html) {
+                            $('.sppro-product-group-add .sp_search_results').append('<div class="sp_mass_product_list">' + products_html + '</div>');
+                        }
+
+                        mass_footer = '<div class="sp_mass_product_list_info">';
+                        mass_footer += '<div class="sp_mass_product_list_info__info"><span>{{ txt_total_found }}: ' + json['products'].length + '</span><button type="button" class="select-all">{{ txt_btn_select_all }}</button></div>';
+
+                        if (products_html) {
+                            mass_footer += '<div class="sp_mass_product_list_info__added"><button type="button" class="button-add-products">{{ txt_btn_add_selected_product }}</button></div>';
+                        }
+                        mass_footer += '</div>';
+
+                        $('.sppro-product-group-add .sp_search_results').append(mass_footer);
+                    } else {
+                        sppgNotify('warning', '{{ txt_notify_search_error }}');
+                    }
+                }
+            });
+        } else {
+            sppgNotify('warning', '{{ txt_enter_name_or_model }}');
+        }
+    }
+
+    function addProductsBySearch() {
+        $('.sppro-product-group-add .alert').remove();
+        if ($('.sppro-product-group-add .sp_search_results .sp_product_container input:checked').length) {
+            addProducts();
+        } else {
+            sppgNotify('warning', '{{ txt_select_product }}');
+        }
+    }
+
+    function addProducts() {
+        data = getProductAddFormData();
+        $('.sppro-product-group-add .product-results').html('<i class="fa fa-refresh"></i> {{ txt_addit_product }}...');
+        $.ajax({
+            url: 'index.php?route=extension/module/sppro_product_group/addProducts&user_token={{ user_token }}',
+            data: data,
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+                console.log(json);
+                if (json['html']) {
+                    $('.sppro-product-group-add .product-results').html(json['html']);
+                    $('.sp_search_results').html('');
+                }
+            }
+        });
+    }
+
+    function addProductToGroup() {
+        $('.sppro-product-group-add .alert').remove();
+        $.ajax({
+            url: 'index.php?route=extension/module/sppro_product_group/addProductsToGroup&user_token={{ user_token }}',
+            data: getProductAddFormData(),
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+                if (json['success']) {
+                    sppgNotify('success', json['success']);
+                }
+                if (json['error']) {
+                    sppgNotify('warning', json['error']);
+                }
+            }
+        });
+    }
+
+    function removeProductsFromGroup() {
+        $('.sppro-product-group-add .alert').remove();
+        $.ajax({
+            url: 'index.php?route=extension/module/sppro_product_group/removeProductsFromGroup&user_token={{ user_token }}',
+            data: getProductAddFormData(),
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+                if (json['success']) {
+                    sppgNotify('success', json['success']);
+                }
+                if (json['error']) {
+                    sppgNotify('warning', json['error']);
+                }
+            }
+        });
+    }
+
+    function getProductAddFormData() {
+        return $('.sppro-product-group-add input[type=\'text\'], .sppro-product-group-add input[type=\'hidden\'], .sppro-product-group-add input[type=\'radio\']:checked, .sppro-product-group-add input[type=\'checkbox\']:checked, .sppro-product-group-add select, .sppro-product-group-add textarea');
+    }
+
+    function checkProductTableFoot() {
+        // if ($('.sppro-product-group-add .product-group-products .group-product').length) {
+        //     $('.sppro-product-group-add .product-group-products').show();
+        // } else {
+        //     $('.sppro-product-group-add .product-group-products').hide();
+        // }
+    }
+
+
+    $(document).on('click', '.sppro-product-group-add .btn_search_mass', searchProducts);
+    $(document).bind('keydown', '.sppro-product-group-add .input-sp_name_or_model', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            searchProducts();
+            return false;
+        }
+    });
+    $(document).on('click', '.sppro-product-group-add .button-add-products', addProductsBySearch);
+    $(document).on('click', '.sppro-product-group-add .button-add-products-to-group', addProductToGroup);
+    $(document).on('click', '.sppro-product-group-add .button-remove-products-from-group', removeProductsFromGroup);
+    $(document).on('click', '.sppro-product-group-add .select-all', function() {
+        if ($(this).hasClass('selected')) {
+            $('.sppro-product-group-add .sp_search_results .sp_mass_product_list .sp_product_container input').prop('checked', false);
+            $(this).removeClass('selected');
+            $('.select-all').html('{{ txt_btn_select_all }}');
+        } else {
+            $('.sppro-product-group-add .sp_search_results .sp_mass_product_list .sp_product_container input').prop('checked', true);
+            $(this).addClass('selected');
+            $('.select-all').html('{{ txt_btn_unselect_all }}');
+        }
+    });
+
+    $('.sppro-product-group-add input[name=\'product_group_search_by_model\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=extension/module/sppro_product_group/autocomplete&user_token={{ user_token }}&filter_model=' +  encodeURIComponent(request),
+                data: getProductAddFormData(),
+                dataType: 'json',
+                success: function(json) {
+                    response($.map(json, function(item) {
+                        return {
+                            label: item['model'],
+                            value: item['product_id'],
+                            product_id: item['product_id'],
+                            model: item['model'],
+                            image: item['image'],
+                            name: item['name'],
+                            edit: item['edit'],
+                        }
+                    }));
+                }
+            });
+        },
+        'select': function(item) {
+            $('.sppro-product-group-add .product-results').append('<input type="hidden" name="search_product_id" value="' + item.product_id + '">');
+            addProducts();
+            $('.sppro-product-group-add input[name=\'product_group_search_by_model\']').val('');
+        }
+    });
+
+    $('.sppro-product-group-add input[name=\'product_group_search_by_name\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=extension/module/sppro_product_group/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+                data: getProductAddFormData(),
+                dataType: 'json',
+                success: function(json) {
+                    response($.map(json, function(item) {
+                        return {
+                            label: item['name'],
+                            value: item['product_id'],
+                            product_id: item['product_id'],
+                            model: item['model'],
+                            image: item['image'],
+                            name: item['name'],
+                            edit: item['edit'],
+                        }
+                    }));
+                }
+            });
+        },
+        'select': function(item) {
+            $('.sppro-product-group-add .product-results').append('<input type="hidden" name="search_product_id" value="' + item.product_id + '">');
+            addProducts();
+            $('.sppro-product-group-add input[name=\'product_group_search_by_name\']').val('');
+        }
+    });
+
+</script>
+
+<div class="sppg_notify_block"></div>
+
+<script>
+    function sppgNotify(type, text) {
+        var icon = "fa fa-info";
+        var css = "";
+        switch (type) {
+            case"success":
+                icon = "sp-icon-notify-success";
+                css = "success";
+                break;
+            case"danger":
+                icon = "sp-icon-notify-danger";
+                css = "warning";
+                break;
+            case"warning":
+                icon = "sp-icon-notify-warning"
+                css = "warning"
+        }
+        var randomNumber = Math.floor(Math.random() * 100);
+        $('.sppg_notify_block').append('<div id="sp_alert_' + randomNumber + '" class="sp_notify_alert ' + css + '"><div class="sp_notify_alert__icon"><svg><use xlink:href="#' + icon + '"></use></svg></div><div class="sp_notify_alert__message">' + text + '</div></div>');
+        setTimeout(function () {
+            $('#sp_alert_' + randomNumber).addClass('hide');
+            setTimeout(function () {
+                $('#sp_alert_' + randomNumber).remove();
+            }, 2000);
+        }, 5000);
+    }
+</script>
+
+<div style="display:none;position:absolute;left:-9999px;">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <symbol xmlns="http://www.w3.org/2000/svg" id="checkout" viewBox="0 -960 960 960">
+            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Z"/>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="checkin" viewBox="0 -960 960 960">
+            <path d="m424-312 282-282-56-56-226 226-114-114-56 56 170 170ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/>
+        </symbol>
+        <symbol id="sp-icon-notify-success" viewBox="0 0 32 32">
+            <g fill="none" fill-rule="evenodd">
+                <circle fill="#5AE4AA" cx="16" cy="16" r="16"/>
+                <path d="M15.484 23.544V12.83c0-.572.374-.858.99-.858.594 0 1.012.286 1.012.858v10.714c0 .594-.418.88-1.012.88-.616 0-.99-.286-.99-.88zM16.496 7a1.46 1.46 0 0 1 1.474 1.474c0 .858-.66 1.496-1.474 1.496A1.47 1.47 0 0 1 15 8.474C15 7.638 15.66 7 16.496 7z" fill="#383838" fill-rule="nonzero"/>
+            </g>
+        </symbol>
+        <symbol id="sp-icon-notify-warning" viewBox="0 0 35.94 31.63">
+            <path fill="#ffd600" fill-rule="evenodd" d="M19.06,.81c-.62-1.08-1.64-1.08-2.26,0L.24,29.47c-.63,1.07,.04,2.16,1.28,2.16H34.66c1.24,0,1.6-1.09,.98-2.16L19.06,.81Z"/>
+            <path fill="#383838" fill-rule="evenodd" d="M16.45,24.75c0-.83,.68-1.51,1.51-1.51,.83,0,1.51,.68,1.51,1.51,0,.83-.68,1.51-1.51,1.51-.83,0-1.51-.67-1.51-1.5,0,0,0,0,0,0m2.04-3.38c-.03,.29-1.04,.25-1.07,0l-.98-9.93c-.08-.83,.52-1.57,1.36-1.66s1.57,.52,1.66,1.36c.01,.1,.01,.2,0,.3l-.98,9.93h0Z"/>
+        </symbol>
+        <symbol id="sp-icon-notify-danger" viewBox="0 0 37 33">
+            <g fill="none" fill-rule="evenodd">
+                <path d="M19.61 1.677C18.987.6 17.971.6 17.35 1.677L.79 30.339C.165 31.414.826 32.5 2.067 32.5H35.21c1.243 0 1.6-1.086.978-2.161L19.61 1.677z" fill="#FA6767"/>
+                <path d="M17.002 25.617a1.508 1.508 0 1 1 1.507 1.51 1.506 1.506 0 0 1-1.507-1.51M19.042 22.24c-.03.292-1.04.248-1.065 0l-.975-9.931a1.515 1.515 0 1 1 3.015 0l-.975 9.932z" fill="#383838"/>
+            </g>
+        </symbol>
+    </svg>
+</div>

@@ -1,0 +1,362 @@
+<div class="oc">
+	<div class="oneclick_wrapper">
+		<div class="oc-head">
+				{{ heading }}
+				<div class="oc_head_label">{{ text_oc_head_label}}</div>
+		</div>
+		<div class="oc-body">			
+				{% if show_images %}
+				<div class="oc-images">
+						<div class="oc-main-image">
+								<img src="{{ thumb }}" alt="" />
+						</div>
+						{% if images %}
+						<div class="oc-thumbs">
+						{% for image in images %}
+							<img src="{{ image.thumb }}" alt="" title="" onclick="oc_set_main_image('{{ image.popup }}', $(this)); return true;"{% if loop.index ==  1%} class="active"{% endif %} />
+							{% if loop.index%1 ==  0 %}<br />{% endif %}
+						{% endfor %}
+						</div>
+						{% endif %}
+				</div>
+		{% endif %}
+
+		{% if product_options_allowed  and  show_options  and  options %}
+			<div class="oc-options hidden">
+				<h3 class="oc-options-title">{{ options_title }}</h3>
+				{% for option in options %}
+						
+						{% if option.type  ==  'select' %}
+							<div id="oc-option-{{ option.product_option_id }}" class="oc-option">
+								<select onchange="oc_update();" name="option[{{ option.product_option_id }}]" class="oc-control">
+									<option value="">{% if option.required  %}* {% endif %}{{ option.name }}</option>
+									{% for option_value in option.product_option_value %}
+										<option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}
+											{% if option_value.price  %}
+												({{ option_value.price_prefix }}{{ option_value.price }})
+											{% endif %}
+										</option>
+									{% endfor %}
+								</select>
+							</div>
+						{% endif %}
+						
+						{% if option.type  ==  'text' %}
+						<div id="oc-option-{{ option.product_option_id }}" class="oc-option">
+							<label for="" class="oc-option-title">{% if option.required  %}* {% endif %}{{ option.name }}</label>
+							<input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" placeholder="{% if option.required  %}* {% endif %}}{{ option.name }}" class="oc-control" />
+						</div>
+						{% endif %}
+
+						{% if option.type  ==  'textarea' %}
+						<div id="oc-option-{{ option.product_option_id }}" class="oc-option">
+							<label for="oc-option-{{ option.product_option_id }}" class="oc-option-title">{% if option.required  %}* {% endif %}}{{ option.name }}</label>
+							<textarea name="option[{{ option.product_option_id }}]" placeholder="{% if option.required  %}* {% endif %}}{{ option.name }}" class="oc-control" id="oc-option-{{ option.product_option_id }}">{{ option.value }}</textarea>
+						</div>
+						{% endif %}
+
+						{% if option.type  ==  'radio' %}
+						<label class="oc-option-title">{% if option.required %}<span class="required">*</span>{% endif %}{{ option.name }}</label>
+						<table id="oc-option-{{ option.product_option_id }}" class="oc-option">
+							<tbody>
+								{% for option_value in option.product_option_value %}
+								<tr>
+									<td class="input-td">
+									<input onchange="oc_update();" type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" id="oc-option-value-{{ option_value.product_option_value_id }}" />
+									</td>
+									<td>
+										<label for="oc-option-value-{{ option_value.product_option_value_id }}">
+											{{ option_value.name }}
+										</label>
+									</td>
+									<td class="oc-text-right">
+										{% if option_value.price  %}
+											{{ option_value.price_prefix }}{{ option_value.price }}
+										{% endif %}
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+						{% endif %}
+
+						{% if option.type  ==  'checkbox' %}
+						<label class="oc-option-title">{% if option.required  %}<span class="required">*</span>{% endif %}{{ option.name }}</label>
+						<table id="oc-option-{{ option.product_option_id }}" class="oc-option">
+							<tbody>
+								{% for option_value in option.product_option_value %}
+								<tr>
+									<td class="input-td">
+									<input
+										onchange="oc_update();"
+										type="checkbox"
+										name="option[{{ option.product_option_id }}][]"
+										value="{{ option_value.product_option_value_id }}"
+										id="oc-option-value-{{ option_value.product_option_value_id }}"
+									/>
+									</td>
+									<td>
+										<label for="oc-option-value-{{ option_value.product_option_value_id }}">
+											{{ option_value.name }}
+										</label>
+									</td>
+									<td class="oc-text-right">
+										{% if option_value.price  %}
+											{{ option_value.price_prefix }}{{ option_value.price }}
+										{% endif %}
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+						{% endif %}
+
+						{% if option.type  ==  'image' %}
+						<label class="oc-option-title">{% if option.required  %}<span class="required">*</span>{% endif %}{{ option.name }}</label>
+						 <table id="oc-option-{{ option.product_option_id }}">
+							<tbody>
+								{% for option_value in option.product_option_value %}
+								<tr>
+									<td class="input-td">
+									<input
+										onchange="oc_update();"
+										type="radio"
+										name="option[{{ option.product_option_id }}]"
+										value="{{ option_value.product_option_value_id }}"
+										id="oc-option-value-{{ option_value.product_option_value_id }}"
+									/>
+									</td>
+									<td style="width:{% if option_images_width  %}{{ option_images_width }}{% else %}{{ '50px' }}{% endif %};">
+										<label for="oc-option-value-{{ option_value.product_option_value_id }}">
+										<img src="{{ option_value.image }}" alt="{{ option_value.name ~ option_value.price }}" />
+										</label>
+									</td>
+									<td>
+										<label for="oc-option-value-{{ option_value.product_option_value_id }}" style="float: left;">
+											{{ option_value.name }}
+										</label>
+									</td>
+									<td>
+										<label for="oc-option-value-{{ option_value.product_option_value_id }}" style="float: right;">
+											{% if option_value.price  %}
+												{{ option_value.price_prefix }}{{ option_value.price }}
+											{% endif %}
+										</label>
+									</td>
+								</tr>
+								{% endfor %}
+								
+							</tbody>
+						</table>
+						{% endif %}
+
+						{% if option.type  ==  'date' %}
+							<label class="oc-option-title">{% if option.required  %}* {% endif %}{{ option.name }}</label>
+							<div id="oc-option-{{ option.product_option_id }}" class="oc-option">
+								<input
+									type="text"
+									name="option[{{ option.product_option_id }}]"
+									value="{{ option.value }}"
+									class="date_input oc-control"
+									data-date-format="YYYY-MM-DD"
+									placeholder="{% if option.required  %}* {% endif %}{{ option.name }}"
+									onfocus="$(this).datetimepicker( { pickTime: false } );"
+								/>
+							</div>
+						{% endif %}
+
+						{% if option.type  ==  'datetime' %}
+							<label class="oc-option-title">{% if option.required  %}* {% endif %}{{ option.name }}</label>
+							<div id="oc-option-{{ option.product_option_id }}" class="oc-option">
+								<input
+									type="text"
+									name="option[{{ option.product_option_id }}]"
+									value="{{ option.value }}"
+									class="datetime_input oc-control"
+									data-date-format="YYYY-MM-DD HH:mm"
+									placeholder="{% if option.required  %}* {% endif %}{{ option.name }}"
+									onfocus="$(this).datetimepicker( { pickDate: true, pickTime: true } );"
+								/>
+							</div>
+						{% endif %}
+
+						{% if option.type  ==  'time' %}
+							<label class="oc-option-title">{% if option.required  %}* {% endif %}}{{ option.name }}</label>
+							<div id="oc-option-{{ option.product_option_id }}" class="oc-option">
+								<input
+									type="text"
+									name="option[{{ option.product_option_id }}]"
+									value="{{ option.value }}"
+									class="time_input oc-control"
+									data-date-format="HH:mm"
+									placeholder="{% if option.required  %}* {% endif %}{{ option.name }}"
+									onfocus="$(this).datetimepicker( { pickDate: false } );"
+								/>
+							</div>
+						{% endif %}
+
+				{% endfor %}
+			</div>
+		{% endif %}
+
+{#			<div class="oc-price-wrap clearfix">				
+ 				<div class="oc-popup-name">
+					<div class="oc-pname">{{ name }}</div>
+					{% if not stock_checkout  and  quantity <= 0 %}
+					<p>
+						<span class="oc-stock">{{ no_in_stock_text }}</span>
+					</p>
+					{% endif %}
+					{% if show_description%}
+					<a onclick="oc_descr();return true;" class="oc-show-descr">{{ description_show_text }}</a>
+					<div class="oc-description">
+							<ul class="list-unstyled">
+									{% if manufacturer %}
+									<li>{{ text_manufacturer }} <a href="{{ manufacturers }}">{{ manufacturer }}</a></li>
+									{% endif %}
+									<li>{{ text_model }} {{ model }}</li>
+									{% if reward %}
+									<li>{{ text_reward }} {{ reward }}</li>
+									{% endif %}
+									<li>{{ text_stock }} {{ stock }}</li>
+							</ul>
+							<div>
+									{{ description }}
+							</div>
+					</div>
+					{% endif %}
+				</div>	
+
+				<div class="oc-group oc-qty">
+					<button onclick="$(this).next().val(~~$(this).next().val()+1);oc_update_price();" id="increase_quantity">+</button>
+						<input type="text" name="quantity" value="1" class="oc-control" id="spiner_quantity" />
+					<button onclick="$(this).prev().val(~~$(this).prev().val()-1);oc_update_price();" id="decrease_quantity">&mdash;</button>
+				</div> 
+						
+				{% if price %}
+					<div class="oc-price">
+					
+							{% if not special %}
+								<span>{{ price }}</span>
+							{% else %}
+								<span class="oc-special">{{ price }}</span>
+								<span>{{ special }}</span>
+							{% endif %}
+								
+							{% if discounts %}
+								<ul class="oc-discounts">
+								{% for discount in discounts %}
+									<li>
+										{{ discount.quantity }}{{ text_discount }}{{ discount.price }}
+									</li>
+								{% endfor %}
+								</ul>
+							{% endif %}
+					</div>
+				{% endif %}
+	
+			</div>#}
+		
+			{# <div class="row"> #}
+			<div class="inputs_box">
+				{% if fields.firstname.status%}
+				{# <div class="col-sm-6"> #}
+				<div>
+				<div class="oc-form-group oc-firstname{% if fields.firstname.required %} oc-required{% endif %}">
+						{% if show_field_title %}<label for="control-firstname" class="control-label">{{ fields[lang_code]['firstname_title'] }}</label>{% endif %}
+						<input type="text" name="firstname" value="" placeholder="{{ fields[lang_code]['firstname_placeholder'] }}" class="oc-control" id="control-firstname" />
+				</div>
+				</div>
+				{% endif %}
+
+				{% if fields.lastname.status %}
+				<div class="col-sm-6">
+				<div class="oc-form-group oc-lastname{% if fields.lastname.required%} oc-required{% endif %}">
+						{% if show_field_title %}<label for="control-lastname" class="control-label">{{ fields[lang_code]['lastname_title'] }}</label>{% endif %}
+						<input type="text" name="lastname" value="" placeholder="{{ fields[lang_code]['lastname_placeholder'] }}" class="oc-control" id="control-lastname" />
+				</div>
+				</div>
+				{% endif %}
+
+				{% if fields.email.status %}
+				<div class="col-sm-6">
+				<div class="oc-form-group oc-email{% if fields.email.required%} oc-required{% endif %}">
+						{% if show_field_title %}<label for="control-email" class="control-label">{{ fields[lang_code]['email_title'] }}</label>{% endif %}
+						<input type="text" name="email" value="" placeholder="{{ fields[lang_code]['email_placeholder'] }}" class="oc-control" id="control-email" />
+				</div>
+				</div>
+				{% endif %}
+
+				{% if fields.telephone.status %}
+				{# <div class="col-sm-6"> #}
+				<div>
+				<div class="oc-form-group oc-telephone{% if fields.telephone.required%} oc-required{% endif %}">
+						{% if show_field_title %}<label for="control-telephone" class="control-label">{{ fields[lang_code]['telephone_title'] }}</label>{% endif %}
+						<input type="text" name="telephone" value="" placeholder="{{ fields[lang_code]['telephone_placeholder'] }}" class="oc-control phone-mask" id="control-telephone" />
+				</div>
+				</div>
+				{% endif %}
+			</div>
+
+				{% if fields.address_1.status %}
+				<div class="oc-form-group oc-address_1{% if fields.address_1.required%} oc-required{% endif %}">
+						{% if show_field_title %}<label for="control-address_1" class="control-label">{{ fields[lang_code]['address_1_title'] }}</label>{% endif %}
+						<input type="text" name="address_1" value="" placeholder="{{ fields[lang_code]['address_1_placeholder'] }}" class="oc-control" id="control-address_1" />
+				</div>
+				{% endif %}
+				{% if fields.comment.status %}
+				<div class="oc-form-group oc-comment{% if fields.comment.required%} oc-required{% endif %}">
+						{% if show_field_title %}<label for="control-comment" class="control-label">{{ fields[lang_code]['comment_title'] }}</label>{% endif %}
+						<textarea name="comment" placeholder="{{ fields[lang_code]['comment_placeholder'] }}" class="oc-control" rows="3" id="control-comment"></textarea>
+				</div>
+				{% endif %}
+
+				<input type="hidden" name="product_id" value="{{ product_id }}" />
+		</div>
+		<div class="oc-footer">
+			{% if (not stock_checkout  and  quantity > 0) or stock_checkout %}
+
+				{% if agree%}
+					<p><label><input type="checkbox" name="agree" value="1" /> {{ agree }}</label></p>
+				{% endif %}
+
+				<div class="row-buttons">
+					{% if price %}
+					<div class="oc-total">
+							{{ total_title }}: 
+							<span>
+								{% if not special %}
+										{{ price }}
+									 {% else %}
+										{{ special }}
+								{% endif %}
+							</span>
+					</div>
+					{% endif %}
+
+					<button id="oc_submit" class="btn btn-success" onclick="oc_submit();">{{ order_button_text }}</button>
+
+				</div>
+				<div class="clearfix"></div>
+
+			{% endif %}
+		</div>
+	</div>	
+</div>
+<script src="catalog/view/javascript/imask.js"></script>
+
+<script>
+document.querySelectorAll('.phone-mask') && document.querySelectorAll('.phone-mask').forEach(elem => IMask(elem, {
+    mask: `+{38} (\\0code) 000-00-00`,
+    lazy: false,
+    placeholderChar: '_',
+    blocks: {
+      code: {
+        mask: IMask.MaskedEnum,
+        enum: [
+          '44','50','63','65','66','67','68','69','73','93','94','95','96','97','98','99',
+        ]
+      }
+    }
+  }))
+</script>

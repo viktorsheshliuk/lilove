@@ -1,0 +1,103 @@
+{% if product_groups %}
+    <div class="product-groups">
+        {% for product_group in product_groups %}
+            <div class="product-group">
+                {% if product_group.title_status %}
+                    {% set group_current_item_name = '' %}
+                    {% for product in product_group.products %}
+                        {% if product.product_id == product_id %}
+                            {% set group_current_item_name = ': ' ~ product.name_in_group %}
+                        {% endif %}
+                    {% endfor %}
+                    <div class="product-group-name">{{ product_group.name }}{{ group_current_item_name }}</div>
+                {% endif %}
+                <div class="product-group-products">
+                    {% if product_group.type == 'select' %}
+                        <div class="product-group-select">
+                            <div class="product-group-select-current">
+                                {% for product in product_group.products %}
+                                    {% if product.product_id == product_id %}
+                                        <div class="product-group-select-option">
+                                            <div class="product-group-select-option-image">
+                                                <img src="{{ product.image_small_select }}" alt="{{ product.name }}" title="{{ product.name }}" >
+                                            </div>
+                                            <div class="product-group-select-option-name">{{ product.name_in_group }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='2.5 5.5 11 6.21' width="10px" height="10px">
+                                    <path fill='#000' d='M3.354 5.646a.5.5 0 1 0-.708.708l.708-.708ZM8 11l-.354.354.354.353.354-.353L8 11Zm5.354-4.646a.5.5 0 0 0-.708-.708l.708.708Zm-10.708 0 5 5 .708-.708-5-5-.708.708Zm5.708 5 5-5-.708-.708-5 5 .708.708Z'/>
+                                </svg>
+                            </div>
+                            <div class="product-group-select-options">
+                                {% for product in product_group.products %}
+                                    <a class="product-group-select-option {% if product.product_id == product_id %}current{% endif %}" href="{{ product.href }}" data-product="{{ product.product_id }}">
+                                        <div class="product-group-select-option-image">
+                                            <img src="{{ product.image_small_select }}" alt="{{ product.name }}" title="{{ product.name }}" >
+                                        </div>
+                                        <div class="product-group-select-option-name">{{ product.name_in_group }}</div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        {% for product in product_group.products %}
+                            <div class="product-group-product{% if product.product_id == product_id %} current{% endif%}{% if product.disabled %} disabled{% endif %}{% if product.quantity == 0 %} out-of-stock{% endif %}">
+
+                                {% if product_group.type == 'product' %}
+                                    <a class="group-image" href="{{ product.href }}">
+                                        <img src="{{ product.attr_image ?: product.image_small }}" alt="{{ product.name }}" title="{{ product.name }}" >
+                                    </a>
+                                {% endif %}
+
+                                {% if product_group.type == 'color' %}
+                                    <a class="group-color {% if product.second_color %}two-colors{% endif%}" href="{{ product.href }}">
+                                        <div class="padding-wrap">
+                                            <div class="first-color" style="background-color: {{ product.first_color }};"></div>
+                                            {% if product.second_color %}
+                                                <div class="second-color" style="background-color: {{ product.second_color }};"></div>
+                                            {% endif%}
+                                        </div>
+                                    </a>
+                                {% endif %}
+
+                                {% if product_group.type == 'text' %}
+                                    <a class="group-text" href="{{ product.href }}">{{ product.name_in_group }}</a>
+                                {% endif %}
+
+                                {% if product_group.help == 'product' %}
+                                    <div class="product-group-product-popup">
+                                        <div class="product-group-product-popup-info">
+                                            <div class="popup-image">
+                                                <img src="{{ product.image_big }}" alt="{{ product.name }}" title="{{ product.name }}" >
+                                            </div>
+                                            <div class="price">
+                                                {% if product.quantity > 0 %}
+                                                    {% if product.special %}
+                                                        <div class="actual-price">{{ product.special }}</div>
+                                                        <div class="old-price">{{ product.price }}</div>
+                                                    {% else %}
+                                                        <div class="actual-price">{{ product.price }}</div>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <div class="out-of-stock">{{ product.stock_status }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if product_group.help == 'value' %}
+                                    {% if product.name_in_group %}
+                                        <div class="product-group-product-popup">
+                                            <div class="product-group-product-popup-text">{{ product.name_in_group }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

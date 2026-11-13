@@ -1,0 +1,1178 @@
+<?php
+class ControllerExtensionModuleTdblog extends Controller {
+	private $error = array();
+
+	public function index() {
+		$this->load->language('extension/module/tdblog');
+		$this->load->model('tdmodules/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('setting/module');
+
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+			if (!isset($this->request->get['module_id'])) {
+				$module_id = $this->model_tdmodules_tdblog->addModule('tdblog', $this->request->post);
+
+				$this->session->data['success'] = $this->language->get('text_success');
+
+				$this->response->redirect($this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $module_id, true));
+			} else {
+				$this->model_setting_module->editModule($this->request->get['module_id'], $this->request->post);
+
+				$this->session->data['success'] = $this->language->get('text_success');
+
+				/* Custom Code for Save & Stay */
+				if (isset($this->request->post['saveandstay'])) {
+					$get = explode("/", $this->request->get['route']);
+					$folder = $get[0];
+					$file = $get[1];
+
+					if ($file == 'user_permission') {
+						$table = 'user_group';
+					} else {
+						$table = $file;
+					}
+
+					$this->load->model('tdmodules/product');
+					$last_id = $this->model_tdmodules_product->getLastInsertID($table);
+
+					$editroute = $folder.'/'.$file.'/tdblog';
+
+					if (!isset($url)) {
+						$url = "";
+					}
+
+					if ((isset($this->request->get[$table.'_id']) || $last_id)) {
+						$url .= '&'.$table.'_id='.(isset($this->request->get[$table.'_id']) ? $this->request->get[$table.'_id'] : $last_id);
+					}
+
+					if ($this->request->post['saveandstay']) {
+						$this->response->redirect($this->url->link($editroute, 'user_token='.$this->session->data['user_token'].$url, 'SSL'));
+					}
+				}
+				/* Custom Code for Save & Stay */
+
+				$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true));
+			}
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['text_view_list'] = sprintf($this->language->get('text_view_list'), $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true));
+		} else {
+			$data['text_view_list'] = sprintf($this->language->get('text_view_list'), $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true));
+		}
+
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+
+		if (isset($this->error['name'])) {
+			$data['error_name'] = $this->error['name'];
+		} else {
+			$data['error_name'] = '';
+		}
+
+		if (isset($this->error['width'])) {
+			$data['error_width'] = $this->error['width'];
+		} else {
+			$data['error_width'] = '';
+		}
+
+		if (isset($this->error['height'])) {
+			$data['error_height'] = $this->error['height'];
+		} else {
+			$data['error_height'] = '';
+		}
+
+		if (isset($this->session->data['success'])) {
+			$data['success'] = $this->session->data['success'];
+
+			unset($this->session->data['success']);
+		} else {
+			$data['success'] = '';
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true)
+		);
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'], true)
+			);
+		} else {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+			);
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['action'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'], true);
+		} else {
+			$data['action'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+		}
+
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true);
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['add_blog'] = '';
+		} elseif (!$this->request->get['module_id']) {
+			$data['add_blog'] = '';
+		} else {
+			$data['add_blog'] = $this->url->link('extension/module/tdblog/add', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+		}
+
+		if (isset($this->request->get['module_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
+			$module_info = $this->model_setting_module->getModule($this->request->get['module_id']);
+		}
+
+		if (isset($this->request->post['module_id'])) {
+			$data['module_id'] = $this->request->post['module_id'];
+		} elseif (isset($this->request->get['module_id'])) {
+			$data['module_id'] = $this->request->get['module_id'];
+		} elseif (!empty($module_info)) {
+			$data['module_id'] = $module_info['module_id'];
+		} else {
+			$data['module_id'] = '';
+		}
+
+		if (isset($this->request->post['name'])) {
+			$data['name'] = $this->request->post['name'];
+		} elseif (!empty($module_info)) {
+			$data['name'] = $module_info['name'];
+		} else {
+			$data['name'] = '';
+		}
+
+		if (isset($this->request->post['status'])) {
+			$data['status'] = $this->request->post['status'];
+		} elseif (!empty($module_info)) {
+			$data['status'] = $module_info['status'];
+		} else {
+			$data['status'] = '';
+		}
+
+		if (isset($this->request->post['width'])) {
+			$data['width'] = $this->request->post['width'];
+		} elseif (!empty($module_info)) {
+			$data['width'] = $module_info['width'];
+		} else {
+			$data['width'] = 80;
+		}
+
+		if (isset($this->request->post['height'])) {
+			$data['height'] = $this->request->post['height'];
+		} elseif (!empty($module_info)) {
+			$data['height'] = $module_info['height'];
+		} else {
+			$data['height'] = 80;
+		}
+
+		if (isset($this->request->post['limit'])) {
+			$data['limit'] = $this->request->post['limit'];
+		} elseif (!empty($module_info)) {
+			$data['limit'] = $module_info['limit'];
+		} else {
+			$data['limit'] = 5;
+		}
+
+		if (isset($this->request->post['char_limit'])) {
+			$data['char_limit'] = $this->request->post['char_limit'];
+		} elseif (!empty($module_info)) {
+			$data['char_limit'] = $module_info['char_limit'];
+		} else {
+			$data['char_limit'] = 50;
+		}
+
+		if (isset($this->request->post['navigation'])) {
+			$data['navigation'] = $this->request->post['navigation'];
+		} elseif (!empty($module_info)) {
+			$data['navigation'] = $module_info['navigation'];
+		} else {
+			$data['navigation'] = 1;
+		}
+
+		if (isset($this->request->post['pagination'])) {
+			$data['pagination'] = $this->request->post['pagination'];
+		} elseif (!empty($module_info)) {
+			$data['pagination'] = $module_info['pagination'];
+		} else {
+			$data['pagination'] = 0;
+		}
+
+		if (isset($this->request->post['auto'])) {
+			$data['auto'] = $this->request->post['auto'];
+		} elseif (!empty($module_info)) {
+			$data['auto'] = $module_info['auto'];
+		} else {
+			$data['auto'] = '';
+		}
+
+		if (isset($this->request->post['speed'])) {
+			$data['speed'] = $this->request->post['speed'];
+		} elseif (!empty($module_info)) {
+			$data['speed'] = $module_info['speed'];
+		} else {
+			$data['speed'] = 2000;
+		}
+
+		if (isset($this->request->post['comments'])) {
+			$data['comments'] = $this->request->post['comments'];
+		} elseif (!empty($module_info)) {
+			$data['comments'] = $module_info['comments'];
+		} else {
+			$data['comments'] = '';
+		}
+
+		if (isset($this->request->post['login'])) {
+			$data['login'] = $this->request->post['login'];
+		} elseif (!empty($module_info)) {
+			$data['login'] = $module_info['login'];
+		} else {
+			$data['login'] = '';
+		}
+
+		if (isset($this->request->post['auto_approve'])) {
+			$data['auto_approve'] = $this->request->post['auto_approve'];
+		} elseif (!empty($module_info)) {
+			$data['auto_approve'] = $module_info['auto_approve'];
+		} else {
+			$data['auto_approve'] = '';
+		}
+
+		$data['tdblog_entries'] = array();
+
+		if (!isset($this->request->get['module_id'])) {
+			$results = array();
+		} else {
+			$results = $this->model_tdmodules_tdblog->getBlogsByModule($this->request->get['module_id']);
+		}
+
+		if ($results) {
+			foreach ($results as $result) {
+				$total_comments = $this->model_tdmodules_tdblog->getTotalBlogComments($result['tdblog_id']);
+
+				$data['tdblog_entries'][] = array(
+					'tdblog_id'     => $result['tdblog_id'],
+					'title'          => $result['title'],
+					'module_id'      => $result['module_id'],
+					'total_comments' => number_format($total_comments),
+					'status'         => ($result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled')),
+					'date_added'     => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
+					'comments'       => $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $result['tdblog_id'] . '&module_id=' . $this->request->get['module_id'], true),
+					'edit'           => $this->url->link('extension/module/tdblog/edit', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $result['tdblog_id'] . '&module_id=' . $this->request->get['module_id'], true),
+					'delete'         => $this->url->link('extension/module/tdblog/delete', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $result['tdblog_id'] . '&module_id=' . $this->request->get['module_id'], true)
+				);
+			}
+		}
+
+		$this->document->addStyle('view/stylesheet/admin-styles.css');
+
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdblog', $data));
+	}
+
+	protected function validate() {
+		if (!$this->user->hasPermission('modify', 'extension/module/tdblog')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+			$this->error['name'] = $this->language->get('error_name');
+		}
+
+		if (!$this->request->post['width']) {
+			$this->error['width'] = $this->language->get('error_width');
+		}
+
+		if (!$this->request->post['height']) {
+			$this->error['height'] = $this->language->get('error_height');
+		}
+
+		return !$this->error;
+	}
+
+	public function install() {
+		$this->load->model('tdmodules/tdblog');
+
+		$this->model_tdmodules_tdblog->createBlogs();
+	}
+
+	public function uninstall() {
+		$this->load->model('tdmodules/tdblog');
+
+		$this->model_tdmodules_tdblog->dropBlogs();
+	}
+
+	public function add() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+			$this->model_tdmodules_tdblog->addBlog($this->request->post, $this->request->post['module_id']);
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$this->response->redirect($this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->post['module_id'], true));
+		}
+
+		$this->getForm();
+	}
+
+	public function edit() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+			$this->model_tdmodules_tdblog->editBlog($this->request->get['tdblog_id'], $this->request->post);
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$this->response->redirect($this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->post['module_id'], true));
+		}
+
+		$this->getForm();
+	}
+
+	public function delete() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		if (isset($this->request->post['selected']) && $this->validateDelete()) {
+			foreach ($this->request->post['selected'] as $tdblog_id) {
+				$this->model_tdmodules_tdblog->deleteBlog($tdblog_id);
+			}
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$url = '';
+
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+
+			$this->response->redirect($this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . $url, true));
+		} elseif ((isset($this->request->get['tdblog_id']) && isset($this->request->get['delete'])) && $this->validateDelete()) {
+			$this->model_tdmodules_tdblog->deleteBlog($this->request->get['tdblog_id']);
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+		$this->response->redirect($this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true));
+		}else{
+		$this->model_tdmodules_tdblog->deleteBlog($this->request->get['tdblog_id']);
+		$this->session->data['success'] = $this->language->get('text_success');
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$this->response->redirect($this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true));
+		} else {
+			$this->response->redirect($this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true));
+		}
+	}
+
+	protected function getForm() {
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+
+		if (isset($this->error['title'])) {
+			$data['error_title'] = $this->error['title'];
+		} else {
+			$data['error_title'] = array();
+		}
+
+		if (isset($this->error['description'])) {
+			$data['error_description'] = $this->error['description'];
+		} else {
+			$data['error_description'] = array();
+		}
+
+		if (isset($this->error['module'])) {
+			$data['error_module'] = $this->error['module'];
+		} else {
+			$data['error_module'] = '';
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true)
+		);
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true)
+			);
+		} else {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+			);
+		}
+
+		if (!isset($this->request->get['tdblog_id'])) {
+			$data['action'] = $this->url->link('extension/module/tdblog/add', 'user_token=' . $this->session->data['user_token'], true);
+		} else {
+			$data['action'] = $this->url->link('extension/module/tdblog/edit', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+		}
+
+		if (isset($this->request->get['tdblog_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
+			$tdblog_info = $this->model_tdmodules_tdblog->getBlog($this->request->get['tdblog_id']);
+		}
+
+		if (isset($this->request->post['module_id'])) {
+			$data['cancel'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->post['module_id'], true);
+		} elseif (isset($this->request->get['module_id'])) {
+			$data['cancel'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+		} elseif (!empty($tdblog_info)) {
+			$data['cancel'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $tdblog_info['module_id'], true);
+		} else {
+			$data['cancel'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token']. '&type=module', true);
+		}
+
+		$data['user_token'] = $this->session->data['user_token'];
+
+		$this->load->model('localisation/language');
+
+		$data['languages'] = $this->model_localisation_language->getLanguages();
+
+		if (isset($this->request->post['tdblog_description'])) {
+			$data['tdblog_description'] = $this->request->post['tdblog_description'];
+		} elseif (isset($this->request->get['tdblog_id'])) {
+			$data['tdblog_description'] = $this->model_tdmodules_tdblog->getBlogDescriptions($this->request->get['tdblog_id']);
+		} else {
+			$data['tdblog_description'] = array();
+		}
+
+		if (isset($this->request->post['status'])) {
+			$data['status'] = $this->request->post['status'];
+		} elseif (!empty($tdblog_info)) {
+			$data['status'] = $tdblog_info['status'];
+		} else {
+			$data['status'] = 1;
+		}
+
+		if (isset($this->request->post['module_id'])) {
+			$data['module_id'] = $this->request->post['module_id'];
+		} elseif (isset($this->request->get['tdblog_id']) && !empty($tdblog_info)) {
+			$data['module_id'] = $tdblog_info['module_id'];
+		} elseif (isset($this->request->get['module_id'])) {
+			$data['module_id'] = $this->request->get['module_id'];
+		} else {
+			$data['module_id'] = '';
+		}
+
+		if (isset($this->request->post['image'])) {
+			$data['image'] = $this->request->post['image'];
+		} elseif (!empty($tdblog_info)) {
+			$data['image'] = $tdblog_info['image'];
+		} else {
+			$data['image'] = '';
+		}
+
+		$this->load->model('tool/image');
+
+		if (isset($this->request->post['image']) && is_file(DIR_IMAGE . $this->request->post['image'])) {
+			$data['thumb'] = $this->model_tool_image->resize($this->request->post['image'], 100, 100);
+		} elseif (!empty($tdblog_info) && is_file(DIR_IMAGE . $tdblog_info['image'])) {
+			$data['thumb'] = $this->model_tool_image->resize($tdblog_info['image'], 100, 100);
+		} else {
+			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
+		}
+
+		$data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
+
+		$this->load->model('setting/module');
+
+		$data['tdblog_modules'] = array();
+
+		$modules = $this->model_setting_module->getModulesByCode('tdblog');
+
+		foreach ($modules as $module) {
+			if (!isset($data['tdblog_modules'][$module['code']])) {
+				$data['tdblog_modules'][$module['code']]['name'] = $this->language->get('page_title');
+			}
+
+			$data['tdblog_modules'][$module['code']]['module'][] = array(
+				'module_id' => $module['module_id'],
+				'name'      => $module['name']
+			);
+		}
+
+		$this->document->addStyle('view/stylesheet/admin-styles.css');
+
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdblog/form', $data));
+	}
+
+	protected function validateForm() {
+		if (!$this->user->hasPermission('modify', 'extension/module/tdblog')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		foreach ($this->request->post['tdblog_description'] as $language_id => $value) {
+			if ((utf8_strlen($value['title']) < 3) || (utf8_strlen($value['title']) > 64)) {
+				$this->error['title'][$language_id] = $this->language->get('error_title');
+			}
+
+			if (utf8_strlen($value['description']) < 3) {
+				$this->error['description'][$language_id] = $this->language->get('error_description');
+			}
+		}
+
+		if (!$this->request->post['module_id']) {
+			$this->error['module'] = $this->language->get('error_module');
+		}
+
+		if ($this->error && !isset($this->error['warning'])) {
+			$this->error['warning'] = $this->language->get('error_warning');
+		}
+
+		return !$this->error;
+	}
+
+	protected function validateDelete() {
+		if (!$this->user->hasPermission('modify', 'extension/module/tdblog')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		return !$this->error;
+	}
+
+	public function view_list() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		$this->getlist();
+	}
+
+	protected function getList() {
+		if (isset($this->request->get['sort'])) {
+			$sort = $this->request->get['sort'];
+		} else {
+			$sort = 'b.module_id, b.date_added';
+		}
+
+		if (isset($this->request->get['order'])) {
+			$order = $this->request->get['order'];
+		} else {
+			$order = 'ASC';
+		}
+
+		if (isset($this->request->get['page'])) {
+			$page = $this->request->get['page'];
+		} else {
+			$page = 1;
+		}
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true)
+		);
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true)
+			);
+		} else {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+			);
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['return'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'], true);
+			$data['add'] = $this->url->link('extension/module/tdblog/add', 'user_token=' . $this->session->data['user_token'], true);
+			$data['delete'] = $this->url->link('extension/module/tdblog/delete', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		} else {
+			$data['return'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+			$data['add'] = $this->url->link('extension/module/tdblog/add', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+			$data['delete'] = $this->url->link('extension/module/tdblog/delete', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . $url, true);
+		}
+
+		$data['tdblogs'] = array();
+
+		$filter_data = array(
+			'sort'  => $sort,
+			'order' => $order,
+			'start' => ($page - 1) * $this->config->get('config_limit_admin'),
+			'limit' => $this->config->get('config_limit_admin')
+		);
+
+		$tdblog_total = $this->model_tdmodules_tdblog->getTotalBlogs();
+
+		$results = $this->model_tdmodules_tdblog->getBlogs($filter_data);
+
+		if (isset($this->request->get['module_id'])) {
+			$url .= '&module_id=' . $this->request->get['module_id'];
+		}
+
+		foreach ($results as $result) {
+			$module_info = $this->model_tdmodules_tdblog->getModule($result['module_id']);
+
+			if ($module_info) {
+				$module = $module_info['name'];
+			} else {
+				$module = $this->language->get('text_unallocated');
+			}
+
+			$total_comments = $this->model_tdmodules_tdblog->getTotalBlogComments($result['tdblog_id']);
+
+			$data['tdblogs'][] = array(
+				'tdblog_id'     => $result['tdblog_id'],
+				'title'          => $result['title'],
+				'module'         => $module,
+				'total_comments' => number_format($total_comments),
+				'status'         => ($result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled')),
+				'date_added'     => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
+				'comments'       => $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $result['tdblog_id'] . $url, true),
+				'edit'           => $this->url->link('extension/module/tdblog/edit', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $result['tdblog_id'], true)
+			);
+		}
+
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+
+		if (isset($this->session->data['success'])) {
+			$data['success'] = $this->session->data['success'];
+
+			unset($this->session->data['success']);
+		} else {
+			$data['success'] = '';
+		}
+
+		if (isset($this->request->post['selected'])) {
+			$data['selected'] = (array)$this->request->post['selected'];
+		} else {
+			$data['selected'] = array();
+		}
+
+		$url = '';
+
+		if ($order == 'ASC') {
+			$url .= '&order=DESC';
+		} else {
+			$url .= '&order=ASC';
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['sort_title'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&sort=bd.title' . $url, true);
+			$data['sort_module'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&sort=b.module_id' . $url, true);
+			$data['sort_date_added'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&sort=b.date_added' . $url, true);
+		} else {
+			$data['sort_title'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&sort=bd.title' . '&module_id=' . $this->request->get['module_id'] . $url, true);
+			$data['sort_module'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&sort=b.module_id' . '&module_id=' . $this->request->get['module_id'] . $url, true);
+			$data['sort_date_added'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&sort=b.date_added' . '&module_id=' . $this->request->get['module_id'] . $url, true);
+		}
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		$pagination = new Pagination();
+		$pagination->total = $tdblog_total;
+		$pagination->page = $page;
+		$pagination->limit = $this->config->get('config_limit_admin');
+
+		if (!isset($this->request->get['module_id'])) {
+			$pagination->url = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
+		} else {
+			$pagination->url = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . $url . '&page={page}', true);
+		}
+
+		$data['pagination'] = $pagination->render();
+
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($tdblog_total) ? (($page - 1) * $this->config->get('config_limit_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_limit_admin')) > ($tdblog_total - $this->config->get('config_limit_admin'))) ? $tdblog_total : ((($page - 1) * $this->config->get('config_limit_admin')) + $this->config->get('config_limit_admin')), $tdblog_total, ceil($tdblog_total / $this->config->get('config_limit_admin')));
+
+		$data['sort'] = $sort;
+		$data['order'] = $order;
+
+		$this->document->addStyle('view/stylesheet/admin-styles.css');
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdblog/list', $data));
+	}
+
+	public function comments() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		$this->getComments();
+	}
+
+	protected function getComments() {
+		if (!isset($this->request->get['tdblog_id'])) {
+			$this->response->redirect($this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true));
+		}
+
+		$blog_info = $this->model_tdmodules_tdblog->getBlog($this->request->get['tdblog_id']);
+
+		$blog_title = $this->model_tdmodules_tdblog->getBlogTitle($this->request->get['tdblog_id']);
+
+		if (isset($this->request->get['sort'])) {
+			$sort = $this->request->get['sort'];
+		} else {
+			$sort = 'date_added';
+		}
+
+		if (isset($this->request->get['order'])) {
+			$order = $this->request->get['order'];
+		} else {
+			$order = 'ASC';
+		}
+
+		if (isset($this->request->get['page'])) {
+			$page = $this->request->get['page'];
+		} else {
+			$page = 1;
+		}
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true)
+		);
+
+		if (!isset($this->request->get['module_id'])){
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $blog_title,
+				'href' => $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'], true)
+			);
+		} else {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $blog_title,
+				'href' => $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'], true)
+			);
+		}
+
+		if (!isset($this->request->get['module_id'])){
+			$data['return'] = $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true);
+			$data['delete'] = $this->url->link('extension/module/tdblog/delete_comment', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true);
+		} else {
+			$data['return'] = $this->url->link('extension/module/tdblog', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+			$data['delete'] = $this->url->link('extension/module/tdblog/delete_comment', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true);
+		}
+
+		$data['blog_comments'] = array();
+
+		$filter_data = array(
+			'sort'  => $sort,
+			'order' => $order,
+			'start' => ($page - 1) * $this->config->get('config_limit_admin'),
+			'limit' => $this->config->get('config_limit_admin')
+		);
+
+		$blog_comment_total = $this->model_tdmodules_tdblog->getTotalBlogComments($this->request->get['tdblog_id']);
+
+		$results = $this->model_tdmodules_tdblog->getBlogComments($this->request->get['tdblog_id'], $filter_data);
+
+		if (isset($this->request->get['module_id'])) {
+			$url .= '&module_id=' . $this->request->get['module_id'];
+		}
+
+		foreach ($results as $result) {
+			$data['blog_comments'][] = array(
+				'tdblog_comment_id' => $result['tdblog_comment_id'],
+				'author'             => $result['author'],
+				'email'              => $result['email'],
+				'approved'           => ($result['approved'] ? $this->language->get('text_approved') : $this->language->get('text_unapproved')),
+				'date_added'         => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
+				'is_approved'        => $result['approved'],
+				'approve'            => $this->url->link('extension/module/tdblog/approve_comment', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . '&tdblog_comment_id=' . $result['tdblog_comment_id'] . $url, true),
+				'disapprove'         => $this->url->link('extension/module/tdblog/disapprove_comment', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . '&tdblog_comment_id=' . $result['tdblog_comment_id'] . $url, true),
+				'view'               => $this->url->link('extension/module/tdblog/view_comment', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . '&tdblog_comment_id=' . $result['tdblog_comment_id'] . $url, true)
+			);
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['button_return'] = $this->language->get('button_list');
+		} else {
+			$data['button_return'] = $this->language->get('button_return');
+		}
+
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
+		} else {
+			$data['error_warning'] = '';
+		}
+
+		if (isset($this->session->data['success'])) {
+			$data['success'] = $this->session->data['success'];
+
+			unset($this->session->data['success']);
+		} else {
+			$data['success'] = '';
+		}
+
+		if (isset($this->request->post['selected'])) {
+			$data['selected'] = (array)$this->request->post['selected'];
+		} else {
+			$data['selected'] = array();
+		}
+
+		$url = '';
+
+		if ($order == 'ASC') {
+			$url .= '&order=DESC';
+		} else {
+			$url .= '&order=ASC';
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['sort_author'] = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&sort=author' . $url . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+			$data['sort_date_added'] = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&sort=date_added' . $url . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+		} else {
+			$data['sort_author'] = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&sort=author' . $url . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+			$data['sort_date_added'] = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&sort=date_added' . $url . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+		}
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		$pagination = new Pagination();
+		$pagination->total = $blog_comment_total;
+		$pagination->page = $page;
+		$pagination->limit = $this->config->get('config_limit_admin');
+
+		if (!isset($this->request->get['module_id'])) {
+			$pagination->url = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . $url . '&tdblog_id=' . $this->request->get['tdblog_id'] . '&page={page}', true);
+		} else {
+			$pagination->url = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . $url . '&tdblog_id=' . $this->request->get['tdblog_id'] . '&page={page}', true);
+		}
+
+		$data['pagination'] = $pagination->render();
+
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($blog_comment_total) ? (($page - 1) * $this->config->get('config_limit_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_limit_admin')) > ($blog_comment_total - $this->config->get('config_limit_admin'))) ? $blog_comment_total : ((($page - 1) * $this->config->get('config_limit_admin')) + $this->config->get('config_limit_admin')), $blog_comment_total, ceil($blog_comment_total / $this->config->get('config_limit_admin')));
+
+		$data['sort'] = $sort;
+		$data['order'] = $order;
+
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdblog/comments', $data));
+	}
+
+	public function approve_comment() {
+		$this->load->language('extension/module/tdblog');
+		$this->load->model('tdmodules/tdblog');
+
+		$this->model_tdmodules_tdblog->approveComment($this->request->get['tdblog_comment_id']);
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$this->response->redirect($this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true));
+		} else {
+			$this->response->redirect($this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true));
+		}
+	}
+
+	public function disapprove_comment() {
+		$this->load->language('extension/module/tdblog');
+		$this->load->model('tdmodules/tdblog');
+
+		$this->model_tdmodules_tdblog->disapproveComment($this->request->get['tdblog_comment_id']);
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$this->response->redirect($this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true));
+		} else {
+			$this->response->redirect($this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true));
+		}
+	}
+
+	public function delete_comment() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		if (isset($this->request->post['selected']) && $this->validateDelete()) {
+			foreach ($this->request->post['selected'] as $tdblog_comment_id) {
+				$this->model_tdmodules_tdblog->deleteBlogComment($tdblog_comment_id);
+			}
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$url = '';
+
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+
+			if (!isset($this->request->get['module_id'])) {
+				$this->response->redirect($this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true));
+			} else {
+				$this->response->redirect($this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true));
+			}
+		}
+
+		$this->getComments();
+	}
+
+	public function view_comment() {
+		$this->load->language('extension/module/tdblog');
+
+		$this->document->setTitle($this->language->get('page_title'));
+
+		$this->load->model('tdmodules/tdblog');
+
+		$this->viewComment();
+	}
+
+	protected function viewComment() {
+		if (!isset($this->request->get['tdblog_id'])) {
+			$this->response->redirect($this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true));
+		}
+
+		$blog_title = $this->model_tdmodules_tdblog->getBlogTitle($this->request->get['tdblog_id']);
+
+		$data['heading_title'] = $this->language->get('heading_title');
+
+		$data['text_author'] = $this->language->get('text_author');
+		$data['text_email'] = $this->language->get('text_email');
+		$data['text_date_added'] = $this->language->get('text_date_added');
+		$data['text_comment'] = $this->language->get('text_comment');
+
+		$data['button_back'] = $this->language->get('button_back');
+
+		$url = '';
+
+		if (isset($this->request->get['sort'])) {
+			$url .= '&sort=' . $this->request->get['sort'];
+		}
+
+		if (isset($this->request->get['order'])) {
+			$url .= '&order=' . $this->request->get['order'];
+		}
+
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&type=module', true)
+		);
+
+		if (!isset($this->request->get['module_id'])){
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $blog_title,
+				'href' => $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true)
+			);
+		} else {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/tdblog/view_list', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $blog_title,
+				'href' => $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'] . $url, true)
+			);
+		}
+
+		if (!isset($this->request->get['module_id'])){
+			$data['return'] = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+		} else {
+			$data['return'] = $this->url->link('extension/module/tdblog/comments', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&tdblog_id=' . $this->request->get['tdblog_id'], true);
+		}
+
+		$comment_info = $this->model_tdmodules_tdblog->getBlogComment($this->request->get['tdblog_comment_id']);
+
+		$comment_descriptions = $this->model_tdmodules_tdblog->getBlogCommentDescriptions($this->request->get['tdblog_comment_id']);
+
+		$data['author'] = $comment_info['author'];
+		$data['email'] = $comment_info['email'];
+		$data['date_added'] = date($this->language->get('date_format_short'), strtotime($comment_info['date_added']));
+		$data['comment_descriptions'] = $comment_descriptions;
+
+		$this->load->model('localisation/language');
+
+		$data['languages'] = $this->model_localisation_language->getLanguages();
+
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/tdblog/view_comment', $data));
+	}
+}

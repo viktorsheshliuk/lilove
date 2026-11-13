@@ -1,0 +1,53 @@
+<div class="attributes-values">
+    <div class="sp_attributes_values">
+        <div class="sp_attributes_values_header">
+            <span class="sp_attributes_values_header_title">{{ txt_value }}</span>
+            <button type="button" id="button-update-attribute-values" class="sppg_btn_update_color">{{ btn_update }}</button>
+        </div>
+    </div>
+    <div id="attributes-values-table" class="sp_attributes_values_list">
+        {% for attribute_value_key, attribute_value in attribute_values %}
+            <div class="sp_attributes_values_item {% if attribute_value.new %} new-attribute-value {% endif %}">
+                <div class="sp_attributes_values_item_name">
+                    <div class="row">
+                        {% for language in languages %}
+                            <div class="col-sm-6">
+                                <div class="sp_animated_input_group">
+                                    <input id="input_group_attribute_text" type="text" name="group_attribute_text[{{ attribute_value_key }}][description][{{ language.language_id }}][text]" placeholder="{{ language.name }}" value="{{ attribute_value.description[language.language_id]['text'] }}" class="profile-form-input">
+                                    <label for="input_group_attribute_text" class="label">{{ attribute_value.description[language.language_id]['base_name'] }}</label>
+                                    <span class="bar"></span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <input type="hidden" name="group_attribute_text[{{ attribute_value_key }}][attribute_value_key]" value="{{ attribute_value_key }}">
+                        <input type="hidden" name="group_attribute_text[{{ attribute_value_key }}][attribute_id]" value="{{ attribute_value.attribute_id }}">
+                    </div>
+                </div>
+                <div class="sp_attributes_values_item_color full {% if attribute_value.second_color %} two-colors {% endif %}">
+                    <div class="sp_attributes_values_item_color_first_color">
+                        <input type="text" class="spectrum" data-coloris name="group_attribute_text[{{ attribute_value_key }}][first_color]" value="{{ attribute_value.first_color }}">
+                    </div>
+                    <div class="sp_attributes_values_item_color_second_color">
+                        <input type="text" class="spectrum" data-coloris name="group_attribute_text[{{ attribute_value_key }}][second_color]" value="{{ attribute_value.second_color }}">
+                    </div>
+                    <div class="sp_attributes_values_item_color_btns">
+                        <button type="button" data-toggle="tooltip" title="{{ txt_btn_color_delete }}" onclick="" class="sp_attributes_values_item_color_btn product-group-color-remove"><svg><use xlink:href="#minus"></use></svg></button>
+                        <button type="button" data-toggle="tooltip" title="{{ txt_btn_color_add }}" onclick="" class="sp_attributes_values_item_color_btn product-group-color-add"><svg><use xlink:href="#plus"></use></svg></button>
+                    </div>
+                </div>
+                <div class="sp_attributes_values_item_action">
+                    <a data-toggle="tooltip" title="{{ txt_delete }}" class="sp_attributes_values_item_action_btn remove-attribute-value"><svg><use xlink:href="#trash"></use></svg></a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    $(".spectrum").spectrum({
+        preferredFormat: "rgb",
+        showInitial: true,
+        showInput: true,
+        showAlpha: true,
+        showPalette: false
+    });
+</script>

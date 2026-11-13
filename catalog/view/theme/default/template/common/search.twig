@@ -1,0 +1,18 @@
+<div id="search" class="input-group">
+    <div class="search_container">
+        <div class="search-top-flexbox">
+          <div id="logo-search">
+              {% if logo %}
+              <img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="" />
+              {% endif %}
+          </div>
+          <div class="search_wrapper">
+              <button type="button" class=""><img src="image/icons/header-search.png" alt="Search" title="Search"></button>
+              <input type="text" name="search" value="{{ search }}" placeholder="{{ text_search }}" class="" />
+              <img class="search_close" src="image/icons/search_close.png" alt="Close" title="Close">
+          </div>
+        </div>   
+        <div class="header__search-mobile-title">{{ text_search_matches }}</div>
+        <div class="product_matches"></div>
+    </div>
+</div>

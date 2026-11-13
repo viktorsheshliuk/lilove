@@ -1,0 +1,161 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+      <div class="container-fluid">
+        <div class="pull-right">
+          <button type="submit" form="form-banners" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+          <button onclick="$('#content form #saveandstay').attr('value', '1'); $('#' + $('#content form').attr('id')).submit();" data-toggle="tooltip" title="{{ button_savestay }}" class="btn btn-warning"><i class="fa fa-save"></i></button>
+          <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+        </div>
+        <h1>{{ heading_title }}</h1>
+        <ul class="breadcrumb">
+          {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default custom-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+        </div>
+        <div class="panel-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-banners" class="form-horizontal">
+
+            {# Module Name #}
+            <div class="form-group">
+              <label class="control-label" for="input-name">{{ entry_name }}</label>
+              <div class="control-group">
+                <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+                {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Module Status #}
+            <div class="form-group">
+              <label class="control-label" for="input-status">{{ entry_status }}</label>
+              <div class="control-group">
+                <div class="switch-field">
+                  <input type="radio" name="status" id="status_on" value="1" {% if status == 1 %} checked="checked" {% endif %}/>
+                  <label for="status_on">{{ text_enabled }}</label>
+                  <input type="radio" name="status" id="status_off" value="0" {% if status == 0 %} checked="checked" {% endif %}/>
+                  <label for="status_off">{{ text_disabled }}</label>
+                </div>
+              </div>
+            </div>
+
+            {# Display Type #}
+            <div class="form-group parent-form">
+              <label class="control-label" for="input-display_type">{{ entry_display_type }}</label>
+              <div class="control-group">
+                <div class="switch-field">
+                  <input type="radio" name="display_type" id="type_grid" value="0" {% if display_type == 0 %} checked="checked" {% endif %}/>
+                  <label for="type_grid">{{ entry_grid }}</label>
+                  <input type="radio" name="display_type" id="type_slider" value="1" {% if display_type == 1 %} checked="checked" {% endif %}/>
+                  <label for="type_slider">{{ entry_slider }}</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="tabs-container">
+              {% set item_row = 1 %}
+              {% for item in items %}
+                <div class="tab-container">
+                  <div class="tab-heading">Banner - {{ item_row }}<span class="delete_tab"><i class="fa fa-times"></i>{{ entry_deletetab }}</span></div>
+                  <div class="tab-content">
+                    <div id="add-type{{ item_row }}" class="">
+                      <div class="control-group addtypeimage">
+                        <a href="" id="thumb-image_{{ item_row }}" data-toggle="image" class="img-item img-thumbnail">
+                          <img style="max-width: 100px" src="{{ item.image|length > 3 ? (http_catalog_url ~ 'image/' ~ item.image) : no_image }}" alt="" title="" data-placeholder="{{ no_image }}" />
+                        </a>
+                        <input type="hidden" name="tdbanners_item[{{ item_row }}][image]" value="{{ item.image }}" id="input-image_{{ item_row }}" />
+                      </div>
+                      {% for language in languages %}
+                        <div class="addTypeInner">
+                          <div class="input-group">
+                            <span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                            <input class="form-control" type="text" name="tdbanners_item[{{ item_row }}][title][{{ language.language_id }}]" value="{{ item.title[language.language_id] }}" placeholder="Banner Title" />
+                          </div>
+                          <div class="input-group">
+                            <span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                            <input class="form-control" type="text" name="tdbanners_item[{{ item_row }}][subtitle][{{ language.language_id }}]" value="{{ item.subtitle[language.language_id] }}" placeholder="Banner Subtitle" />
+                          </div>
+                          <div class="input-group">
+                            <span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                            <input class="form-control" type="text" name="tdbanners_item[{{ item_row }}][addurl][{{ language.language_id }}]" value="{{ item.addurl[language.language_id] }}" placeholder="Banner Link URL" />
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+                {% set item_row = item_row + 1 %}
+              {% endfor %}
+            </div>
+            <button type="button" onclick="additem();" data-toggle="tooltip" title="{{ entry_addnewtab }}" class="btn btn-primary button-addnew"><i class="fa fa-plus-circle"></i> {{ entry_addnewtab }}</button>
+            <input type="hidden" name="saveandstay" id="saveandstay" value="0">
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+{{ footer }}
+<script type="text/javascript">
+  $(document).ready(function(){
+    afterAdd();
+  });
+  function afterAdd(){
+    $(document).on('click', '.tab-heading', function() {
+      $(this).parent().find('.tab-content').slideToggle('slow');
+      event.stopPropagation();
+    });
+    $('.delete_tab').click(function(){
+      $(this).parent().parent().remove();
+    });
+  }
+  /*Row item add*/
+  var item_row = "{{ item_row }}";
+  function additem() {
+    html  = '<div class="tab-container">';
+      html += '<div class="tab-heading">Banner - ' + item_row + '<span class="delete_tab"><i class="fa fa-times"></i>{{ entry_deletetab }}</span></div>';
+      html += '<div class="tab-content">';
+        html += '<div class="control-group addTypeInner">';
+          html += '<a href="" id="thumb-image_' + item_row + '" data-toggle="image" class="img-thumbnail">';
+            html += '<img style="max-width: 100px" src="{{ no_image }}" alt="" title="" data-placeholder="{{ no_image }}" />';
+          html += '</a>';
+          html += '<input type="hidden" name="tdbanners_item[' + item_row + '][image]" value="" id="input-image_' + item_row + '" />';
+        html += '</div>';
+        html += '<div id="add-type' + item_row + '" class="">';
+          {% for language in languages %}
+            html += '<div class="addTypeInner">';
+              html += '<div class="input-group">';
+                html += '<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>';
+                html += '<input type="text" name="tdbanners_item[' + item_row + '][title][{{ language.language_id }}]" value="" class="form-control" placeholder="Banner Title" />';
+              html += '</div>';
+              html += '<div class="input-group">';
+                html += '<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>';
+                html += '<input type="text" name="tdbanners_item[' + item_row + '][subtitle][{{ language.language_id }}]" value="" class="form-control" placeholder="Banner Subtitle" />';
+              html += '</div>';
+              html += '<div class="input-group">';
+                html += '<span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>';
+                html += '<input type="text" name="tdbanners_item[' + item_row + '][addurl][{{ language.language_id }}]" value="" class="form-control" placeholder="Banner Link Url" />';
+              html += '</div>';
+            html += '</div>';
+          {% endfor %}
+        html += '</div>';
+      html += '</div>';
+    html += '</div>';
+    $('.tabs-container').append(html);
+    item_row++;
+    afterAdd();
+    $('body').scrollTop(10000);
+  }
+</script>
