@@ -17,4 +17,4 @@ if (!defined('DIR_APPLICATION')) {
 require_once(DIR_SYSTEM . 'startup.php');
 
 start('catalog');
-// DEPLOY
+// DEPLOY 2
