@@ -76,6 +76,21 @@ class ModelCatalogProduct extends Model {
 			}
 		}
 
+		
+		if (isset($data['product_video'])) {
+			foreach ($data['product_video'] as $product_video) {
+				$video_url = isset($product_video['video_url']) ? trim($product_video['video_url']) : '';
+
+				if (!$video_url) {
+					continue;
+				}
+
+				$video_type = $this->getProductVideoType($video_url);
+
+				$this->db->query("INSERT INTO " . DB_PREFIX . "product_video SET product_id = '" . (int)$product_id . "', video_type = '" . $this->db->escape($video_type) . "', video_url = '" . $this->db->escape($video_url) . "', preview = '" . $this->db->escape(isset($product_video['preview']) ? $product_video['preview'] : '') . "', sort_order = '" . (isset($product_video['sort_order']) ? (int)$product_video['sort_order'] : 0) . "', date_added = NOW()");
+			}
+		}
+
 		if (isset($data['product_download'])) {
 			foreach ($data['product_download'] as $download_id) {
 				$this->db->query("INSERT INTO " . DB_PREFIX . "product_to_download SET product_id = '" . (int)$product_id . "', download_id = '" . (int)$download_id . "'");
@@ -223,6 +238,23 @@ class ModelCatalogProduct extends Model {
 			}
 		}
 
+		
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_video WHERE product_id = '" . (int)$product_id . "'");
+
+		if (isset($data['product_video'])) {
+			foreach ($data['product_video'] as $product_video) {
+				$video_url = isset($product_video['video_url']) ? trim($product_video['video_url']) : '';
+
+				if (!$video_url) {
+					continue;
+				}
+
+				$video_type = $this->getProductVideoType($video_url);
+
+				$this->db->query("INSERT INTO " . DB_PREFIX . "product_video SET product_id = '" . (int)$product_id . "', video_type = '" . $this->db->escape($video_type) . "', video_url = '" . $this->db->escape($video_url) . "', preview = '" . $this->db->escape(isset($product_video['preview']) ? $product_video['preview'] : '') . "', sort_order = '" . (isset($product_video['sort_order']) ? (int)$product_video['sort_order'] : 0) . "', date_added = NOW()");
+			}
+		}
+
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download WHERE product_id = '" . (int)$product_id . "'");
 
 		if (isset($data['product_download'])) {
@@ -310,6 +342,7 @@ class ModelCatalogProduct extends Model {
 			$data['product_discount'] = $this->getProductDiscounts($product_id);
 			$data['product_filter'] = $this->getProductFilters($product_id);
 			$data['product_image'] = $this->getProductImages($product_id);
+			$data['product_video'] = $this->getProductVideos($product_id);
 			$data['product_option'] = $this->getProductOptions($product_id);
 			$data['product_related'] = $this->getProductRelated($product_id);
 			$data['product_reward'] = $this->getProductRewards($product_id);
@@ -331,6 +364,7 @@ class ModelCatalogProduct extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_filter WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_video WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE product_id = '" . (int)$product_id . "'");
@@ -540,6 +574,27 @@ class ModelCatalogProduct extends Model {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "' ORDER BY sort_order ASC");
 
 		return $query->rows;
+	}
+
+	
+	public function getProductVideos($product_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_video WHERE product_id = '" . (int)$product_id . "' ORDER BY sort_order ASC, product_video_id ASC");
+
+		return $query->rows;
+	}
+
+	/**
+	 * Тип видео по расширению ссылки: mp4 или mov (по умолчанию mp4).
+	 */
+	protected function getProductVideoType($video_url) {
+		$video_path = preg_replace('/[?#].*$/', '', (string)$video_url);
+		$video_type = utf8_strtolower(utf8_substr(strrchr($video_path, '.'), 1));
+
+		if (!in_array($video_type, array('mp4', 'mov'))) {
+			$video_type = 'mp4';
+		}
+
+		return $video_type;
 	}
 
 	public function getProductDiscounts($product_id) {

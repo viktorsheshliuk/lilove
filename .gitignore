@@ -41,3 +41,6 @@ system/storage/upload/*
 !/storage/upload/index.html
 
 catalog/view/theme/*/stylesheet/ocfilter/ocf.cache.*
+
+/LOCAL
+.clinerules

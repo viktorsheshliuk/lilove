@@ -274,15 +274,112 @@ class ControllerProductProduct extends Controller {
 			}
 
 			$data['images'] = array();
+			$data['media'] = array();
 
 			$results = $this->model_catalog_product->getProductImages($this->request->get['product_id']);
 
+			$media_position = 0;
+
 			foreach ($results as $result) {
-				$data['images'][] = array(
+				$image = array(
 					'popup' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height')),
 					'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height'))
 				);
+
+				$data['images'][] = $image;
+
+				$data['media'][] = $image + array(
+					'type' => 'image',
+					'sort_order' => isset($result['sort_order']) ? (int)$result['sort_order'] : 0,
+					'position' => $media_position++
+				);
 			}
+
+			$data['videos'] = array();
+
+			$video_results = $this->model_catalog_product->getProductVideos($this->request->get['product_id']);
+
+			$server = (isset($this->request->server['HTTPS']) && ($this->request->server['HTTPS'] == 'on' || $this->request->server['HTTPS'] == '1')) ? HTTPS_SERVER : HTTP_SERVER;
+
+			$popup_width = $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width');
+			$popup_height = $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height');
+			$additional_width = $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width');
+			$additional_height = $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height');
+
+			foreach ($video_results as $result) {
+				$video_url = trim($result['video_url']);
+
+				if ($video_url === '') {
+					continue;
+				}
+
+				if (preg_match('~^(?:https?:)?//~i', $video_url)) {
+					$src = $video_url;
+				} else {
+					$video_path = ltrim($video_url, '/');
+
+					if (strpos($video_path, 'image/') === 0) {
+						$video_path = substr($video_path, 6);
+					}
+
+					$src = $server . 'image/' . $video_path;
+				}
+
+				$preview = !empty($result['preview']) ? trim($result['preview']) : '';
+				$fallback_image = !empty($product_info['image']) ? $product_info['image'] : 'placeholder.png';
+
+				$poster = '';
+				$poster_thumb = '';
+
+				if ($preview && preg_match('~^(?:https?:)?//~i', $preview)) {
+					$poster = $preview;
+					$poster_thumb = $preview;
+				} elseif ($preview) {
+					$preview_path = ltrim($preview, '/');
+
+					if (strpos($preview_path, 'image/') === 0) {
+						$preview_path = substr($preview_path, 6);
+					}
+
+					if (is_file(DIR_IMAGE . $preview_path)) {
+						$poster = $this->model_tool_image->resize($preview_path, $popup_width, $popup_height);
+						$poster_thumb = $this->model_tool_image->resize($preview_path, $additional_width, $additional_height);
+					}
+				}
+
+				if (!$poster) {
+					$poster = $this->model_tool_image->resize($fallback_image, $popup_width, $popup_height);
+					$poster_thumb = $this->model_tool_image->resize($fallback_image, $additional_width, $additional_height);
+				}
+
+				$video_path_info = parse_url($src, PHP_URL_PATH);
+				$extension = $video_path_info ? strtolower(pathinfo($video_path_info, PATHINFO_EXTENSION)) : '';
+				$mime = ($extension == 'mov') ? 'video/quicktime' : 'video/mp4';
+
+				$video = array(
+					'src' => $src,
+					'poster' => $poster,
+					'poster_thumb' => $poster_thumb,
+					'mime' => $mime,
+					'title' => $product_info['name']
+				);
+
+				$data['videos'][] = $video;
+
+				$data['media'][] = $video + array(
+					'type' => 'video',
+					'sort_order' => isset($result['sort_order']) ? (int)$result['sort_order'] : 0,
+					'position' => $media_position++
+				);
+			}
+
+			usort($data['media'], function($a, $b) {
+				if ($a['sort_order'] == $b['sort_order']) {
+					return $a['position'] - $b['position'];
+				}
+
+				return ($a['sort_order'] < $b['sort_order']) ? -1 : 1;
+			});
 
 			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 				$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);

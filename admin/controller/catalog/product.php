@@ -2,6 +2,13 @@
 class ControllerCatalogProduct extends Controller {
 	private $error = array();
 
+	// Максимальный размер загружаемого видео (50 МБ)
+	const PRODUCT_VIDEO_MAX_SIZE = 50971520;
+
+	// Разрешённые расширения видео
+	const PRODUCT_VIDEO_EXTENSIONS = array('mp4');
+
+
 	public function index() {
 		$this->load->language('catalog/product');
 
@@ -519,6 +526,12 @@ class ControllerCatalogProduct extends Controller {
 			$data['error_keyword'] = $this->error['keyword'];
 		} else {
 			$data['error_keyword'] = '';
+		}
+
+		if (isset($this->error['video'])) {
+			$data['error_video'] = $this->error['video'];
+		} else {
+			$data['error_video'] = array();
 		}
 
 		$url = '';
@@ -1091,6 +1104,44 @@ class ControllerCatalogProduct extends Controller {
 			);
 		}
 
+		// Videos (mp4)
+		if (isset($this->request->post['product_video'])) {
+			$product_videos = $this->request->post['product_video'];
+		} elseif (isset($this->request->get['product_id'])) {
+			$product_videos = $this->model_catalog_product->getProductVideos($this->request->get['product_id']);
+		} else {
+			$product_videos = array();
+		}
+
+		$data['product_videos'] = array();
+
+		foreach ($product_videos as $product_video) {
+			$video_url = isset($product_video['video_url']) ? trim($product_video['video_url']) : '';
+			$preview = isset($product_video['preview']) ? $product_video['preview'] : '';
+
+			if (!$video_url) {
+				continue;
+			}
+
+			if ($preview && is_file(DIR_IMAGE . $preview)) {
+				$thumb = $this->model_tool_image->resize($preview, 100, 100);
+			} else {
+				$preview = '';
+				$thumb = $this->model_tool_image->resize('no_image.png', 100, 100);
+			}
+
+			$data['product_videos'][] = array(
+				'video_url'  => $video_url,
+				'preview'    => $preview,
+				'thumb'      => $thumb,
+				'sort_order' => isset($product_video['sort_order']) ? (int)$product_video['sort_order'] : 0
+			);
+		}
+
+		$data['product_video_max_size'] = self::PRODUCT_VIDEO_MAX_SIZE;
+
+		$data['help_media_sort'] = $this->language->get('help_media_sort');
+
 		// Downloads
 		$this->load->model('catalog/download');
 
@@ -1222,6 +1273,32 @@ class ControllerCatalogProduct extends Controller {
 			}
 		}
 
+		// Videos (mp4/mov): каждая заполненная строка должна содержать корректный файл
+		if (isset($this->request->post['product_video'])) {
+			foreach ($this->request->post['product_video'] as $video_row => $product_video) {
+				$video_url = isset($product_video['video_url']) ? trim($product_video['video_url']) : '';
+
+				if (!$video_url) {
+					continue;
+				}
+
+				$video_path = preg_replace('/[?#].*$/', '', $video_url);
+
+				if (!preg_match('/\.(mp4|mov)$/i', $video_path)) {
+					$this->error['video'][$video_row] = $this->language->get('error_video_file');
+				} elseif (!preg_match('~^https?://~i', $video_url) && !is_file(DIR_IMAGE . $video_url)) {
+					$this->error['video'][$video_row] = $this->language->get('error_video_file');
+				} elseif (!preg_match('~^https?://~i', $video_url)) {
+					// Кодек и faststart проверяем по байтам файла: HEVC и moov в конце браузеры не воспроизводят
+					$video_error = $this->validateVideoFile(DIR_IMAGE . $video_url);
+
+					if ($video_error) {
+						$this->error['video'][$video_row] = $this->language->get($video_error);
+					}
+				}
+			}
+		}
+
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
@@ -1329,4 +1406,244 @@ class ControllerCatalogProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+	/**
+	 * AJAX-загрузка mp4/mov в image/catalog/video/ (лимит 20 МБ)
+	 */
+	public function uploadVideo() {
+		$this->load->language('catalog/product');
+
+		$json = array();
+
+		if (!$this->user->hasPermission('modify', 'catalog/product')) {
+			$json['error'] = $this->language->get('error_permission');
+		}
+
+		if (!$json) {
+			if (isset($this->request->files['file'])) {
+				$file = $this->request->files['file'];
+			} else {
+				$file = array('name' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0);
+			}
+
+			if (empty($file['name']) || !is_file($file['tmp_name'])) {
+				$json['error'] = $this->language->get('error_upload_video');
+			} elseif (($file['error'] == UPLOAD_ERR_INI_SIZE) || ($file['error'] == UPLOAD_ERR_FORM_SIZE) || ($file['size'] > self::PRODUCT_VIDEO_MAX_SIZE)) {
+				$json['error'] = sprintf($this->language->get('error_video_size'), round(self::PRODUCT_VIDEO_MAX_SIZE / 1048576));
+			} elseif (($file['error'] != UPLOAD_ERR_OK) || !is_uploaded_file($file['tmp_name'])) {
+				$json['error'] = $this->language->get('error_upload_video');
+			}
+		}
+
+		if (!$json) {
+			$filename = basename(html_entity_decode($file['name'], ENT_QUOTES, 'UTF-8'));
+			$extension = utf8_strtolower(utf8_substr(strrchr($filename, '.'), 1));
+
+			if (!in_array($extension, self::PRODUCT_VIDEO_EXTENSIONS)) {
+				$json['error'] = $this->language->get('error_video_file');
+			}
+		}
+
+		if (!$json) {
+			$mime = '';
+
+			if (function_exists('finfo_open')) {
+				$finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+				if ($finfo) {
+					$mime = finfo_file($finfo, $file['tmp_name']);
+
+					finfo_close($finfo);
+				}
+			}
+
+			if ($mime && !in_array($mime, array('video/mp4', 'video/quicktime', 'application/octet-stream'))) {
+				$json['error'] = $this->language->get('error_video_file');
+			}
+		}
+
+		
+		// Кодек и расположение метаданных: HEVC (hvc1/hev1) и moov в конце файла браузеры не воспроизводят
+		if (!$json) {
+			$video_error = $this->validateVideoFile($file['tmp_name']);
+
+			if ($video_error) {
+				$json['error'] = $this->language->get($video_error);
+			}
+		}
+
+		if (!$json) {
+			$directory = DIR_IMAGE . 'catalog/video/';
+
+			if (!is_dir($directory)) {
+				@mkdir($directory, 0755, true);
+			}
+
+			if (!is_dir($directory) || !is_writable($directory)) {
+				$json['error'] = $this->language->get('error_upload_video');
+			}
+		}
+
+		if (!$json) {
+			// Контейнер MOV с H.264 храним как .mp4: браузеры надёжнее отдают его с корректным MIME
+			if ($extension == 'mov') {
+				$extension = 'mp4';
+			}
+			$new_filename = token(16) . '.' . $extension;
+
+			if (move_uploaded_file($file['tmp_name'], $directory . $new_filename)) {
+				$json['success'] = $this->language->get('text_video_uploaded');
+				$json['video_url'] = 'catalog/video/' . $new_filename;
+			} else {
+				$json['error'] = $this->language->get('error_upload_video');
+			}
+		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
+
+		
+	/**
+	 * Информация о контейнере и кодеке видео по байтам файла (без ffmpeg).
+	 *
+	 * Разбираются box'ы верхнего уровня ISO BMFF: 'ftyp' (бренд контейнера),
+	 * 'moov' (метаданные) и 'mdat' (данные) — порядок moov/mdat показывает faststart,
+	 * а fourcc видеодорожки внутри moov показывает кодек (avc1/avc3 — H.264, hvc1/hev1 — HEVC).
+	 *
+	 * @param  string $path Абсолютный путь к файлу
+	 * @return array  array('codec' => ..., 'faststart' => bool, 'brand' => ...)
+	 */
+	private function getVideoInfo($path) {
+		$info = array(
+			'brand'      => '',
+			'codec'      => 'unknown',
+			'faststart'  => false,
+			'readable'   => false
+		);
+
+		$size = @filesize($path);
+
+		if (!$size) {
+			return $info;
+		}
+
+		$handle = @fopen($path, 'rb');
+
+		if (!$handle) {
+			return $info;
+		}
+
+		$info['readable'] = true;
+
+		// 1. Бренд контейнера: size (4) + 'ftyp' (4) + major_brand (4)
+		$head = fread($handle, 16);
+
+		if (strlen($head) >= 12 && substr($head, 4, 4) == 'ftyp') {
+			$info['brand'] = substr($head, 8, 4);
+		}
+
+		// 2. Порядок box'ов верхнего уровня: moov до mdat — метаданные доступны сразу (faststart)
+		fseek($handle, 0);
+
+		$moov_offset = -1;
+		$mdat_offset = -1;
+		$offset = 0;
+
+		while ($offset + 8 <= $size) {
+			fseek($handle, $offset);
+
+			$header = fread($handle, 16);
+
+			if (strlen($header) < 8) {
+				break;
+			}
+
+			$box_size = unpack('Nsize', substr($header, 0, 4));
+			$box_size = $box_size['size'];
+
+			$box_type = substr($header, 4, 4);
+
+			if ($box_size == 1) {
+				// 64-битный размер: largesize идёт сразу после типа
+				if (strlen($header) < 16) {
+					break;
+				}
+
+				$large = unpack('Nhi/Nlo', substr($header, 8, 8));
+				$box_size = $large['hi'] * 4294967296 + $large['lo'];
+			} elseif ($box_size == 0) {
+				// Размер до конца файла
+				$box_size = $size - $offset;
+			}
+
+			if ($box_size < 8) {
+				break;
+			}
+
+			if (($box_type == 'moov') && ($moov_offset < 0)) {
+				$moov_offset = $offset;
+			}
+
+			if (($box_type == 'mdat') && ($mdat_offset < 0)) {
+				$mdat_offset = $offset;
+			}
+
+			$offset += $box_size;
+		}
+
+		if (($moov_offset >= 0) && (($mdat_offset < 0) || ($moov_offset < $mdat_offset))) {
+			$info['faststart'] = true;
+		}
+
+		// 3. Кодек видеодорожки: fourcc в stsd внутри moov (stsd расположен в начале moov)
+		if ($moov_offset >= 0) {
+			fseek($handle, $moov_offset);
+
+			$moov = fread($handle, min($size - $moov_offset, 1048576));
+
+			$codecs = array('avc1', 'avc3', 'hvc1', 'hev1', 'av01', 'vp09');
+
+			foreach ($codecs as $codec) {
+				if (strpos($moov, $codec) !== false) {
+					$info['codec'] = $codec;
+
+					break;
+				}
+			}
+		}
+
+		fclose($handle);
+
+		return $info;
+	}
+
+	/**
+	 * Проверка пригодности видео для веб-плеера: H.264 + метаданные в начале файла.
+	 *
+	 * @param  string $path Абсолютный путь к файлу
+	 * @return string|false Ключ ошибки или false
+	 */
+	private function validateVideoFile($path) {
+		$info = $this->getVideoInfo($path);
+
+		if (!$info['readable']) {
+			return 'error_video_container';
+		}
+
+		if ($info['codec'] == 'unknown') {
+			return 'error_video_container';
+		}
+
+		if (($info['codec'] != 'avc1') && ($info['codec'] != 'avc3')) {
+			return 'error_video_codec';
+		}
+
+		if (!$info['faststart']) {
+			return 'error_video_faststart';
+		}
+
+		return false;
+	}
+
 }

@@ -22,8 +22,8 @@
       <div class="product__flex-container">
         <div class="left-box">
           <div class="product__images">
-          {% if thumb or images %}
-            {% if images %}
+          {% if thumb or images or videos %}
+            {% if images or videos %}
               <div class="product__previews">
                 <div class="button-prev"></div>
                 <div class="button-next"></div>
@@ -31,8 +31,21 @@
                   <div id="" class="slideshow_images swiper-container">
            
                     <div class="swiper-wrapper"> 
-                              {% for image in images %}
-                                <a class="swiper-slide" data-fancybox="gallery" href="{{ image.popup }}" title="{{ heading_title }}"> <img src="{{ image.thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" /></a>
+                              {% for media in media %}
+                                {% if media.type == 'video' %}
+                                  <div class="swiper-slide product__video-slide">
+                                    <a class="product__video-link" data-fancybox="gallery" data-gallery-order="{{ media.sort_order }}" data-gallery-position="{{ loop.index }}" data-type="html5video" href="{{ media.src|e }}" data-src="{{ media.src|e }}" data-poster="{{ media.poster|e }}" data-video-format="{{ media.mime|e }}" data-thumb-src="{{ media.poster_thumb|e }}" title="{{ media.title|e }}">
+                                      <video class="product__video" muted loop playsinline webkit-playsinline preload="none" poster="{{ media.poster|e }}" data-src="{{ media.src|e }}" data-mime="{{ media.mime|e }}"></video>
+                                      <span class="product__video-play" aria-hidden="true"></span>
+                                    </a>
+                                    <div class="product__video-error" hidden>
+                                      <span class="product__video-error-text">{{ text_video_error|e }}</span>
+                                      <a class="product__video-fallback" href="{{ media.src|e }}" target="_blank" rel="noopener">{{ text_video_fallback|e }}</a>
+                                    </div>
+                                  </div>
+                                {% else %}
+                                  <a class="swiper-slide" data-fancybox="gallery" data-gallery-order="{{ media.sort_order }}" data-gallery-position="{{ loop.index }}" href="{{ media.popup }}" title="{{ heading_title }}"> <img src="{{ media.thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" /></a>
+                                {% endif %}
                               {% endfor %}
                      </div>
           
@@ -48,7 +61,7 @@
               {% endif %}
             {% if thumb %}
               <div class="product__image">
-                <a class="" data-fancybox="gallery" href="{{ popup }}" title="{{ heading_title }}"><img src="{{ thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" class="img-responsive" /></a>
+                <a class="" data-fancybox="gallery" data-gallery-main="1" data-gallery-order="0" data-gallery-position="0" href="{{ popup }}" title="{{ heading_title }}"><img src="{{ thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" class="img-responsive" /></a>
               </div>
             {% endif %}  
           {% endif %} 
@@ -953,10 +966,170 @@ document.getElementById('copy_button2').addEventListener('click', function() {
 // 			enabled: true
 // 		}
 // 	});
-  Fancybox.bind('[data-fancybox="gallery"]', {
-  // Your custom options for a specific gallery
+  Fancybox.defaults.Hash = false;
+
+  var galleryOptions = {
+    Hash: false,
     Thumbs: {
       type: "classic",
+    },
+    Html: {
+      videoAutoplay: true
+    },
+    on: {
+      "done": function(fancybox, slide) {
+        var video = slide && slide.el ? slide.el.querySelector('video') : null;
+
+        if (video) {
+          video.loop = true;
+        }
+      }
+    }
+  };
+
+  var galleryItems = Array.prototype.slice.call(document.querySelectorAll('[data-fancybox="gallery"]'));
+
+  galleryItems.sort(function(a, b) {
+    var aMain = a.getAttribute('data-gallery-main') === '1' ? 1 : 0;
+    var bMain = b.getAttribute('data-gallery-main') === '1' ? 1 : 0;
+
+    if (aMain !== bMain) {
+      return bMain - aMain;
+    }
+
+    var aOrder = parseInt(a.getAttribute('data-gallery-order'), 10) || 0;
+    var bOrder = parseInt(b.getAttribute('data-gallery-order'), 10) || 0;
+
+    if (aOrder !== bOrder) {
+      return aOrder - bOrder;
+    }
+
+    var aPosition = parseInt(a.getAttribute('data-gallery-position'), 10) || 0;
+    var bPosition = parseInt(b.getAttribute('data-gallery-position'), 10) || 0;
+
+    return aPosition - bPosition;
+  });
+
+  galleryItems.forEach(function(item) {
+    item.addEventListener('click', function(event) {
+      event.preventDefault();
+
+      Fancybox.fromNodes(galleryItems, Object.assign({}, galleryOptions, {
+        startIndex: galleryItems.indexOf(item)
+      }));
+    });
+  });
+
+  var productVideos = document.querySelectorAll('.product__video-slide video[data-src]');
+
+  function loadProductVideo(video) {
+    if (video.getAttribute('data-loaded') === '1') {
+      return;
+    }
+
+    video.setAttribute('data-loaded', '1');
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.src = video.getAttribute('data-src');
+    video.load();
+  }
+
+  function playProductVideo(video) {
+    var slide = video.closest('.product__video-slide');
+
+    if (slide && slide.classList.contains('is-error')) {
+      return;
+    }
+
+    loadProductVideo(video);
+
+    var promise = video.play();
+
+    if (promise && typeof promise.catch === 'function') {
+      promise.catch(function() {});
+    }
+  }
+
+  function pauseProductVideo(video) {
+    if (!video.paused) {
+      video.pause();
+    }
+  }
+
+  Array.prototype.forEach.call(productVideos, function(video) {
+    var slide = video.closest('.product__video-slide');
+    var errorBox = slide ? slide.querySelector('.product__video-error') : null;
+
+    video.addEventListener('playing', function() {
+      if (slide) {
+        slide.classList.add('is-playing');
+      }
+    });
+
+    video.addEventListener('pause', function() {
+      if (slide) {
+        slide.classList.remove('is-playing');
+      }
+    });
+
+    video.addEventListener('error', function() {
+      if (slide) {
+        slide.classList.add('is-error');
+        slide.classList.remove('is-playing');
+      }
+
+      if (errorBox) {
+        errorBox.hidden = false;
+      }
+    });
+  });
+
+  if ('IntersectionObserver' in window && productVideos.length) {
+    var productVideoObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var video = entry.target.querySelector('video[data-src]');
+
+        if (!video) {
+          return;
+        }
+
+        if (entry.isIntersecting) {
+          playProductVideo(video);
+        } else {
+          pauseProductVideo(video);
+        }
+      });
+    }, {
+      threshold: 0.5
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.product__video-slide'), function(slide) {
+      productVideoObserver.observe(slide);
+    });
+  } else {
+    Array.prototype.forEach.call(productVideos, function(video) {
+      playProductVideo(video);
+    });
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      Array.prototype.forEach.call(productVideos, pauseProductVideo);
+    } else {
+      Array.prototype.forEach.call(productVideos, function(video) {
+        var slide = video.closest('.product__video-slide');
+
+        if (!slide) {
+          return;
+        }
+
+        var rect = slide.getBoundingClientRect();
+
+        if (rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth) {
+          playProductVideo(video);
+        }
+      });
     }
   });
 
