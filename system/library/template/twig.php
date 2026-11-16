@@ -27,6 +27,11 @@ final class Twig {
 		}
 
 		$this->twig = new \Twig_Environment($loader, $config);
+
+		// Add the filemtime function to the Twig environment  - добавлено
+        $this->twig->addFunction(new \Twig_SimpleFunction('filemtime', function ($file) {
+            return filemtime($file);
+        }));
 		
 		try {
 			// load template

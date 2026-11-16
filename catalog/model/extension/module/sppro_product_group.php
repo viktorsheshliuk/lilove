@@ -221,8 +221,9 @@ class ModelExtensionModuleSpproProductGroup extends Model {
         }
         $query = $this->db->query($sql);
         foreach ($query->rows as $row) {
-            $product_attributes[$row['product_id']][$row['attribute_id']] = $row['text'];
-        }
+            //$product_attributes[$row['product_id']][$row['attribute_id']] = $row['text'];
+            $product_attributes[$row['product_id']][$row['attribute_id']] = trim($row['text']);
+            }
         return $product_attributes;
     }
 
