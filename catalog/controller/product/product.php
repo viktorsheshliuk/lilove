@@ -9,7 +9,7 @@ class ControllerProductProduct extends Controller {
 		$this->document->addScript('catalog/view/javascript/jquery/swiper/js/swiper.jquery.js');
 		//$this->document->addStyle('catalog/view/javascript/jquery/swiper/css/opencart.css');
 		$this->document->addStyle('catalog/view/javascript/fancybox/fancybox.css');
-		$this->document->addScript('catalog/view/javascript/fancybox/fancybox.umd.js');
+		$this->document->addScript('catalog/view/javascript/fancybox/fancybox.umd.js?v=' . filemtime(DIR_APPLICATION . 'view/javascript/fancybox/fancybox.umd.js'));
 		
 
 		$data['breadcrumbs'] = array();
