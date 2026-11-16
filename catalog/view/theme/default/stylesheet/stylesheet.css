@@ -1693,6 +1693,8 @@ header .container:before, header .container:after{
 }
 .fancybox__html5video {
 	object-fit: contain;
+	/* Fancybox не начинает свайп, если цель события — VIDEO; пропускаем жест к карусели */
+	pointer-events: none;
 }
 @media (max-width: 991px) {
 	.fancybox__container .has-html5video .fancybox__content {
@@ -3616,6 +3618,12 @@ h2.price {
 	}
 }
 @media (min-width: 1201px) {
+	/* Колонка превью = ширина доп. изображения (theme_default_image_additional_width = 99px).
+	   Без фиксированной ширины колонка схлопывается в 0, если в превью только видео-слайд:
+	   у .product__video-link нет содержимого в потоке (video и иконка спозиционированы absolute). */
+	#product-product .product__previews {
+		flex: 0 0 99px;
+	}
 	#product-product .product__previews .button-prev.swiper-button-disabled, 
     #product-product .product__previews .button-next.swiper-button-disabled,
     #product-product .product__previews .swiper-button-prev,

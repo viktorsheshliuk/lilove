@@ -982,6 +982,8 @@ document.getElementById('copy_button2').addEventListener('click', function() {
 
         if (video) {
           video.loop = true;
+          video.removeAttribute('controls');
+          video.controls = false;
         }
       }
     }
